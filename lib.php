@@ -143,7 +143,7 @@ class enrol_autoenrol_plugin extends enrol_plugin
         }
 
         if (!$instance->customint8) {
-            $context = get_context_instance(CONTEXT_COURSE, $instance->courseid);
+            $context = context_course::instance($instance->courseid);
             if (has_capability('moodle/course:view', $context) || is_enrolled($context)) {
                 //no need to enrol someone who is already enrolled
                 return FALSE;
@@ -300,7 +300,7 @@ class enrol_autoenrol_plugin extends enrol_plugin
             $this->enrol_user($instance, $USER->id, $instance->customint3, time(), 0);
             $this->do_group($instance);
         }
-        $context = get_context_instance(CONTEXT_COURSE, $instance->courseid);
+        $context = context_course::instance($instance->courseid);
         if (has_capability('enrol/autoenrol:config', $context)) {
             $managelink = new moodle_url('/enrol/autoenrol/edit.php', array('courseid' => $instance->courseid, 'id' => $instance->id));
             $instancesnode->add($this->get_instance_name($instance), $managelink, navigation_node::TYPE_SETTING);
@@ -335,7 +335,7 @@ class enrol_autoenrol_plugin extends enrol_plugin
         if ($instance->enrol !== 'autoenrol') {
             throw new coding_exception('invalid enrol instance!');
         }
-        $context = get_context_instance(CONTEXT_COURSE, $instance->courseid);
+        $context = context_course::instance($instance->courseid);
         $icons = array();
 
         if (has_capability('enrol/autoenrol:config', $context)) {
@@ -390,7 +390,7 @@ class enrol_autoenrol_plugin extends enrol_plugin
     {
         global $DB;
 
-        $context = get_context_instance(CONTEXT_COURSE, $courseid, MUST_EXIST);
+        $context = context_course::instance($courseid);
 
         if (!has_capability('moodle/course:enrolconfig', $context) or !has_capability('enrol/autoenrol:config', $context)) {
             return NULL;
