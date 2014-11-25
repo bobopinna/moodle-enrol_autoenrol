@@ -22,14 +22,14 @@
  * @package    enrol
  * @subpackage autoenrol
  * @author     Mark Ward & Matthew Cannings - based on code by Martin Dougiamas, Petr Skoda, Eugene Venter and others
- * @date       September 2012
+ * @date       July 2013
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2013050800;
+$plugin->version  = 2013070100;
 $plugin->requires = 2010112400;   // Requires this Moodle version
-$plugin->release = '1.1'; //plugin release
+$plugin->release = '1.2'; //plugin release
 $plugin->component = 'enrol_autoenrol';    // Full name of the plugin (used for diagnostics)
-$plugin->maturity   = MATURITY_STABLE;	
+$plugin->maturity   = MATURITY_STABLE;    //moodle.org release

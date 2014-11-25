@@ -22,7 +22,7 @@
  * @package    enrol
  * @subpackage autoenrol
  * @author     Mark Ward & Matthew Cannings - based on code by Martin Dougiamas, Petr Skoda, Eugene Venter and others
- * @date       October 2011
+ * @date       July 2013
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -30,6 +30,8 @@ $string['pluginname'] = 'Auto Enrol ';
 $string['pluginname_desc'] = 'The automatic enrolment module allows an option for logged in users to be automatically granted entry to a course and enrolled. This is similar to allowing guest access but the students will be permanently enrolled and therefore able to participate in forum and activities within the area.';
 
 $string['config'] = 'Configuration';
+$string['general'] = 'General';
+$string['filtering'] = 'User Filtering';
 
 $string['warning'] = 'Caution!';
 $string['warning_message'] = 'Adding this plugin to your course will allow any registered Moodle users access to your course. Only install this plugin if you want to allow open access to your course for users who have logged in.';
@@ -46,9 +48,22 @@ $string['groupon'] = 'Group By';
 $string['g_none'] = 'Select...';
 $string['g_auth'] = 'Auth Method';
 $string['g_dept'] = 'Department';
+$string['g_email'] = 'Email Address';
 $string['g_inst'] = 'Institution';
 $string['g_lang'] = 'Language';
-$string['groupon_help'] = 'Auto Enrol can automatically add users to a group when they are enrolled based upon one of these user fields.';
+$string['groupon_help'] = 'AutoEnrol can automatically add users to a group when they are enrolled based upon one of these user fields.';
+
+$string['countlimit'] = 'Limit';
+$string['countlimit_help'] = 'This instance will count the number of enrolments it makes on a course and can stop enrolling users once it reaches a certain level. The default setting of 0 means unlimited.';
+
+$string['alwaysenrol'] = 'Always Enrol';
+$string['alwaysenrol_help'] = 'When set to Yes the plugins will always enrol users, even if they already have access to the course through another method.';
+
+$string['softmatch'] = 'Soft Match';
+$string['softmatch_help'] = 'When enabled AutoEnrol will enrol a user when they partially match the "Allow Only" value instead of requiring an exact match. Soft matches are also case-insensitive. The value of "Filter By" will be used for the group name.';
+
+$string['instancename'] = 'Custom Label';
+$string['instancename_help'] = 'You can add a custom label to make it clear what this enrolment method does. This option is most useful when there are multiple instances of AutoEnrol on one course.';
 
 $string['filter'] = 'Allow Only';
 $string['filter_help'] = 'When a group focus is selected you can use this field to filter which type of user you wish to enrol onto the course. For example, if you grouped by authentication and filtered with "manual" only users who have registered directly with your site would be enrolled.';
@@ -60,3 +75,7 @@ $string['defaultrole'] = 'Default role assignment';
 $string['defaultrole_desc'] = 'Select role which should be assigned to users during automatic enrolments';
 $string['autoenrol:config'] = 'Configure automatic enrolments';
 $string['autoenrol:method'] = 'User can enrol users onto a course at login';
+$string['autoenrol:unenrol'] = 'User can unenrol autoenrolled users';
+$string['autoenrol:unenrolself'] = 'User can unenrol themselves if they are being enrolled on access';
+
+$string['unenrolselfconfirm'] = 'Do you really want to unenrol yourself from course "{$a}"? You can revisit the course to be reenrolled but information such as grades and assignment submissions may be lost.';

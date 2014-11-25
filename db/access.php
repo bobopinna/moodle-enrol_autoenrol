@@ -22,7 +22,7 @@
  * @package    enrol
  * @subpackage autoenrol
  * @author     Mark Ward & Matthew Cannings - based on code by Martin Dougiamas, Petr Skoda, Eugene Venter and others
- * @date       October 2011
+ * @date       July 2013
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -38,14 +38,30 @@ $capabilities = array(
             'editingteacher' => CAP_ALLOW,
         )
     ),
-	
-	'enrol/autoenrol:method' => array(
-		'captype' => 'write',
-		'contextlevel' => CONTEXT_COURSE,
-		'archetypes' => array(
-			'manager' => CAP_ALLOW
-		)
-	),
+    
+    'enrol/autoenrol:unenrol' => array(
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+        )
+    ),
+        
+    'enrol/autoenrol:unenrolself' => array(
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => array(
+        )
+    ),
+    
+    'enrol/autoenrol:method' => array(
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW
+        )
+    ),
 
 );
 
