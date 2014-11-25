@@ -50,9 +50,13 @@ class enrol_autoenrol_edit_form extends moodleform {
             $mform->setExpanded('generalsection');
         }
 
-        $img = html_writer::img(
-            $OUTPUT->pix_url('logo', 'enrol_autoenrol'),
-            'AutoEnrol Logo'
+        $img = html_writer::empty_tag(
+            'img',
+            array(
+                'src' => $OUTPUT->pix_url('logo', 'enrol_autoenrol'),
+                'alt' => 'AutoEnrol Logo',
+                'title' => 'AutoEnrol Logo'
+            )
         );
         $img = html_writer::div($img, null, array('style'=>'text-align:center;margin: 1em 0;'));
 
