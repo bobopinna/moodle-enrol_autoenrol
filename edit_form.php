@@ -39,16 +39,28 @@ class enrol_autoenrol_edit_form extends moodleform {
     /**
      *
      */
-    function definition() {
-        global $CFG, $OUTPUT;
-        $mform = $this->_form;
-
+    public function definition() {
         list($instance, $plugin, $context) = $this->_customdata;
 
-        $mform->addElement('header', 'generalsection', get_string('general', 'enrol_autoenrol'));
-        if(property_exists($mform, 'setExpanded')){
-            $mform->setExpanded('generalsection');
-        }
+        $this->add_hidden_fields();
+        $this->add_general_section($instance, $plugin, $context);
+        $this->add_filtering_section();
+        $this->add_action_buttons(true, ($instance->id ? null : get_string('addinstance', 'enrol')));
+
+        $this->set_data($instance);
+    }
+
+    /**
+     * @param $instance
+     * @param $plugin
+     * @param $context
+     * @throws coding_exception
+     */
+    protected function add_general_section($instance, $plugin, $context) {
+        global $CFG, $OUTPUT;
+
+        $this->_form->addElement('header', 'generalsection', get_string('general', 'enrol_autoenrol'));
+        $this->_form->setExpanded('generalsection');
 
         $img = html_writer::empty_tag(
             'img',
@@ -60,82 +72,107 @@ class enrol_autoenrol_edit_form extends moodleform {
         );
         $img = html_writer::div($img, null, array('style'=>'text-align:center;margin: 1em 0;'));
 
-        $mform->addElement('html', $img);
-        $mform->addElement('static', 'description', html_writer::tag('strong',get_string('warning', 'enrol_autoenrol')),
-                  get_string('warning_message', 'enrol_autoenrol'));
-        
-        $mform->addElement('text', 'customchar2', get_string('instancename', 'enrol_autoenrol'));    
-        $mform->setType('customchar2', PARAM_TEXT);
-        $mform->setDefault('customchar2', '');    
-        $mform->addHelpButton('customchar2', 'instancename', 'enrol_autoenrol');    
-        
+        $this->_form->addElement('html', $img);
+        $this->_form->addElement('static', 'description', html_writer::tag('strong',get_string('warning', 'enrol_autoenrol')),
+            get_string('warning_message', 'enrol_autoenrol'));
+
+        $this->_form->addElement('text', 'customchar2', get_string('instancename', 'enrol_autoenrol'));
+        $this->_form->setType('customchar2', PARAM_TEXT);
+        $this->_form->setDefault('customchar2', '');
+        $this->_form->addHelpButton('customchar2', 'instancename', 'enrol_autoenrol');
+
         if ($instance->id) {
             $roles = get_default_enrol_roles($context, $instance->roleid);
         } else {
             $roles = get_default_enrol_roles($context, $plugin->get_config('roleid'));
         }
-        $mform->addElement('select', 'customint3', get_string('role', 'enrol_autoenrol'), $roles);        
-        $mform->setAdvanced('customint3');
-        $mform->addHelpButton('customint3', 'role', 'enrol_autoenrol');        
+        $this->_form->addElement('select', 'customint3', get_string('role', 'enrol_autoenrol'), $roles);
+        $this->_form->setAdvanced('customint3');
+        $this->_form->addHelpButton('customint3', 'role', 'enrol_autoenrol');
         if (!has_capability('enrol/autoenrol:method', $context)){
-            $mform->disabledIf('customint3', 'customint2');
+            $this->_form->disabledIf('customint3', 'customint2');
         }
-        $mform->setDefault('customint3', $plugin->get_config('defaultrole'));    
-        $mform->setType('customint3', PARAM_INT);
-                        
-        $method = array(get_string('m_course', 'enrol_autoenrol'),get_string('m_site', 'enrol_autoenrol'));        
-        $mform->addElement('select', 'customint1', get_string('method', 'enrol_autoenrol'), $method);    
+        $this->_form->setDefault('customint3', $plugin->get_config('defaultrole'));
+        $this->_form->setType('customint3', PARAM_INT);
+
+        $method = array(get_string('m_course', 'enrol_autoenrol'),get_string('m_site', 'enrol_autoenrol'));
+        $this->_form->addElement('select', 'customint1', get_string('method', 'enrol_autoenrol'), $method);
         if (!has_capability('enrol/autoenrol:method', $context)){
-            $mform->disabledIf('customint1', 'customint2');
+            $this->_form->disabledIf('customint1', 'customint2');
         }
-        $mform->setAdvanced('customint1');
-        $mform->setType('customint1', PARAM_INT);
-        $mform->addHelpButton('customint1', 'method', 'enrol_autoenrol');
+        $this->_form->setAdvanced('customint1');
+        $this->_form->setType('customint1', PARAM_INT);
+        $this->_form->addHelpButton('customint1', 'method', 'enrol_autoenrol');
 
-        $mform->addElement('selectyesno', 'customint8', get_string('alwaysenrol', 'enrol_autoenrol'));    
-        $mform->setAdvanced('customint8');    
-        $mform->setType('customint8', PARAM_INT);
-        $mform->setDefault('customint8', 0);    
-        $mform->addHelpButton('customint8', 'alwaysenrol', 'enrol_autoenrol');    
-        
-        $mform->addElement('header', 'filtersection', get_string('filtering', 'enrol_autoenrol'));    
-        if(property_exists($mform, 'setExpanded')){
-            $mform->setExpanded('filtersection', false);
-        }
-        
-        $fields = array(get_string('g_none', 'enrol_autoenrol'),
-                        get_string('g_auth', 'enrol_autoenrol'),
-                        get_string('g_dept', 'enrol_autoenrol'),
-                        get_string('g_inst', 'enrol_autoenrol'),
-                        get_string('g_lang', 'enrol_autoenrol'),
-                        get_string('g_email', 'enrol_autoenrol'));
-                        
-        $mform->addElement('select', 'customint2', get_string('groupon', 'enrol_autoenrol'), $fields);    
-        $mform->setType('customint2', PARAM_INT);
-        $mform->addHelpButton('customint2', 'groupon', 'enrol_autoenrol');                    
-                      
-        $mform->addElement('text','customchar1', get_string('filter', 'enrol_autoenrol'));
-        $mform->setDefault('customchar1', '');    
-        $mform->setType('customchar1', PARAM_TEXT);
-        $mform->addHelpButton('customchar1', 'filter', 'enrol_autoenrol');    
-        $mform->disabledIf('customchar1', 'customint2', 'eq', 0);
-        
-        $mform->addElement('selectyesno', 'customint4', get_string('softmatch', 'enrol_autoenrol'));    
-        $mform->setDefault('customint4', 0);    
-        $mform->addHelpButton('customint4', 'softmatch', 'enrol_autoenrol');    
-        
-        $mform->addElement('text', 'customint5', get_string('countlimit', 'enrol_autoenrol'));    
-        $mform->setType('customint5', PARAM_INT);
-        $mform->setDefault('customint5', 0);    
-        $mform->addHelpButton('customint5', 'countlimit', 'enrol_autoenrol');    
-                      
-        $mform->addElement('hidden', 'id');
-        $mform->setType('id', PARAM_INT);
-        $mform->addElement('hidden', 'courseid');
-        $mform->setType('courseid', PARAM_INT);
-
-        $this->add_action_buttons(true, ($instance->id ? null : get_string('addinstance', 'enrol')));
-
-        $this->set_data($instance);
+        $this->_form->addElement('selectyesno', 'customint8', get_string('alwaysenrol', 'enrol_autoenrol'));
+        $this->_form->setAdvanced('customint8');
+        $this->_form->setType('customint8', PARAM_INT);
+        $this->_form->setDefault('customint8', 0);
+        $this->_form->addHelpButton('customint8', 'alwaysenrol', 'enrol_autoenrol');
     }
+
+    /**
+     * @throws coding_exception
+     */
+    protected function add_filtering_section() {
+        $this->_form->addElement('header', 'filtersection', get_string('filtering', 'enrol_autoenrol'));
+        $this->_form->setExpanded('filtersection', false);
+
+        $fields = array(get_string('g_none', 'enrol_autoenrol'),
+            get_string('g_auth', 'enrol_autoenrol'),
+            get_string('g_dept', 'enrol_autoenrol'),
+            get_string('g_inst', 'enrol_autoenrol'),
+            get_string('g_lang', 'enrol_autoenrol'),
+            get_string('g_email', 'enrol_autoenrol'));
+
+        $this->_form->addElement('select', 'customint2', get_string('groupon', 'enrol_autoenrol'), $fields);
+        $this->_form->setType('customint2', PARAM_INT);
+        $this->_form->addHelpButton('customint2', 'groupon', 'enrol_autoenrol');
+
+        $this->_form->addElement('text','customchar1', get_string('filter', 'enrol_autoenrol'));
+        $this->_form->setDefault('customchar1', '');
+        $this->_form->setType('customchar1', PARAM_TEXT);
+        $this->_form->addHelpButton('customchar1', 'filter', 'enrol_autoenrol');
+        $this->_form->disabledIf('customchar1', 'customint2', 'eq', 0);
+
+        $this->_form->addElement('selectyesno', 'customint4', get_string('softmatch', 'enrol_autoenrol'));
+        $this->_form->setDefault('customint4', 0);
+        $this->_form->addHelpButton('customint4', 'softmatch', 'enrol_autoenrol');
+
+        $this->_form->addElement('text', 'customint5', get_string('countlimit', 'enrol_autoenrol'));
+        $this->_form->setType('customint5', PARAM_INT);
+        $this->_form->setDefault('customint5', 0);
+        $this->_form->addHelpButton('customint5', 'countlimit', 'enrol_autoenrol');
+    }
+
+    /**
+     *
+     */
+    protected function add_hidden_fields() {
+        $this->_form->addElement('hidden', 'id');
+        $this->_form->setType('id', PARAM_INT);
+        $this->_form->addElement('hidden', 'courseid');
+        $this->_form->setType('courseid', PARAM_INT);
+    }
+
+    /**
+     * @param array $data
+     * @param array $files
+     * @return array
+     */
+    public function validation($data, $files) {
+        return parent::validation($data, $files);
+    }
+
+    /**
+     * @return object
+     */
+    public function get_data() {
+        return parent::get_data();
+    }
+
+    /**
+     * @type occurrence
+     */
+    protected $_customdata;
 }
