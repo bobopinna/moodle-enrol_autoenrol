@@ -247,9 +247,6 @@ class enrol_autoenrol_plugin extends enrol_plugin
                 }
                 groups_add_member($group, $USER->id);
 
-
-                add_to_log($instance->courseid, 'course', 'enrol', '../enrol/users.php?id=' . $instance->courseid, $instance->courseid);
-
             } else {
                 //debugging("this shouldnt be possible!");
                 return null;
