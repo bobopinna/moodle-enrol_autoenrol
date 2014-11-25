@@ -57,6 +57,7 @@ class enrol_autoenrol_edit_form extends moodleform {
         if (!has_capability('enrol/autoenrol:method', $context))
 			$mform->disabledIf('customint3', 'customint2');
         $mform->setDefault('customint3', $plugin->get_config('defaultrole'));	
+		$mform->setType('customint3', PARAM_INT);
 						
 		
 		$method = array(get_string('m_course', 'enrol_autoenrol'),get_string('m_site', 'enrol_autoenrol'));		
@@ -64,15 +65,18 @@ class enrol_autoenrol_edit_form extends moodleform {
         if (!has_capability('enrol/autoenrol:method', $context))
 			$mform->disabledIf('customint1', 'customint2');
 		$mform->setAdvanced('customint1');
+		$mform->setType('customint1', PARAM_INT);
 		$mform->addHelpButton('customint1', 'method', 'enrol_autoenrol');
 		 	
 		$fields = array(get_string('g_none', 'enrol_autoenrol'),get_string('g_auth', 'enrol_autoenrol'),get_string('g_dept', 'enrol_autoenrol'),get_string('g_inst', 'enrol_autoenrol'),get_string('g_lang', 'enrol_autoenrol'));		
         $mform->addElement('select', 'customint2', get_string('groupon', 'enrol_autoenrol'), $fields);	
-		$mform->setAdvanced('customint2');		
+		$mform->setAdvanced('customint2');	
+		$mform->setType('customint2', PARAM_INT);
 		$mform->addHelpButton('customint2', 'groupon', 'enrol_autoenrol');		
 					  
 		$mform->addElement('text','customchar1', get_string('filter', 'enrol_autoenrol'));
 		$mform->setAdvanced('customchar1');		
+		$mform->setType('customchar1', PARAM_TEXT);
 		$mform->addHelpButton('customchar1', 'filter', 'enrol_autoenrol');	
 		$mform->disabledIf('customchar1', 'customint2', 'eq', 0);
 					  
