@@ -66,7 +66,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
 		if ($instance->enrol !== 'autoenrol') {
              throw new coding_exception('Invalid enrol instance type!');
         }
-		if ($instance->customint1 != 1 && $this->enrol_allowed($instance)){
+		if ($instance->customint1 != 1 && $this->enrol_allowed($USER, $instance)){
 			$this->enrol_user($instance, $USER->id, $instance->customint3, time(), 0);
 			$this->do_group($instance);
 		}
@@ -110,7 +110,6 @@ class enrol_autoenrol_plugin extends enrol_plugin {
     public function sync_user_enrolments($user) {
 		global $DB;
 		
-	
 		//this process takes 0.01 seconds on average
 
 		//Get records of all the AutoEnrolment instances which are set to enrol at login
@@ -125,7 +124,8 @@ class enrol_autoenrol_plugin extends enrol_plugin {
 					$found = TRUE;
 				}
 			}
-			if (!$found && $this->enrol_allowed($instance)){
+			
+			if (!$found && $this->enrol_allowed($user, $instance)){
 				$this->enrol_user($instance, $user->id, $instance->customint3, time(), 0);
 				$this->do_group($instance);
 			}
@@ -193,7 +193,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      */
     public function enrol_page_hook(stdClass $instance) {
 		global $USER;
-		if ($instance->customint1 != 1 && $this->enrol_allowed($instance)){
+		if ($instance->customint1 != 1 && $this->enrol_allowed($USER,$instance)){
 			$this->enrol_user($instance, $USER->id, $instance->customint3, time(), 0);
 			$this->do_group($instance);
 		}
@@ -204,19 +204,38 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      * Custom function, checks to see if user fulfills
      * our requirements before enrolling them.
      */
-	public function enrol_allowed(stdClass $instance){
-        global $USER, $DB;		
+	public function enrol_allowed($USER, stdClass $instance){
+        global $DB;		
 	    	
 		if (isguestuser()) {
             // can not enrol guest!!
             return FALSE;
         }
-
+		
 		//very quick check to see if the user is being filtered
-		if ($instance->customchar1!='' && isset($USER->auth) && isset($USER->department) && isset($USER->institution) && isset($USER->lang)){
+		if ($instance->customchar1!=''){
+			if(!is_object($USER)){
+				return FALSE;
+			}
+			if(!isset($USER->auth)){
+				$USER->auth = '';
+			}
+			
+			if(!isset($USER->department)){
+				$USER->department = '';
+			}
+
+			if(!isset($USER->institution)){
+				$USER->institution = '';
+			}
+
+			if(!isset($USER->lang)){
+				$USER->lang = '';
+			}
 			$type = array(1=>$USER->auth, $USER->department, $USER->institution, $USER->lang);
 			if($instance->customchar1!=$type[$instance->customint2]){
 				return FALSE;
+				
 			}
 		}		
 		

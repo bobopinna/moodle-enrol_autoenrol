@@ -22,15 +22,13 @@
  * @package    enrol
  * @subpackage autoenrol
  * @author     Mark Ward & Matthew Cannings - based on code by Martin Dougiamas, Petr Skoda, Eugene Venter and others
- * @date       October 2011
+ * @date       September 2012
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-	$plugin->component = 'block_course_contacts';
-    $plugin->version = 2012061300;  // YYYYMMDDHH (year, month, day, 24-hr time)
-    $plugin->requires = 2010112400; // YYYYMMDDHH (This is the release version for Moodle 2.0)
-	$plugin->release = '0.9'; //plugin release
-	$plugin->maturity   = MATURITY_BETA;	
-?>
+$plugin->version  = 2012092700;
+$plugin->requires = 2010112400;   // Requires this Moodle version
+$plugin->release = '0.91'; //plugin release
+$plugin->maturity   = MATURITY_BETA;	
