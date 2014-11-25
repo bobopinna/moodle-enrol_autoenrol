@@ -40,7 +40,7 @@ class enrol_autoenrol_edit_form extends moodleform {
      *
      */
     function definition() {
-        global $CFG;
+        global $CFG, $OUTPUT;
         $mform = $this->_form;
 
         list($instance, $plugin, $context) = $this->_customdata;
@@ -49,11 +49,16 @@ class enrol_autoenrol_edit_form extends moodleform {
         if(property_exists($mform, 'setExpanded')){
             $mform->setExpanded('generalsection');
         }
-        
-        $mform->addElement('html', "<div style='text-align:center'><img src='".$CFG->wwwroot."/theme/image.php?image=logo&component=enrol_autoenrol' alt='AutoEnrol Logo' title='AutoEnrol Logo' /></div><br />");
-        $mform->addElement('static', 'description', '<b>'.get_string('warning', 'enrol_autoenrol').'</b>',
+
+        $img = html_writer::img(
+            $OUTPUT->pix_url('logo', 'enrol_autoenrol'),
+            'AutoEnrol Logo'
+        );
+        $img = html_writer::div($img, null, array('style'=>'text-align:center;margin: 1em 0;'));
+
+        $mform->addElement('html', $img);
+        $mform->addElement('static', 'description', html_writer::tag('strong',get_string('warning', 'enrol_autoenrol')),
                   get_string('warning_message', 'enrol_autoenrol'));
-        $mform->addElement('html', '<br />');      
         
         $mform->addElement('text', 'customchar2', get_string('instancename', 'enrol_autoenrol'));    
         $mform->setType('customchar2', PARAM_TEXT);
