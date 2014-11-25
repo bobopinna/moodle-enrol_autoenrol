@@ -201,6 +201,16 @@ class enrol_autoenrol_plugin extends enrol_plugin {
     }
 
     /**
+     * Add new instance of enrol plugin with default settings.
+     * @param object $course
+     * @return int id of new instance, null if can not be created
+     */
+    public function add_default_instance($course) {
+        $fields = array('status'=>0, 'customint3'=>$this->get_config('defaultrole'));
+        return $this->add_instance($course, $fields);
+    }
+	
+    /**
      * Custom function, checks to see if user fulfills
      * our requirements before enrolling them.
      */
@@ -253,7 +263,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
 		return TRUE;
 	}
 	
-	public function do_group(stdClass $instance){
+	private function do_group(stdClass $instance){
         global $CFG, $USER, $DB;					
 		if (isloggedin()){  
 			//debugging("trying to enrol user now");			

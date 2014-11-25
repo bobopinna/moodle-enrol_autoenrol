@@ -32,6 +32,8 @@ if ($ADMIN->fulltree) {
 
     $settings->add(new admin_setting_heading('enrol_autoenrol_settings', '', get_string('pluginname_desc', 'enrol_autoenrol')));
 
+	$settings->add(new admin_setting_configcheckbox('enrol_autoenrol/defaultenrol', get_string('defaultenrol', 'enrol'), get_string('defaultenrol_desc', 'enrol'), 0));
+	
     if (!during_initial_install()) {
         $options = get_default_enrol_roles(get_context_instance(CONTEXT_SYSTEM));
         $student = get_archetype_roles('student');
