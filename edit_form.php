@@ -31,8 +31,14 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir.'/formslib.php');
 
+/**
+ * Class enrol_autoenrol_edit_form
+ */
 class enrol_autoenrol_edit_form extends moodleform {
 
+    /**
+     *
+     */
     function definition() {
         global $CFG;
         $mform = $this->_form;

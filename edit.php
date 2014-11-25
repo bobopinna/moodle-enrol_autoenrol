@@ -33,16 +33,16 @@ require_once('edit_form.php');
 $courseid = required_param('courseid', PARAM_INT);
 $instanceid = optional_param('id', 0, PARAM_INT); // instanceid
 
-$course = $DB->get_record('course', array('id'=>$courseid), '*', MUST_EXIST);
+$course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
 $context = get_context_instance(CONTEXT_COURSE, $course->id, MUST_EXIST);
 
 require_login($course);
 require_capability('enrol/autoenrol:config', $context);
 
-$PAGE->set_url('/enrol/autoenrol/edit.php', array('courseid'=>$course->id));
+$PAGE->set_url('/enrol/autoenrol/edit.php', array('courseid' => $course->id));
 $PAGE->set_pagelayout('admin');
 
-$return = new moodle_url('/enrol/instances.php', array('id'=>$course->id));
+$return = new moodle_url('/enrol/instances.php', array('id' => $course->id));
 if (!enrol_is_enabled('autoenrol')) {
     redirect($return);
 }
@@ -50,13 +50,13 @@ if (!enrol_is_enabled('autoenrol')) {
 $plugin = enrol_get_plugin('autoenrol');
 
 if ($instanceid) {
-    $instance = $DB->get_record('enrol', array('courseid'=>$course->id, 'enrol'=>'autoenrol', 'id'=>$instanceid), '*', MUST_EXIST);
+    $instance = $DB->get_record('enrol', array('courseid' => $course->id, 'enrol' => 'autoenrol', 'id' => $instanceid), '*', MUST_EXIST);
 } else {
     require_capability('moodle/course:enrolconfig', $context);
     // no instance yet, we have to add new instance
-    navigation_node::override_active_url(new moodle_url('/enrol/instances.php', array('id'=>$course->id)));
+    navigation_node::override_active_url(new moodle_url('/enrol/instances.php', array('id' => $course->id)));
     $instance = new stdClass();
-    $instance->id       = null;
+    $instance->id = null;
     $instance->courseid = $course->id;
 }
 
@@ -67,48 +67,47 @@ if ($mform->is_cancelled()) {
 
 } else if ($data = $mform->get_data()) {
     if ($instance->id) {
-        if($data->customint4 != 0 && $data->customint4 != 1){
+        if ($data->customint4 != 0 && $data->customint4 != 1) {
             $data->customint4 = 0;
         }
-        if($data->customint5 < 0){
+        if ($data->customint5 < 0) {
             $data->customint5 = 0;
         }
         $instance->customint5 = $data->customint5;
-        if($data->customint8 != 0 && $data->customint8 != 1){
+        if ($data->customint8 != 0 && $data->customint8 != 1) {
             $data->customint8 = 0;
         }
-    
+
         $instance->timemodified = time();
-        if (has_capability('enrol/autoenrol:method', $context)){
+        if (has_capability('enrol/autoenrol:method', $context)) {
             $instance->customint1 = $data->customint1;
             $instance->customint3 = $data->customint3;
         }
         $instance->customint2 = $data->customint2;
         $instance->customint4 = $data->customint4;
         $instance->customint8 = $data->customint8;
-        $instance->customchar1 = $data->customchar1;        
-        $instance->customchar2 = $data->customchar2;        
+        $instance->customchar1 = $data->customchar1;
+        $instance->customchar2 = $data->customchar2;
         $DB->update_record('enrol', $instance);
-        
 
-    //do not add a new instance if one already exists (someone may have added one while we are looking at the edit form)
-    } 
-    else {
-        if($data->customint5 < 0){
+
+        //do not add a new instance if one already exists (someone may have added one while we are looking at the edit form)
+    } else {
+        if ($data->customint5 < 0) {
             $data->customint5 = 0;
         }
-        if($data->customint8 != 0 && $data->customint8 != 1){
+        if ($data->customint8 != 0 && $data->customint8 != 1) {
             $data->customint8 = 0;
         }
-        $fields = array('customint1'=>0, 'customint2'=>$data->customint2, 
-                        'customint3'=>5,'customint4'=>$data->customint4,
-                        'customint5'=>$data->customint5, 'customint8'=>$data->customint8,
-                        'customchar1'=>$data->customchar1,'customchar2'=>$data->customchar2);
-        if (has_capability('enrol/autoenrol:method', $context)){
+        $fields = array('customint1' => 0, 'customint2' => $data->customint2,
+            'customint3' => 5, 'customint4' => $data->customint4,
+            'customint5' => $data->customint5, 'customint8' => $data->customint8,
+            'customchar1' => $data->customchar1, 'customchar2' => $data->customchar2);
+        if (has_capability('enrol/autoenrol:method', $context)) {
             $fields['customint1'] = $data->customint1;
             $fields['customint3'] = $data->customint3;
-        }    
-        
+        }
+
         $plugin->add_instance($course, $fields);
 
     }

@@ -38,7 +38,7 @@ $capabilities = array(
             'editingteacher' => CAP_ALLOW,
         )
     ),
-    
+
     'enrol/autoenrol:unenrol' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_COURSE,
@@ -47,14 +47,13 @@ $capabilities = array(
             'editingteacher' => CAP_ALLOW,
         )
     ),
-        
+
     'enrol/autoenrol:unenrolself' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_COURSE,
-        'archetypes' => array(
-        )
+        'archetypes' => array()
     ),
-    
+
     'enrol/autoenrol:method' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_COURSE,
