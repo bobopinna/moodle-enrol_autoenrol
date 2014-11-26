@@ -28,6 +28,7 @@
  */
 
 require('../../config.php');
+require_once($CFG->libdir.'/formslib.php');
 require_once('edit_form.php');
 
 $courseid = required_param('courseid', PARAM_INT);
