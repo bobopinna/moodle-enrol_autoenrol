@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -30,53 +29,51 @@
 /**
  * Class enrol_autoenrol_plugin
  */
-class enrol_autoenrol_plugin extends enrol_plugin
-{
+class enrol_autoenrol_plugin extends enrol_plugin {
 
     /**
      * @param array $instances
+     *
      * @return array
      */
-    public function get_info_icons(array $instances)
-    {
+    public function get_info_icons(array $instances) {
         return array(new pix_icon('icon', get_string('pluginname', 'enrol_autoenrol'), 'enrol_autoenrol'));
     }
 
     /**
      * @return bool
      */
-    public function roles_protected()
-    {
-        // users with role assign cap may tweak the roles later
+    public function roles_protected() {
+        // Users with role assign cap may tweak the roles later.
         return false;
     }
 
     /**
      * @param stdClass $instance
+     *
      * @return bool
      */
-    public function allow_unenrol(stdClass $instance)
-    {
-        // users with unenrol cap may unenrol other users manually - requires enrol/autoenrol:unenrol
+    public function allow_unenrol(stdClass $instance) {
+        // Users with unenrol cap may unenrol other users manually - requires enrol/autoenrol:unenrol.
         return true;
     }
 
     /**
      * @param stdClass $instance
+     *
      * @return bool
      */
-    public function allow_manage(stdClass $instance)
-    {
-        // users with manage cap may tweak period and status - requires enrol/autoenrol:manage
+    public function allow_manage(stdClass $instance) {
+        // Users with manage cap may tweak period and status - requires enrol/autoenrol:manage.
         return false;
     }
 
     /**
      * @param stdClass $instance
+     *
      * @return bool
      */
-    public function show_enrolme_link(stdClass $instance)
-    {
+    public function show_enrolme_link(stdClass $instance) {
         return false;
     }
 
@@ -84,19 +81,17 @@ class enrol_autoenrol_plugin extends enrol_plugin
      * Returns list of unenrol links for all enrol instances in course.
      *
      * @param int $instance
+     *
      * @return moodle_url or NULL if self unenrolment not supported
      */
-    public function get_unenrolself_link($instance)
-    {
+    public function get_unenrolself_link($instance) {
         if ($instance->customint1 > 0) {
-            //don't offer unenrolself if we are going to re-enrol them on login
-            return NULL;
+            // Don't offer unenrolself if we are going to re-enrol them on login.
+            return null;
         }
         return parent::get_unenrolself_link($instance);
     }
 
-
-    /**
 
     /**
      * Attempt to automatically enrol current user in course without any interaction,
@@ -105,11 +100,11 @@ class enrol_autoenrol_plugin extends enrol_plugin
      * This should return either a timestamp in the future or false.
      *
      * @param stdClass $instance course enrol instance
+     *
      * @return bool|int false means not enrolled, integer means timeend
      * @throws coding_exception
      */
-    public function try_autoenrol(stdClass $instance)
-    {
+    public function try_autoenrol(stdClass $instance) {
         global $USER;
         if ($instance->enrol !== 'autoenrol') {
             throw new coding_exception('Invalid enrol instance type!');
@@ -119,7 +114,7 @@ class enrol_autoenrol_plugin extends enrol_plugin
             $this->process_group($instance);
             return 9999999999;
         }
-        return FALSE;
+        return false;
     }
 
 
@@ -127,43 +122,43 @@ class enrol_autoenrol_plugin extends enrol_plugin
      * Custom function, checks to see if user fulfills
      * our requirements before enrolling them.
      *
-     * @param $USER
+     * @param          $USER
      * @param stdClass $instance
+     *
      * @return bool
      */
-    public function enrol_allowed($USER, stdClass $instance)
-    {
+    public function enrol_allowed($USER, stdClass $instance) {
         global $DB;
 
         if (isguestuser()) {
-            // can not enrol guest!!
-            return FALSE;
+            // Can not enrol guest!!
+            return false;
         }
 
         if (!$instance->customint8) {
             $context = context_course::instance($instance->courseid);
             if (has_capability('moodle/course:view', $context) || is_enrolled($context)) {
-                //no need to enrol someone who is already enrolled
-                return FALSE;
+                // No need to enrol someone who is already enrolled.
+                return false;
             }
         }
 
         if ($DB->record_exists('user_enrolments', array('userid' => $USER->id, 'enrolid' => $instance->id))) {
-            return FALSE;
+            return false;
         }
 
         if ($instance->customint5 > 0) {
-            //we need to check that we havent reached the limit count.
+            // We need to check that we haven't reached the limit count.
             $totalenrolments = $DB->count_records('user_enrolments', array('enrolid' => $instance->id));
             if ($totalenrolments >= $instance->customint5) {
-                return FALSE;
+                return false;
             }
         }
 
-        //very quick check to see if the user is being filtered
+        // Very quick check to see if the user is being filtered.
         if ($instance->customchar1 != '') {
             if (!is_object($USER)) {
-                return FALSE;
+                return false;
             }
 
             if (!isset($USER->auth)) {
@@ -185,37 +180,37 @@ class enrol_autoenrol_plugin extends enrol_plugin
             $type = array(1 => $USER->auth, $USER->department, $USER->institution, $USER->lang, $USER->email);
 
             if ($instance->customint4) {
-                //allow partial
+                // Allow partial.
                 $match = strstr(strtolower($type[$instance->customint2]), strtolower($instance->customchar1));
             } else {
-                //require exact
+                // Require exact.
                 $match = $instance->customchar1 == $type[$instance->customint2];
             }
 
             if (!$match) {
-                return FALSE;
+                return false;
             }
         }
 
         if ($instance->enrolstartdate != 0 and $instance->enrolstartdate > time()) {
-            return FALSE;
+            return false;
         }
 
         if ($instance->enrolenddate != 0 and $instance->enrolenddate < time()) {
-            return FALSE;
+            return false;
         }
-        return TRUE;
+        return true;
     }
 
     /**
      * Gets an array of the user enrolment actions.
      *
      * @param course_enrolment_manager $manager
-     * @param stdClass $ue A user enrolment object
+     * @param stdClass                 $ue A user enrolment object
+     *
      * @return array An array of user_enrolment_actions
      */
-    public function get_user_enrolment_actions(course_enrolment_manager $manager, $ue)
-    {
+    public function get_user_enrolment_actions(course_enrolment_manager $manager, $ue) {
         $actions = array();
         $context = $manager->get_context();
         $instance = $ue->enrolmentinstance;
@@ -223,7 +218,9 @@ class enrol_autoenrol_plugin extends enrol_plugin
         $params['ue'] = $ue->id;
         if ($this->allow_unenrol_user($instance, $ue) && has_capability("enrol/autoenrol:unenrol", $context)) {
             $url = new moodle_url('/enrol/unenroluser.php', $params);
-            $actions[] = new user_enrolment_action(new pix_icon('t/delete', ''), get_string('unenrol', 'enrol'), $url, array('class' => 'unenrollink', 'rel' => $ue->id));
+            $actions[] = new user_enrolment_action(
+                    new pix_icon('t/delete', ''), get_string('unenrol', 'enrol'), $url,
+                    array('class' => 'unenrollink', 'rel' => $ue->id));
         }
         return $actions;
     }
@@ -231,23 +228,26 @@ class enrol_autoenrol_plugin extends enrol_plugin
     /**
      * Sets up navigation entries.
      *
-     * @param $instancesnode
+     * @param          $instancesnode
      * @param stdClass $instance
+     *
      * @throws coding_exception
      */
-    public function add_course_navigation($instancesnode, stdClass $instance)
-    {
+    public function add_course_navigation($instancesnode, stdClass $instance) {
         global $USER;
         if ($instance->enrol !== 'autoenrol') {
             throw new coding_exception('Invalid enrol instance type!');
         }
-        if (!empty($instance->customint8) && $instance->customint8 == 1 && $instance->customint1 == 0 && $this->enrol_allowed($USER, $instance)) {
+        if (!empty($instance->customint8) && $instance->customint8 == 1 && $instance->customint1 == 0 && $this->enrol_allowed(
+                        $USER, $instance)
+        ) {
             $this->enrol_user($instance, $USER->id, $instance->customint3, time(), 0);
             $this->process_group($instance);
         }
         $context = context_course::instance($instance->courseid);
         if (has_capability('enrol/autoenrol:config', $context)) {
-            $managelink = new moodle_url('/enrol/autoenrol/edit.php', array('courseid' => $instance->courseid, 'id' => $instance->id));
+            $managelink = new moodle_url(
+                    '/enrol/autoenrol/edit.php', array('courseid' => $instance->courseid, 'id' => $instance->id));
             $instancesnode->add($this->get_instance_name($instance), $managelink, navigation_node::TYPE_SETTING);
         }
     }
@@ -257,10 +257,10 @@ class enrol_autoenrol_plugin extends enrol_plugin
      * Returns localised name of enrol instance
      *
      * @param object $instance (null is accepted too)
+     *
      * @return string
      */
-    public function get_instance_name($instance)
-    {
+    public function get_instance_name($instance) {
         if ($instance->customchar2 != '') {
             return get_string('auto', 'enrol_autoenrol') . ' (' . $instance->customchar2 . ')';
         }
@@ -271,11 +271,11 @@ class enrol_autoenrol_plugin extends enrol_plugin
      * Returns edit icons for the page with list of instances
      *
      * @param stdClass $instance
+     *
      * @return array
      * @throws coding_exception
      */
-    public function get_action_icons(stdClass $instance)
-    {
+    public function get_action_icons(stdClass $instance) {
         global $OUTPUT;
 
         if ($instance->enrol !== 'autoenrol') {
@@ -285,8 +285,10 @@ class enrol_autoenrol_plugin extends enrol_plugin
         $icons = array();
 
         if (has_capability('enrol/autoenrol:config', $context)) {
-            $editlink = new moodle_url("/enrol/autoenrol/edit.php", array('courseid' => $instance->courseid, 'id' => $instance->id));
-            $icons[] = $OUTPUT->action_icon($editlink, new pix_icon('t/edit', get_string('edit'), 'core', array('class' => 'iconsmall')));
+            $editlink = new moodle_url(
+                    "/enrol/autoenrol/edit.php", array('courseid' => $instance->courseid, 'id' => $instance->id));
+            $icons[] = $OUTPUT->action_icon(
+                    $editlink, new pix_icon('t/edit', get_string('edit'), 'core', array('class' => 'iconsmall')));
         }
 
         return $icons;
@@ -297,24 +299,24 @@ class enrol_autoenrol_plugin extends enrol_plugin
      * this function is called for all enabled enrol plugins
      * right after every user login.
      *
-     * @param object $user user record
+     * @param object         $user user record
+     *
      * @type moodle_database $DB
      * @return void
      */
-    public function sync_user_enrolments($user)
-    {
+    public function sync_user_enrolments($user) {
         global $DB;
 
-        //Get records of all the AutoEnrol instances which are set to enrol at login
-        $instances = $DB->get_records('enrol', array('enrol' => 'autoenrol', 'customint1' => 1), NULL, '*');
-        //Now get a record of all of the users enrolments
-        $user_enrolments = $DB->get_records('user_enrolments', array('userid' => $user->id), NULL, '*');
-        //run throuch all of the autoenrolment instances and check that the user has been enrolled.
+        // Get records of all the AutoEnrol instances which are set to enrol at login.
+        $instances = $DB->get_records('enrol', array('enrol' => 'autoenrol', 'customint1' => 1), null, '*');
+        // Now get a record of all of the users enrolments.
+        $user_enrolments = $DB->get_records('user_enrolments', array('userid' => $user->id), null, '*');
+        // Run throuch all of the autoenrolment instances and check that the user has been enrolled.
         foreach ($instances as $instance) {
-            $found = FALSE;
+            $found = false;
             foreach ($user_enrolments as $user_enrolment) {
                 if ($user_enrolment->enrolid == $instance->id) {
-                    $found = TRUE;
+                    $found = true;
                 }
             }
 
@@ -328,20 +330,21 @@ class enrol_autoenrol_plugin extends enrol_plugin
 
     /**
      * Returns link to page which may be used to add new instance of enrolment plugin in course.
+     *
      * @param int $courseid
+     *
      * @return moodle_url page url
      */
-    public function get_newinstance_link($courseid)
-    {
+    public function get_newinstance_link($courseid) {
         global $DB;
 
         $context = context_course::instance($courseid);
 
         if (!has_capability('moodle/course:enrolconfig', $context) or !has_capability('enrol/autoenrol:config', $context)) {
-            return NULL;
+            return null;
         }
 
-        // multiple instances supported
+        // Multiple instances supported.
         return new moodle_url('/enrol/autoenrol/edit.php', array('courseid' => $courseid));
     }
 
@@ -349,8 +352,7 @@ class enrol_autoenrol_plugin extends enrol_plugin
      * Intercepts the instance deletion call and gives some
      * custom instructions before resuming the parent function
      */
-    public function delete_instance($instance)
-    {
+    public function delete_instance($instance) {
         global $DB;
         require_once("../group/lib.php");
 
@@ -368,20 +370,21 @@ class enrol_autoenrol_plugin extends enrol_plugin
      * and enrols user if necessary. It can also redirect.
      *
      * @param stdClass $instance
+     *
      * @return string html text, usually a form in a text box
      */
-    public function enrol_page_hook(stdClass $instance)
-    {
-        return NULL;
+    public function enrol_page_hook(stdClass $instance) {
+        return null;
     }
 
     /**
      * Add new instance of enrol plugin with default settings.
+     *
      * @param object $course
+     *
      * @return int id of new instance, null if can not be created
      */
-    public function add_default_instance($course)
-    {
+    public function add_default_instance($course) {
         $fields = array('status' => 0, 'customint3' => $this->get_config('defaultrole'), 'customint5' => 0, 'customint8' => 0);
         return $this->add_instance($course, $fields);
     }
@@ -389,8 +392,7 @@ class enrol_autoenrol_plugin extends enrol_plugin
     /**
      * @param stdClass $instance
      */
-    private function process_group(stdClass $instance)
-    {
+    private function process_group(stdClass $instance) {
         global $CFG, $USER;
         if (isloggedin()) {
             if ($instance->customint2 != 0) {
@@ -413,24 +415,24 @@ class enrol_autoenrol_plugin extends enrol_plugin
     }
 
     /**
-     * @param stdClass $instance
-     * @param $name
+     * @param stdClass       $instance
+     * @param                $name
+     *
      * @return int id of the group
      * @type moodle_database $DB
      * @throws coding_exception
      * @throws moodle_exception
      */
-    public function get_group(stdClass $instance, $name)
-    {
+    public function get_group(stdClass $instance, $name) {
         global $DB;
         $group = $DB->get_record('groups', array('name' => $name, 'courseid' => $instance->courseid));
-        if ($group == NULL) {
+        if ($group == null) {
             $newgroupdata = new stdclass();
             $newgroupdata->courseid = $instance->courseid;
             $newgroupdata->name = $name;
             $newgroupdata->description = get_string('auto_desc', 'enrol_autoenrol');
             $group = groups_create_group($newgroupdata);
-            //keep a record of what we have created, deleting random groups just wouldn't be cricket!
+            // Keep a record of what we have created, deleting random groups just wouldn't be cricket!
             $instance->customtext1 = $group . ',' . $instance->customtext1;
             $DB->update_record('enrol', $instance);
         } else {

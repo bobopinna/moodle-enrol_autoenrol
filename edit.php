@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -28,11 +27,11 @@
  */
 
 require('../../config.php');
-require_once($CFG->libdir.'/formslib.php');
+require_once($CFG->libdir . '/formslib.php');
 require_once('edit_form.php');
 
 $courseid = required_param('courseid', PARAM_INT);
-$instanceid = optional_param('id', 0, PARAM_INT); // instanceid
+$instanceid = optional_param('id', 0, PARAM_INT); // The instanceid.
 
 $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
 $context = context_course::instance($course->id);
@@ -51,17 +50,18 @@ if (!enrol_is_enabled('autoenrol')) {
 $plugin = enrol_get_plugin('autoenrol');
 
 if ($instanceid) {
-    $instance = $DB->get_record('enrol', array('courseid' => $course->id, 'enrol' => 'autoenrol', 'id' => $instanceid), '*', MUST_EXIST);
+    $instance = $DB->get_record(
+            'enrol', array('courseid' => $course->id, 'enrol' => 'autoenrol', 'id' => $instanceid), '*', MUST_EXIST);
 } else {
     require_capability('moodle/course:enrolconfig', $context);
-    // no instance yet, we have to add new instance
+    // No instance yet, we have to add new instance.
     navigation_node::override_active_url(new moodle_url('/enrol/instances.php', array('id' => $course->id)));
     $instance = new stdClass();
     $instance->id = null;
     $instance->courseid = $course->id;
 }
 
-$mform = new enrol_autoenrol_edit_form(NULL, array($instance, $plugin, $context));
+$mform = new enrol_autoenrol_edit_form(null, array($instance, $plugin, $context));
 
 if ($mform->is_cancelled()) {
     redirect($return);
@@ -92,7 +92,7 @@ if ($mform->is_cancelled()) {
         $DB->update_record('enrol', $instance);
 
 
-        //do not add a new instance if one already exists (someone may have added one while we are looking at the edit form)
+        // Do not add a new instance if one already exists (someone may have added one while we are looking at the edit form).
     } else {
         if ($data->customint5 < 0) {
             $data->customint5 = 0;
@@ -101,9 +101,9 @@ if ($mform->is_cancelled()) {
             $data->customint8 = 0;
         }
         $fields = array('customint1' => 0, 'customint2' => $data->customint2,
-            'customint3' => 5, 'customint4' => $data->customint4,
-            'customint5' => $data->customint5, 'customint8' => $data->customint8,
-            'customchar1' => $data->customchar1, 'customchar2' => $data->customchar2);
+                        'customint3' => 5, 'customint4' => $data->customint4,
+                        'customint5' => $data->customint5, 'customint8' => $data->customint8,
+                        'customchar1' => $data->customchar1, 'customchar2' => $data->customchar2);
         if (has_capability('enrol/autoenrol:method', $context)) {
             $fields['customint1'] = $data->customint1;
             $fields['customint3'] = $data->customint3;

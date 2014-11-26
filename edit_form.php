@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -50,6 +49,7 @@ class enrol_autoenrol_edit_form extends moodleform {
      * @param $instance
      * @param $plugin
      * @param $context
+     *
      * @throws coding_exception
      */
     protected function add_general_section($instance, $plugin, $context) {
@@ -59,18 +59,19 @@ class enrol_autoenrol_edit_form extends moodleform {
         $this->_form->setExpanded('generalsection');
 
         $img = html_writer::empty_tag(
-            'img',
-            array(
-                'src' => $OUTPUT->pix_url('logo', 'enrol_autoenrol'),
-                'alt' => 'AutoEnrol Logo',
-                'title' => 'AutoEnrol Logo'
-            )
+                'img',
+                array(
+                        'src'   => $OUTPUT->pix_url('logo', 'enrol_autoenrol'),
+                        'alt'   => 'AutoEnrol Logo',
+                        'title' => 'AutoEnrol Logo'
+                )
         );
-        $img = html_writer::div($img, null, array('style'=>'text-align:center;margin: 1em 0;'));
+        $img = html_writer::div($img, null, array('style' => 'text-align:center;margin: 1em 0;'));
 
         $this->_form->addElement('html', $img);
-        $this->_form->addElement('static', 'description', html_writer::tag('strong',get_string('warning', 'enrol_autoenrol')),
-            get_string('warning_message', 'enrol_autoenrol'));
+        $this->_form->addElement(
+                'static', 'description', html_writer::tag('strong', get_string('warning', 'enrol_autoenrol')),
+                get_string('warning_message', 'enrol_autoenrol'));
 
         $this->_form->addElement('text', 'customchar2', get_string('instancename', 'enrol_autoenrol'));
         $this->_form->setType('customchar2', PARAM_TEXT);
@@ -85,15 +86,15 @@ class enrol_autoenrol_edit_form extends moodleform {
         $this->_form->addElement('select', 'customint3', get_string('role', 'enrol_autoenrol'), $roles);
         $this->_form->setAdvanced('customint3');
         $this->_form->addHelpButton('customint3', 'role', 'enrol_autoenrol');
-        if (!has_capability('enrol/autoenrol:method', $context)){
+        if (!has_capability('enrol/autoenrol:method', $context)) {
             $this->_form->disabledIf('customint3', 'customint2');
         }
         $this->_form->setDefault('customint3', $plugin->get_config('defaultrole'));
         $this->_form->setType('customint3', PARAM_INT);
 
-        $method = array(get_string('m_course', 'enrol_autoenrol'),get_string('m_site', 'enrol_autoenrol'));
+        $method = array(get_string('m_course', 'enrol_autoenrol'), get_string('m_site', 'enrol_autoenrol'));
         $this->_form->addElement('select', 'customint1', get_string('method', 'enrol_autoenrol'), $method);
-        if (!has_capability('enrol/autoenrol:method', $context)){
+        if (!has_capability('enrol/autoenrol:method', $context)) {
             $this->_form->disabledIf('customint1', 'customint2');
         }
         $this->_form->setAdvanced('customint1');
@@ -115,17 +116,17 @@ class enrol_autoenrol_edit_form extends moodleform {
         $this->_form->setExpanded('filtersection', false);
 
         $fields = array(get_string('g_none', 'enrol_autoenrol'),
-            get_string('g_auth', 'enrol_autoenrol'),
-            get_string('g_dept', 'enrol_autoenrol'),
-            get_string('g_inst', 'enrol_autoenrol'),
-            get_string('g_lang', 'enrol_autoenrol'),
-            get_string('g_email', 'enrol_autoenrol'));
+                get_string('g_auth', 'enrol_autoenrol'),
+                get_string('g_dept', 'enrol_autoenrol'),
+                get_string('g_inst', 'enrol_autoenrol'),
+                get_string('g_lang', 'enrol_autoenrol'),
+                get_string('g_email', 'enrol_autoenrol'));
 
         $this->_form->addElement('select', 'customint2', get_string('groupon', 'enrol_autoenrol'), $fields);
         $this->_form->setType('customint2', PARAM_INT);
         $this->_form->addHelpButton('customint2', 'groupon', 'enrol_autoenrol');
 
-        $this->_form->addElement('text','customchar1', get_string('filter', 'enrol_autoenrol'));
+        $this->_form->addElement('text', 'customchar1', get_string('filter', 'enrol_autoenrol'));
         $this->_form->setDefault('customchar1', '');
         $this->_form->setType('customchar1', PARAM_TEXT);
         $this->_form->addHelpButton('customchar1', 'filter', 'enrol_autoenrol');
@@ -149,22 +150,6 @@ class enrol_autoenrol_edit_form extends moodleform {
         $this->_form->setType('id', PARAM_INT);
         $this->_form->addElement('hidden', 'courseid');
         $this->_form->setType('courseid', PARAM_INT);
-    }
-
-    /**
-     * @param array $data
-     * @param array $files
-     * @return array
-     */
-    public function validation($data, $files) {
-        return parent::validation($data, $files);
-    }
-
-    /**
-     * @return object
-     */
-    public function get_data() {
-        return parent::get_data();
     }
 
     /**
