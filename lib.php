@@ -111,7 +111,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
         }
         if ($instance->customint1 == 0 && $this->enrol_allowed($USER, $instance)) {
             $this->enrol_user($instance, $USER->id, $instance->customint3, time(), 0);
-            $this->process_group($instance);
+            $this->process_group($instance, $USER);
             return 9999999999;
         }
         return false;
@@ -242,7 +242,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
                         $USER, $instance)
         ) {
             $this->enrol_user($instance, $USER->id, $instance->customint3, time(), 0);
-            $this->process_group($instance);
+            $this->process_group($instance, $USER);
         }
         $context = context_course::instance($instance->courseid);
         if (has_capability('enrol/autoenrol:config', $context)) {
@@ -322,7 +322,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
 
             if (!$found && $this->enrol_allowed($user, $instance)) {
                 $this->enrol_user($instance, $user->id, $instance->customint3, time(), 0);
-                $this->process_group($instance);
+                $this->process_group($instance, $user);
             }
 
         }
@@ -392,26 +392,26 @@ class enrol_autoenrol_plugin extends enrol_plugin {
     /**
      * @param stdClass $instance
      */
-    private function process_group(stdClass $instance) {
-        global $CFG, $USER;
-        if (isloggedin()) {
-            if ($instance->customint2 != 0) {
+    private function process_group(stdClass $instance, $user) {
+        global $CFG;
 
-                $type = array(1 => $USER->auth, $USER->department, $USER->institution, $USER->lang);
+        if ($instance->customint2 != 0) {
 
-                require_once($CFG->dirroot . '/group/lib.php');
+            $type = array(1 => $user->auth, $user->department, $user->institution, $user->lang);
 
-                if (strlen($instance->customchar1) > 0) {
-                    $name = get_string('auto', 'enrol_autoenrol') . '|' . $instance->customchar1;
-                } else {
-                    $name = get_string('auto', 'enrol_autoenrol') . '|' . $type[$instance->customint2];
-                }
+            require_once($CFG->dirroot . '/group/lib.php');
 
-                $group = $this->get_group($instance, $name);
-                groups_add_member($group, $USER->id);
-
+            if (strlen($instance->customchar1) > 0) {
+                $name = get_string('auto', 'enrol_autoenrol') . '|' . $instance->customchar1;
+            } else {
+                $name = get_string('auto', 'enrol_autoenrol') . '|' . $type[$instance->customint2];
             }
+
+            $group = $this->get_group($instance, $name);
+            return groups_add_member($group, $user->id);
+
         }
+
     }
 
     /**
