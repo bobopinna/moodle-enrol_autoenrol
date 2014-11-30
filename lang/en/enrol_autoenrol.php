@@ -79,3 +79,5 @@ $string['autoenrol:unenrol'] = 'User can unenrol autoenrolled users';
 $string['autoenrol:unenrolself'] = 'User can unenrol themselves if they are being enrolled on access';
 
 $string['unenrolselfconfirm'] = 'Do you really want to unenrol yourself from course "{$a}"? You can revisit the course to be reenrolled but information such as grades and assignment submissions may be lost.';
+
+$string['emptyfield'] ='No {$a}';

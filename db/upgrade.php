@@ -28,9 +28,43 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-function xmldb_classroom_upgrade($oldversion) {
+function xmldb_enrol_autoenrol_upgrade($oldversion) {
     global $DB;
     $dbman = $DB->get_manager();
+
+    if ($oldversion < 2014113000) {
+
+        $filtertype = array(get_string('g_none', 'enrol_autoenrol'),
+            get_string('g_auth', 'enrol_autoenrol'),
+            get_string('g_dept', 'enrol_autoenrol'),
+            get_string('g_inst', 'enrol_autoenrol'),
+            get_string('g_lang', 'enrol_autoenrol'),
+            get_string('g_email', 'enrol_autoenrol'));
+
+        $instances = $DB->get_records('enrol',array('enrol'=>'autoenrol'));
+
+        foreach($instances as $instance){
+            $groupids = explode(',',$instance->customtext1);
+            $groups = $DB->get_records_list('groups','id',$groupids);
+
+            foreach($groups as $group){
+                $group->name = str_replace('Auto|','',$group->name);
+
+                if(!strlen($group->name)){
+                    $group->name =  get_string('emptyfield', 'enrol_autoenrol', $filtertype[$instance->customint2]);
+                }
+
+                $group->idnumber = "autoenrol|$instance->id|$group->name";
+                $DB->update_record('groups',$group);
+            }
+
+            $instance->customtext1 = null;
+            $DB->update_record('enrol',$instance);
+        }
+
+        // Savepoint reached.
+        upgrade_plugin_savepoint(true, 2014113000, 'enrol', 'autoenrol');
+    }
 
     return true;
 }

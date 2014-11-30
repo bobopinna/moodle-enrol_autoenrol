@@ -423,7 +423,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      * @throws coding_exception
      * @throws moodle_exception
      */
-    public function get_group(stdClass $instance, $name) {
+    private function get_group(stdClass $instance, $name) {
         global $DB;
         $group = $DB->get_record('groups', array('name' => $name, 'courseid' => $instance->courseid));
         if ($group == null) {
