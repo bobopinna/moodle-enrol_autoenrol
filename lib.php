@@ -356,12 +356,15 @@ class enrol_autoenrol_plugin extends enrol_plugin {
         global $DB;
         require_once("../group/lib.php");
 
-        $groups = explode(',', $instance->customtext1);
+        $groups = $DB->get_records_sql(
+            "SELECT * FROM {groups} WHERE ".$DB->sql_like('idnumber', ':idnumber'),
+            array('idnumber' => "autoenrol|$instance->id|%")
+        );
+
         foreach ($groups as $group) {
-            if ($DB->record_exists('groups', array('id' => $group))) {
-                groups_delete_group($group);
-            }
+            groups_delete_group($group);
         }
+
         parent::delete_instance($instance);
     }
 
@@ -393,21 +396,31 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      * @param stdClass $instance
      */
     private function process_group(stdClass $instance, $user) {
-        global $CFG;
+        global $CFG, $DB;
 
         if ($instance->customint2 != 0) {
-
-            $type = array(1 => $user->auth, $user->department, $user->institution, $user->lang);
-
             require_once($CFG->dirroot . '/group/lib.php');
 
-            if (strlen($instance->customchar1) > 0) {
-                $name = get_string('auto', 'enrol_autoenrol') . '|' . $instance->customchar1;
+            if (strlen($instance->customchar1)) {
+                $name = $instance->customchar1;
             } else {
-                $name = get_string('auto', 'enrol_autoenrol') . '|' . $type[$instance->customint2];
+                $types = array(1 => $user->auth, $user->department, $user->institution, $user->lang);
+
+                $name = $types[$instance->customint2];
+
+                if(!strlen($name)){
+                    $filtertype = array(get_string('g_none', 'enrol_autoenrol'),
+                        get_string('g_auth', 'enrol_autoenrol'),
+                        get_string('g_dept', 'enrol_autoenrol'),
+                        get_string('g_inst', 'enrol_autoenrol'),
+                        get_string('g_lang', 'enrol_autoenrol'),
+                        get_string('g_email', 'enrol_autoenrol'));
+
+                    $name =  get_string('emptyfield', 'enrol_autoenrol', $filtertype[$instance->customint2]);
+                }
             }
 
-            $group = $this->get_group($instance, $name);
+            $group = $this->get_group($instance, $name, $DB);
             return groups_add_member($group, $user->id);
 
         }
@@ -415,29 +428,30 @@ class enrol_autoenrol_plugin extends enrol_plugin {
     }
 
     /**
-     * @param stdClass       $instance
-     * @param                $name
-     *
-     * @return int id of the group
-     * @type moodle_database $DB
+     * @param stdClass $instance
+     * @param $name
+     * @param moodle_database $DB
+     * @return int|mixed id of the group
      * @throws coding_exception
      * @throws moodle_exception
      */
-    private function get_group(stdClass $instance, $name) {
-        global $DB;
-        $group = $DB->get_record('groups', array('name' => $name, 'courseid' => $instance->courseid));
+    private function get_group(stdClass $instance, $name, moodle_database $DB) {
+
+        $idnumber = "autoenrol|$instance->id|$name";
+
+        $group = $DB->get_record('groups', array('idnumber' => $idnumber, 'courseid' => $instance->courseid));
+
         if ($group == null) {
             $newgroupdata = new stdclass();
             $newgroupdata->courseid = $instance->courseid;
             $newgroupdata->name = $name;
+            $newgroupdata->idnumber = $idnumber;
             $newgroupdata->description = get_string('auto_desc', 'enrol_autoenrol');
             $group = groups_create_group($newgroupdata);
-            // Keep a record of what we have created, deleting random groups just wouldn't be cricket!
-            $instance->customtext1 = $group . ',' . $instance->customtext1;
-            $DB->update_record('enrol', $instance);
         } else {
             $group = $group->id;
         }
+
         return $group;
     }
 }
