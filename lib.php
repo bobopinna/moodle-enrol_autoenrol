@@ -349,6 +349,16 @@ class enrol_autoenrol_plugin extends enrol_plugin {
     }
 
     /**
+     * Is it possible to hide/show enrol instance via standard UI?
+     *
+     * @param stdClass $instance
+     * @return bool
+     */
+    public function can_hide_show_instance($instance){
+        return true;
+    }
+
+    /**
      * Intercepts the instance deletion call and gives some
      * custom instructions before resuming the parent function
      */
