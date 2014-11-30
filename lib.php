@@ -354,15 +354,18 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      */
     public function delete_instance($instance) {
         global $DB;
-        require_once("../group/lib.php");
 
-        $groups = $DB->get_records_sql(
-            "SELECT * FROM {groups} WHERE ".$DB->sql_like('idnumber', ':idnumber'),
-            array('idnumber' => "autoenrol|$instance->id|%")
-        );
+        if($this->get_config('removegroups')) {
+            require_once("../group/lib.php");
 
-        foreach ($groups as $group) {
-            groups_delete_group($group);
+            $groups = $DB->get_records_sql(
+                "SELECT * FROM {groups} WHERE " . $DB->sql_like('idnumber', ':idnumber'),
+                array('idnumber' => "autoenrol|$instance->id|%")
+            );
+
+            foreach ($groups as $group) {
+                groups_delete_group($group);
+            }
         }
 
         parent::delete_instance($instance);
