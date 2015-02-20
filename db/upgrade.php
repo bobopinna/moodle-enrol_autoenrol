@@ -45,6 +45,21 @@ function xmldb_enrol_autoenrol_upgrade($oldversion) {
 
         foreach($instances as $instance){
             $groupids = explode(',',$instance->customtext1);
+
+            //ensure that each groupid is a valid int
+            foreach($groupids as $key=>$groupid){
+                if(empty($groupid) || is_int($groupid)){
+                    unset($groupids[$key]);
+                }
+                else {
+                    $groupids[$key] = (int) $groupid;
+                }
+            }
+
+            if(empty($groupids)){
+                continue;
+            }
+
             $groups = $DB->get_records_list('groups','id',$groupids);
 
             foreach($groups as $group){
