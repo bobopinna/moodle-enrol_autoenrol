@@ -355,7 +355,8 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      * @return bool
      */
     public function can_hide_show_instance($instance){
-        return true;
+        $context = context_course::instance($instance->courseid);
+        return has_capability('enrol/autoenrol:hideshowinstance', $context);
     }
 
     /**
