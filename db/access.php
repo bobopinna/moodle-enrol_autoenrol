@@ -39,6 +39,16 @@ $capabilities = array(
         )
     ),
 
+    'enrol/autoenrol:hideshowinstance'      => array(
+        'captype'      => 'write',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes'   => array(
+            'manager'        => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+        ),
+        'clonepermissionsfrom' => 'enrol/autoenrol:config'
+    ),
+
     'enrol/autoenrol:unenrol'     => array(
         'captype'      => 'write',
         'contextlevel' => CONTEXT_COURSE,

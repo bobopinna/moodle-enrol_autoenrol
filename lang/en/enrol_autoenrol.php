@@ -77,6 +77,7 @@ $string['autoenrol:config'] = 'Configure automatic enrolments';
 $string['autoenrol:method'] = 'User can enrol users onto a course at login';
 $string['autoenrol:unenrol'] = 'User can unenrol autoenrolled users';
 $string['autoenrol:unenrolself'] = 'User can unenrol themselves if they are being enrolled on access';
+$string['autoenrol:hideshowinstance'] = 'User can enable or disable autoenrol instances';
 
 $string['unenrolselfconfirm'] = 'Do you really want to unenrol yourself from course "{$a}"? You can revisit the course to be reenrolled but information such as grades and assignment submissions may be lost.';
 
