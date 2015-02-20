@@ -48,7 +48,7 @@ function xmldb_enrol_autoenrol_upgrade($oldversion) {
 
             //ensure that each groupid is a valid int
             foreach($groupids as $key=>$groupid){
-                if(empty($groupid) || is_int($groupid)){
+                if(empty($groupid) || !is_int($groupid)){
                     unset($groupids[$key]);
                 }
                 else {
