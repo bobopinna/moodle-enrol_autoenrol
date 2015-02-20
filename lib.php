@@ -450,7 +450,11 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      */
     private function get_group(stdClass $instance, $name, moodle_database $DB) {
 
-        $idnumber = "autoenrol|$instance->id|$name";
+        $idnumber = substr(
+            "autoenrol|$instance->id|$name",
+            0,
+            100 //group idnumber must be no more than 100 characters
+        );
 
         $group = $DB->get_record('groups', array('idnumber' => $idnumber, 'courseid' => $instance->courseid));
 
