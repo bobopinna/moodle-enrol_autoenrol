@@ -39,7 +39,7 @@ $capabilities = array(
         )
     ),
 
-    'enrol/autoenrol:hideshowinstance'      => array(
+    'enrol/autoenrol:manage'      => array(
         'captype'      => 'write',
         'contextlevel' => CONTEXT_COURSE,
         'archetypes'   => array(
