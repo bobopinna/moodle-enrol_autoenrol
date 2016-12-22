@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+defined('MOODLE_INTERNAL') || die();
+
 require_once('autoenrol_base.php');
 
 /**
@@ -38,9 +40,8 @@ class sync_user_enrolments_test extends autoenrol_base {
     public function no_records_test() {
         global $DB;
         $DB = $this->getMockForAbstractClass('moodle_database');
-        $DB->expects($this->any())
-           ->method('get_records')
-           ->will($this->returnValue(array()));
+
+        $DB->expects($this->any())->method('get_records')->will($this->returnValue(array()));
 
         $enrol = new enrol_autoenrol_plugin();
 
