@@ -84,11 +84,11 @@ if ($mform->is_cancelled()) {
             $instance->customint1 = $data->customint1;
             $instance->customint3 = $data->customint3;
         }
-        $instance->customint2 = $data->customint2;
         $instance->customint4 = $data->customint4;
         $instance->customint8 = $data->customint8;
         $instance->customchar1 = $data->customchar1;
         $instance->customchar2 = $data->customchar2;
+        $instance->customchar3 = $data->customchar3;
         $DB->update_record('enrol', $instance);
 
 
@@ -100,10 +100,15 @@ if ($mform->is_cancelled()) {
         if ($data->customint8 != 0 && $data->customint8 != 1) {
             $data->customint8 = 0;
         }
-        $fields = array('customint1' => 0, 'customint2' => $data->customint2,
-                        'customint3' => 5, 'customint4' => $data->customint4,
-                        'customint5' => $data->customint5, 'customint8' => $data->customint8,
-                        'customchar1' => $data->customchar1, 'customchar2' => $data->customchar2);
+        $fields = array('customint1' => 0,
+                        'customint3' => 5,
+                        'customint4' => $data->customint4,
+                        'customint5' => $data->customint5,
+                        'customint8' => $data->customint8,
+                        'customchar1' => $data->customchar1,
+                        'customchar2' => $data->customchar2,
+                        'customchar3' => $data->customchar3
+        );
         if (has_capability('enrol/autoenrol:method', $context)) {
             $fields['customint1'] = $data->customint1;
             $fields['customint3'] = $data->customint3;

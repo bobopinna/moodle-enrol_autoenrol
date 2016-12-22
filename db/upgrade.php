@@ -41,44 +41,67 @@ function xmldb_enrol_autoenrol_upgrade($oldversion) {
             get_string('g_lang', 'enrol_autoenrol'),
             get_string('g_email', 'enrol_autoenrol'));
 
-        $instances = $DB->get_records('enrol',array('enrol'=>'autoenrol'));
+        $instances = $DB->get_records('enrol', array('enrol' => 'autoenrol'));
 
-        foreach($instances as $instance){
-            $groupids = explode(',',$instance->customtext1);
+        foreach ($instances as $instance) {
+            $groupids = explode(',', $instance->customtext1);
 
-            //ensure that each groupid is a valid int
-            foreach($groupids as $key=>$groupid){
-                if(empty($groupid) || !is_int($groupid)){
+            // Ensure that each groupid is a valid int.
+            foreach ($groupids as $key => $groupid) {
+                if (empty($groupid) || !is_int($groupid)) {
                     unset($groupids[$key]);
-                }
-                else {
+                } else {
                     $groupids[$key] = (int) $groupid;
                 }
             }
 
-            if(empty($groupids)){
+            if (empty($groupids)) {
                 continue;
             }
 
-            $groups = $DB->get_records_list('groups','id',$groupids);
+            $groups = $DB->get_records_list('groups', 'id', $groupids);
 
-            foreach($groups as $group){
-                $group->name = str_replace('Auto|','',$group->name);
+            foreach ($groups as $group) {
+                $group->name = str_replace('Auto|', '', $group->name);
 
-                if(!strlen($group->name)){
-                    $group->name =  get_string('emptyfield', 'enrol_autoenrol', $filtertype[$instance->customint2]);
+                if (!strlen($group->name)) {
+                    $group->name = get_string('emptyfield', 'enrol_autoenrol', $filtertype[$instance->customint2]);
                 }
 
                 $group->idnumber = "autoenrol|$instance->id|$group->name";
-                $DB->update_record('groups',$group);
+                $DB->update_record('groups', $group);
             }
 
             $instance->customtext1 = null;
-            $DB->update_record('enrol',$instance);
+            $DB->update_record('enrol', $instance);
         }
 
         // Savepoint reached.
         upgrade_plugin_savepoint(true, 2014113000, 'enrol', 'autoenrol');
+    }
+
+    if ($oldversion < 2016122000) {
+
+        $fields = array();
+        $fields[] = '-';
+        $fields[] = 'auth';
+        $fields[] = 'department';
+        $fields[] = 'institution';
+        $fields[] = 'lang';
+        $fields[] = 'email';
+
+        $instances = $DB->get_records('enrol', array('enrol' => 'autoenrol'));
+
+        foreach ($instances as $instance) {
+            if (isset($instance->customint2)) {
+                $instance->customchar3 = $fields[$instance->customint2];
+            }
+
+            $DB->update_record('enrol', $instance);
+        }
+
+        // Savepoint reached.
+        upgrade_plugin_savepoint(true, 2016122000, 'enrol', 'autoenrol');
     }
 
     return true;

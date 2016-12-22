@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * autoenrol enrolment plugin.
  *
@@ -87,7 +89,7 @@ class enrol_autoenrol_edit_form extends moodleform {
         $this->_form->setAdvanced('customint3');
         $this->_form->addHelpButton('customint3', 'role', 'enrol_autoenrol');
         if (!has_capability('enrol/autoenrol:method', $context)) {
-            $this->_form->disabledIf('customint3', 'customint2');
+            $this->_form->disabledIf('customint3', 'customchar3', 'eq', '-');
         }
         $this->_form->setDefault('customint3', $plugin->get_config('defaultrole'));
         $this->_form->setType('customint3', PARAM_INT);
@@ -95,7 +97,7 @@ class enrol_autoenrol_edit_form extends moodleform {
         $method = array(get_string('m_course', 'enrol_autoenrol'), get_string('m_site', 'enrol_autoenrol'));
         $this->_form->addElement('select', 'customint1', get_string('method', 'enrol_autoenrol'), $method);
         if (!has_capability('enrol/autoenrol:method', $context)) {
-            $this->_form->disabledIf('customint1', 'customint2');
+            $this->_form->disabledIf('customint1', 'customchar3', 'eq', '-');
         }
         $this->_form->setAdvanced('customint1');
         $this->_form->setType('customint1', PARAM_INT);
@@ -112,25 +114,37 @@ class enrol_autoenrol_edit_form extends moodleform {
      * @throws coding_exception
      */
     protected function add_filtering_section() {
+        global $DB;
+
         $this->_form->addElement('header', 'filtersection', get_string('filtering', 'enrol_autoenrol'));
-        $this->_form->setExpanded('filtersection', false);
+        $this->_form->setExpanded('filtersection', true);
 
-        $fields = array(get_string('g_none', 'enrol_autoenrol'),
-                get_string('g_auth', 'enrol_autoenrol'),
-                get_string('g_dept', 'enrol_autoenrol'),
-                get_string('g_inst', 'enrol_autoenrol'),
-                get_string('g_lang', 'enrol_autoenrol'),
-                get_string('g_email', 'enrol_autoenrol'));
+        $fields = array('-' => get_string('choose'));
+        $fields['auth'] = get_string('authentication');
+        $fields['lang'] = get_string('language');
+        $fields['email'] = get_string('email');
+        $fields['institution'] = get_string('institution');
+        $fields['department'] = get_string('department');
+        $fields['address'] = get_string('address');
+        $fields['city'] = get_string('city');
 
-        $this->_form->addElement('select', 'customint2', get_string('groupon', 'enrol_autoenrol'), $fields);
-        $this->_form->setType('customint2', PARAM_INT);
-        $this->_form->addHelpButton('customint2', 'groupon', 'enrol_autoenrol');
+        $standardfieldcount = count($fields);
+        $customfields = $DB->get_records('user_info_field');
+        if (!empty($customfields)) {
+            foreach ($customfields as $customfield) {
+                $fields[$customfield->shortname] = $customfield->name;
+            }
+        }
+
+        $this->_form->addElement('select', 'customchar3', get_string('groupon', 'enrol_autoenrol'), $fields);
+        $this->_form->setType('customchar3', PARAM_ALPHA);
+        $this->_form->addHelpButton('customchar3', 'groupon', 'enrol_autoenrol');
 
         $this->_form->addElement('text', 'customchar1', get_string('filter', 'enrol_autoenrol'));
         $this->_form->setDefault('customchar1', '');
         $this->_form->setType('customchar1', PARAM_TEXT);
         $this->_form->addHelpButton('customchar1', 'filter', 'enrol_autoenrol');
-        $this->_form->disabledIf('customchar1', 'customint2', 'eq', 0);
+        $this->_form->disabledIf('customchar1', 'customchar3', 'eq', '-');
 
         $this->_form->addElement('selectyesno', 'customint4', get_string('softmatch', 'enrol_autoenrol'));
         $this->_form->setDefault('customint4', 0);

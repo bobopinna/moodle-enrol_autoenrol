@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * autoenrol enrolment plugin.
  *
@@ -54,7 +56,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      * @return bool
      */
     public function allow_unenrol(stdClass $instance) {
-        // Users with unenrol cap may unenrol other users manually - requires enrol/autoenrol:unenrol.
+        // Users with onenrol cap may unenrol other users manually - requires enrol/autoenrol:unenrol.
         return true;
     }
 
@@ -109,8 +111,10 @@ class enrol_autoenrol_plugin extends enrol_plugin {
         if ($instance->enrol !== 'autoenrol') {
             throw new coding_exception('Invalid enrol instance type!');
         }
-        if ($instance->customint1 == 0 && $this->enrol_allowed($USER, $instance)) {
-            $this->enrol_user($instance, $USER->id, $instance->customint3, time(), 0);
+        if ($instance->customint1 == 0) {
+            if ($this->enrol_allowed($USER, $instance)) {
+                $this->enrol_user($instance, $USER->id, $instance->customint3, time(), 0);
+            }
             $this->process_group($instance, $USER);
             return 9999999999;
         }
@@ -127,7 +131,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      *
      * @return bool
      */
-    public function enrol_allowed($USER, stdClass $instance) {
+    public function enrol_allowed($user, stdClass $instance) {
         global $DB;
 
         if (isguestuser()) {
@@ -136,6 +140,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
         }
 
         if (!$instance->customint8) {
+            // Do not reenrol if already enrolled with another method.
             $context = context_course::instance($instance->courseid);
             if (has_capability('moodle/course:view', $context) || is_enrolled($context)) {
                 // No need to enrol someone who is already enrolled.
@@ -143,7 +148,8 @@ class enrol_autoenrol_plugin extends enrol_plugin {
             }
         }
 
-        if ($DB->record_exists('user_enrolments', array('userid' => $USER->id, 'enrolid' => $instance->id))) {
+        // Do not reenrol if already enrolled with this method.
+        if ($DB->record_exists('user_enrolments', array('userid' => $user->id, 'enrolid' => $instance->id))) {
             return false;
         }
 
@@ -155,41 +161,8 @@ class enrol_autoenrol_plugin extends enrol_plugin {
             }
         }
 
-        // Very quick check to see if the user is being filtered.
-        if ($instance->customchar1 != '') {
-            if (!is_object($USER)) {
-                return false;
-            }
-
-            if (!isset($USER->auth)) {
-                $USER->auth = '';
-            }
-            if (!isset($USER->department)) {
-                $USER->department = '';
-            }
-            if (!isset($USER->institution)) {
-                $USER->institution = '';
-            }
-            if (!isset($USER->lang)) {
-                $USER->lang = '';
-            }
-            if (!isset($USER->email)) {
-                $USER->email = '';
-            }
-
-            $type = array(1 => $USER->auth, $USER->department, $USER->institution, $USER->lang, $USER->email);
-
-            if ($instance->customint4) {
-                // Allow partial.
-                $match = strstr(strtolower($type[$instance->customint2]), strtolower($instance->customchar1));
-            } else {
-                // Require exact.
-                $match = $instance->customchar1 == $type[$instance->customint2];
-            }
-
-            if (!$match) {
-                return false;
-            }
+        if (!$this->check_rule($instance, $user)) {
+            return false;
         }
 
         if ($instance->enrolstartdate != 0 and $instance->enrolstartdate > time()) {
@@ -198,6 +171,73 @@ class enrol_autoenrol_plugin extends enrol_plugin {
 
         if ($instance->enrolenddate != 0 and $instance->enrolenddate < time()) {
             return false;
+        }
+        return true;
+    }
+
+    private function check_rule($instance, $user) {
+        global $CFG;
+
+        // Very quick check to see if the user is being filtered.
+        if (!empty($instance->customchar1)) {
+            if (!is_object($user)) {
+                return false;
+            }
+
+            $uservalue = '';
+
+            // Profile field to check.
+            $profileattribute = '';
+            if (isset($instance->customchar3) && ($instance->customchar3 != '-')) {
+                $profileattribute = $instance->customchar3;
+            } else if (isset($instance->customint2)) {
+                $oldfields = array(0 => '', 1 => 'auth', 2 => 'department', 3 => 'institution', 4 => 'lang', 5 => 'email');
+                $profileattribute = $oldfields[$instance->customint2];
+            }
+
+            $standardfields = array('auth', 'lang', 'department', 'institution', 'address', 'city');
+            if (in_array($profileattribute, $standardfields)) {
+                if (!isset($user->auth)) {
+                    $user->auth = '';
+                }
+                if (!isset($user->lang)) {
+                    $user->lang = '';
+                }
+                if (!isset($user->department)) {
+                    $user->department = '';
+                }
+                if (!isset($user->institution)) {
+                    $user->institution = '';
+                }
+                if (!isset($user->address)) {
+                    $user->address = '';
+                }
+                if (!isset($user->city)) {
+                    $user->city = '';
+                }
+                if (!isset($user->email)) {
+                    $user->email = '';
+                }
+                $uservalue = $user->$profileattribute;
+            } else {
+                require_once($CFG->dirroot.'/user/profile/lib.php');
+                $userdata = profile_user_record($user->id);
+                if (!empty($userdata) && isset($userdata->$profileattribute)) {
+                    $uservalue = $userdata->$profileattribute;
+                }
+            }
+
+            if ($instance->customint4) {
+                // Allow partial.
+                $match = mb_strpos(mb_strtolower($uservalue), mb_strtolower($instance->customchar1));
+            } else {
+                // Require exact.
+                $match = $instance->customchar1 == $uservalue;
+            }
+
+            if ($match === false) {
+                return false;
+            }
         }
         return true;
     }
@@ -238,12 +278,13 @@ class enrol_autoenrol_plugin extends enrol_plugin {
         if ($instance->enrol !== 'autoenrol') {
             throw new coding_exception('Invalid enrol instance type!');
         }
-        if (!empty($instance->customint8) && $instance->customint8 == 1 && $instance->customint1 == 0 && $this->enrol_allowed(
-                        $USER, $instance)
-        ) {
-            $this->enrol_user($instance, $USER->id, $instance->customint3, time(), 0);
+        if (!empty($instance->customint8) && empty($instance->customint1)) {
+            if ($this->enrol_allowed($USER, $instance)) {
+                $this->enrol_user($instance, $USER->id, $instance->customint3, time(), 0);
+            }
             $this->process_group($instance, $USER);
         }
+
         $context = context_course::instance($instance->courseid);
         if (has_capability('enrol/autoenrol:config', $context)) {
             $managelink = new moodle_url(
@@ -294,6 +335,30 @@ class enrol_autoenrol_plugin extends enrol_plugin {
         return $icons;
     }
 
+
+    public function unenrol_user(stdClass $instance, $userid) {
+        global $CFG;
+
+        // Remove user from enrol method related group.
+        $usergroups = groups_get_all_groups($instance->courseid, $userid);
+        if (!empty($usergroups)) {
+            require_once($CFG->dirroot . '/group/lib.php');
+
+            foreach ($usergroups as $usergroupid => $usergroup) {
+                if (strpos($usergroup->idnumber, 'autoenrol|'.$instance->id.'|') === false) {
+                    unset($usergroups[$usergroupid]);
+                }
+            }
+
+            if (!empty($usergroups) && (count($usergroups) == 1)) {
+                $usergroup = reset($usergroups);
+                groups_remove_member($usergroup->id, $userid);
+            }
+        }
+
+        parent::unenrol_user($instance, $userid);
+    }
+
     /**
      * This is important especially for external enrol plugins,
      * this function is called for all enabled enrol plugins
@@ -310,19 +375,27 @@ class enrol_autoenrol_plugin extends enrol_plugin {
         // Get records of all the AutoEnrol instances which are set to enrol at login.
         $instances = $DB->get_records('enrol', array('enrol' => 'autoenrol', 'customint1' => 1), null, '*');
         // Now get a record of all of the users enrolments.
-        $user_enrolments = $DB->get_records('user_enrolments', array('userid' => $user->id), null, '*');
+        $userenrolments = $DB->get_records('user_enrolments', array('userid' => $user->id), null, '*');
         // Run throuch all of the autoenrolment instances and check that the user has been enrolled.
         foreach ($instances as $instance) {
             $found = false;
-            foreach ($user_enrolments as $user_enrolment) {
-                if ($user_enrolment->enrolid == $instance->id) {
+            foreach ($userenrolments as $userenrolment) {
+                if ($userenrolment->enrolid == $instance->id) {
                     $found = true;
                 }
             }
 
-            if (!$found && $this->enrol_allowed($user, $instance)) {
-                $this->enrol_user($instance, $user->id, $instance->customint3, time(), 0);
-                $this->process_group($instance, $user);
+            if (!$found) {
+                if ($this->enrol_allowed($user, $instance)) {
+                    $this->enrol_user($instance, $user->id, $instance->customint3, time(), 0);
+                    $this->process_group($instance, $user);
+                }
+            } else {
+                if (!$this->check_rule($instance, $user)) {
+                    $this->unenrol_user($instance, $user->id);
+                } else {
+                    $this->process_group($instance, $user);
+                }
             }
 
         }
@@ -377,13 +450,11 @@ class enrol_autoenrol_plugin extends enrol_plugin {
     public function delete_instance($instance) {
         global $DB;
 
-        if($this->get_config('removegroups')) {
+        if ($this->get_config('removegroups')) {
             require_once("../group/lib.php");
 
-            $groups = $DB->get_records_sql(
-                "SELECT * FROM {groups} WHERE " . $DB->sql_like('idnumber', ':idnumber'),
-                array('idnumber' => "autoenrol|$instance->id|%")
-            );
+            $groups = $DB->get_records_sql("SELECT * FROM {groups} WHERE " . $DB->sql_like('idnumber', ':idnumber'),
+                    array('idnumber' => "autoenrol|$instance->id|%"));
 
             foreach ($groups as $group) {
                 groups_delete_group($group);
@@ -423,33 +494,63 @@ class enrol_autoenrol_plugin extends enrol_plugin {
     private function process_group(stdClass $instance, $user) {
         global $CFG, $DB;
 
-        if ($instance->customint2 != 0) {
+        $profileattribute = '';
+        if (isset($instance->customchar3) && ($instance->customchar3 != '-')) {
+            $profileattribute = $instance->customchar3;
+        } else if (isset($instance->customint2)) {
+            $oldfields = array(0 => '', 1 => 'auth', 2 => 'department', 3 => 'institution', 4 => 'lang', 5 => 'email');
+            $profileattribute = $oldfields[$instance->customint2];
+        }
+
+        if (!empty($profileattribute)) {
             require_once($CFG->dirroot . '/group/lib.php');
 
-            if (strlen($instance->customchar1)) {
+            $name = '';
+            if (!empty($instance->customchar1)) {
                 $name = $instance->customchar1;
             } else {
-                $types = array(1 => $user->auth, $user->department, $user->institution, $user->lang);
-
-                $name = $types[$instance->customint2];
-
-                if(!strlen($name)){
-                    $filtertype = array(get_string('g_none', 'enrol_autoenrol'),
-                        get_string('g_auth', 'enrol_autoenrol'),
-                        get_string('g_dept', 'enrol_autoenrol'),
-                        get_string('g_inst', 'enrol_autoenrol'),
-                        get_string('g_lang', 'enrol_autoenrol'),
-                        get_string('g_email', 'enrol_autoenrol'));
-
-                    $name =  get_string('emptyfield', 'enrol_autoenrol', $filtertype[$instance->customint2]);
+                $standardfields = array('auth', 'lang', 'department', 'institution', 'address', 'city');
+                if (in_array($profileattribute, $standardfields)) {
+                    $name = $user->$profileattribute;
+                } else {
+                    require_once($CFG->dirroot.'/user/profile/lib.php');
+                    $userdata = profile_user_record($user->id);
+                    if (!empty($userdata)) {
+                        $name = $userdata->$profileattribute;
+                    } else {
+                        $name = get_string('emptyfield', 'enrol_autoenrol', $profileattribute);
+                    }
                 }
             }
 
-            $group = $this->get_group($instance, $name, $DB);
-            return groups_add_member($group, $user->id);
+            $groupid = 0;
+            if (!empty($name)) {
+                $groupid = $this->get_group($instance, $name, $DB);
+            }
 
+            // Check if this instance already added this user to a group and remove membership if group is changed.
+            $usergroups = groups_get_all_groups($instance->courseid, $user->id);
+            if (!empty($usergroups)) {
+                foreach ($usergroups as $usergroupid => $usergroup) {
+                    if (strpos($usergroup->idnumber, 'autoenrol|'.$instance->id.'|') === false) {
+                        unset($usergroups[$usergroupid]);
+                    }
+                }
+
+                if (!empty($usergroups) && (count($usergroups) == 1)) {
+                    $usergroup = reset($usergroups);
+                    if ($usergroup->id != $groupid) {
+                        groups_remove_member($usergroup->id, $user->id);
+                    }
+                }
+            }
+
+            if (!empty($name)) {
+                return groups_add_member($groupid, $user->id);
+            } else {
+                return null;
+            }
         }
-
     }
 
     /**
@@ -462,11 +563,8 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      */
     private function get_group(stdClass $instance, $name, moodle_database $DB) {
 
-        $idnumber = substr(
-            "autoenrol|$instance->id|$name",
-            0,
-            100 //group idnumber must be no more than 100 characters
-        );
+        // Group idnumber must be no more than 100 characters.
+        $idnumber = substr("autoenrol|$instance->id|$name", 0, 100);
 
         $group = $DB->get_record('groups', array('idnumber' => $idnumber, 'courseid' => $instance->courseid));
 
@@ -476,11 +574,11 @@ class enrol_autoenrol_plugin extends enrol_plugin {
             $newgroupdata->name = $name;
             $newgroupdata->idnumber = $idnumber;
             $newgroupdata->description = get_string('auto_desc', 'enrol_autoenrol');
-            $group = groups_create_group($newgroupdata);
+            $groupid = groups_create_group($newgroupdata);
         } else {
-            $group = $group->id;
+            $groupid = $group->id;
         }
 
-        return $group;
+        return $groupid;
     }
 }
