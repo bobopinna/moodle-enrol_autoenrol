@@ -195,7 +195,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
                 $profileattribute = $oldfields[$instance->customint2];
             }
 
-            $standardfields = array('auth', 'lang', 'department', 'institution', 'address', 'city');
+            $standardfields = array('auth', 'lang', 'department', 'institution', 'address', 'city', 'email');
             if (in_array($profileattribute, $standardfields)) {
                 if (!isset($user->auth)) {
                     $user->auth = '';
