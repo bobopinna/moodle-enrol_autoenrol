@@ -509,7 +509,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
             if (!empty($instance->customchar1)) {
                 $name = $instance->customchar1;
             } else {
-                $standardfields = array('auth', 'lang', 'department', 'institution', 'address', 'city');
+                $standardfields = array('auth', 'lang', 'department', 'institution', 'address', 'city', 'email');
                 if (in_array($profileattribute, $standardfields)) {
                     $name = $user->$profileattribute;
                 } else {
