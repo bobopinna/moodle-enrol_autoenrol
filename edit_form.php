@@ -122,11 +122,11 @@ class enrol_autoenrol_edit_form extends moodleform {
         $fields = array('-' => get_string('choose'));
         $fields['auth'] = get_string('authentication');
         $fields['lang'] = get_string('language');
-        $fields['email'] = get_string('email');
-        $fields['institution'] = get_string('institution');
         $fields['department'] = get_string('department');
+        $fields['institution'] = get_string('institution');
         $fields['address'] = get_string('address');
         $fields['city'] = get_string('city');
+        $fields['email'] = get_string('email');
 
         $standardfieldcount = count($fields);
         $customfields = $DB->get_records('user_info_field');
