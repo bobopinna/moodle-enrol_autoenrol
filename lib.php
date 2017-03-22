@@ -56,7 +56,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      * @return bool
      */
     public function allow_unenrol(stdClass $instance) {
-        // Users with onenrol cap may unenrol other users manually - requires enrol/autoenrol:unenrol.
+        // Users with unenrol cap may unenrol other users manually - requires enrol/autoenrol:unenrol.
         return true;
     }
 
@@ -107,17 +107,21 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      * @throws coding_exception
      */
     public function try_autoenrol(stdClass $instance) {
-        global $USER;
+        global $USER, $DB;
         if ($instance->enrol !== 'autoenrol') {
             throw new coding_exception('Invalid enrol instance type!');
         }
-        if ($instance->customint1 == 0) {
+//        if ($instance->customint1 == 0) {
             if ($this->enrol_allowed($USER, $instance)) {
                 $this->enrol_user($instance, $USER->id, $instance->customint3, time(), 0);
+                $this->process_group($instance, $USER);
+                return 9999999999;
+            } else {
+                if ($DB->record_exists('user_enrolments', array('userid' => $USER->id, 'enrolid' => $instance->id))) {
+                    $this->process_group($instance, $USER);
+                }
             }
-            $this->process_group($instance, $USER);
-            return 9999999999;
-        }
+//        }
         return false;
     }
 
@@ -142,7 +146,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
         if (!$instance->customint8) {
             // Do not reenrol if already enrolled with another method.
             $context = context_course::instance($instance->courseid);
-            if (has_capability('moodle/course:view', $context) || is_enrolled($context)) {
+            if (is_enrolled($context, $user, 'moodle/course:view')) {
                 // No need to enrol someone who is already enrolled.
                 return false;
             }
@@ -277,12 +281,6 @@ class enrol_autoenrol_plugin extends enrol_plugin {
         global $USER;
         if ($instance->enrol !== 'autoenrol') {
             throw new coding_exception('Invalid enrol instance type!');
-        }
-        if (!empty($instance->customint8) && empty($instance->customint1)) {
-            if ($this->enrol_allowed($USER, $instance)) {
-                $this->enrol_user($instance, $USER->id, $instance->customint3, time(), 0);
-            }
-            $this->process_group($instance, $USER);
         }
 
         $context = context_course::instance($instance->courseid);
