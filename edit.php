@@ -89,6 +89,8 @@ if ($mform->is_cancelled()) {
         $instance->customchar1 = $data->customchar1;
         $instance->customchar2 = $data->customchar2;
         $instance->customchar3 = $data->customchar3;
+        $instance->enrolstartdate = $data->enrolstartdate;
+        $instance->enrolenddate = $data->enrolenddate;
         $DB->update_record('enrol', $instance);
 
 
@@ -107,7 +109,9 @@ if ($mform->is_cancelled()) {
                         'customint8' => $data->customint8,
                         'customchar1' => $data->customchar1,
                         'customchar2' => $data->customchar2,
-                        'customchar3' => $data->customchar3
+                        'customchar3' => $data->customchar3,
+                         'enrolstartdate' => $data->enrolstartdate,
+                        'enrolenddate' => $data->enrolenddate
         );
         if (has_capability('enrol/autoenrol:method', $context)) {
             $fields['customint1'] = $data->customint1;
