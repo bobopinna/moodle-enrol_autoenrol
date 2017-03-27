@@ -85,3 +85,6 @@ $string['emptyfield'] = 'No {$a}';
 
 $string['removegroups'] = 'Remove groups';
 $string['removegroups_desc'] = 'When an enrolment instance is deleted, should it attempt to remove the groups it has created?';
+
+$string['enrolstartdate'] = 'enrol start date';
+$string['enrolclosedate'] = 'enrol close date';
