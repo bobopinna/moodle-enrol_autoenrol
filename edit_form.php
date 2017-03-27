@@ -108,6 +108,11 @@ class enrol_autoenrol_edit_form extends moodleform {
         $this->_form->setType('customint8', PARAM_INT);
         $this->_form->setDefault('customint8', 0);
         $this->_form->addHelpButton('customint8', 'alwaysenrol', 'enrol_autoenrol');
+        
+        $this->_form->addElement('date_time_selector', 'enrolstartdate', get_string('enrolstartdate', 'enrol_autoenrol'));
+        $this->_form->setDefault('enrolstartdate', 0);
+        $this->_form->addElement('date_time_selector', 'enrolenddate', get_string('enrolenddate', 'enrol_autoenrol'));
+        $this->_form->setDefault('enrolenddate', 0);
     }
 
     /**
