@@ -112,11 +112,11 @@ class enrol_autoenrol_edit_form extends moodleform {
         $options = array('optional' => true);
         $this->_form->addElement('date_time_selector', 'enrolstartdate', get_string('enrolstartdate', 'enrol_autoenrol'), $options);
         $this->_form->setDefault('enrolstartdate', 0);
-        $mform->addHelpButton('enrolstartdate', 'enrolstartdate', 'enrol_autoenrol');
+        $this->_form->addHelpButton('enrolstartdate', 'enrolstartdate', 'enrol_autoenrol');
 
         $this->_form->addElement('date_time_selector', 'enrolenddate', get_string('enrolenddate', 'enrol_autoenrol'), $options);
         $this->_form->setDefault('enrolenddate', 0);
-        $mform->addHelpButton('enrolenddate', 'enrolenddate', 'enrol_autoenrol');
+        $this->_form->addHelpButton('enrolenddate', 'enrolenddate', 'enrol_autoenrol');
     }
 
     /**
