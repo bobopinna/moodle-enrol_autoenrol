@@ -14,27 +14,36 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * autoenrol enrolment plugin.
  *
  * This plugin automatically enrols a user onto a course the first time they try to access it.
  *
- * @package    enrol
- * @subpackage autoenrol
- * @author     Mark Ward & Matthew Cannings - based on code by Martin Dougiamas, Petr Skoda, Eugene Venter and others
- * @date       July 2013
+ * @package    enrol_autoenrol
+ * @copyright  2013 Mark Ward, Roberto Pinna & Matthew Cannings - based on code by Martin Dougiamas, Petr Skoda, Eugene Venter and others
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Class enrol_autoenrol_edit_form
+ *
+ * @package    enrol_autoenrol
+ * @copyright  2013 Mark Ward, Roberto Pinna & Matthew Cannings - based on code by Martin Dougiamas, Petr Skoda, Eugene Venter and others
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class enrol_autoenrol_edit_form extends moodleform {
 
     /**
+     * Customdata object
      *
+     * @var object
+     */
+    protected $_customdata;
+
+    /**
+     * Form definition
      */
     public function definition() {
         list($instance, $plugin, $context) = $this->_customdata;
@@ -48,9 +57,11 @@ class enrol_autoenrol_edit_form extends moodleform {
     }
 
     /**
-     * @param $instance
-     * @param $plugin
-     * @param $context
+     * Add the general section to the form
+     *
+     * @param stdClass $instance
+     * @param object $plugin
+     * @param object $context
      *
      * @throws coding_exception
      */
@@ -108,7 +119,7 @@ class enrol_autoenrol_edit_form extends moodleform {
         $this->_form->setType('customint8', PARAM_INT);
         $this->_form->setDefault('customint8', 0);
         $this->_form->addHelpButton('customint8', 'alwaysenrol', 'enrol_autoenrol');
-        
+
         $options = array('optional' => true);
         $this->_form->addElement('date_time_selector', 'enrolstartdate', get_string('enrolstartdate', 'enrol_autoenrol'), $options);
         $this->_form->setDefault('enrolstartdate', 0);
@@ -120,6 +131,8 @@ class enrol_autoenrol_edit_form extends moodleform {
     }
 
     /**
+     * Add filtering section to form
+     *
      * @throws coding_exception
      */
     protected function add_filtering_section() {
@@ -166,7 +179,7 @@ class enrol_autoenrol_edit_form extends moodleform {
     }
 
     /**
-     *
+     * Add hidden fields
      */
     protected function add_hidden_fields() {
         $this->_form->addElement('hidden', 'id');
@@ -174,9 +187,4 @@ class enrol_autoenrol_edit_form extends moodleform {
         $this->_form->addElement('hidden', 'courseid');
         $this->_form->setType('courseid', PARAM_INT);
     }
-
-    /**
-     * @type occurrence
-     */
-    protected $_customdata;
 }

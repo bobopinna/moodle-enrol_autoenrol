@@ -14,26 +14,30 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * autoenrol enrolment plugin.
  *
  * This plugin automatically enrols a user onto a course the first time they try to access it.
  *
- * @package    enrol
- * @subpackage autoenrol
- * @author     Mark Ward & Matthew Cannings - based on code by Martin Dougiamas, Petr Skoda, Eugene Venter and others
- * @date       July 2013
+ * @package    enrol_autoenrol
+ * @copyright  2013 Mark Ward, Roberto Pinna & Matthew Cannings - based on code by Martin Dougiamas, Petr Skoda, Eugene Venter and others
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Class enrol_autoenrol_plugin
+ *
+ * @package    enrol_autoenrol
+ * @copyright  2013 Mark Ward, Roberto Pinna & Matthew Cannings - based on code by Martin Dougiamas, Petr Skoda, Eugene Venter and others
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class enrol_autoenrol_plugin extends enrol_plugin {
 
     /**
+     * Get enrol method icon
+     *
      * @param array $instances
      *
      * @return array
@@ -43,34 +47,39 @@ class enrol_autoenrol_plugin extends enrol_plugin {
     }
 
     /**
+     * Users with role assign cap may tweak the roles later.
+     *
      * @return bool
      */
     public function roles_protected() {
-        // Users with role assign cap may tweak the roles later.
         return false;
     }
 
     /**
+     * Users with unenrol cap may unenrol other users manually - requires enrol/autoenrol:unenrol.
+     *
      * @param stdClass $instance
      *
      * @return bool
      */
     public function allow_unenrol(stdClass $instance) {
-        // Users with unenrol cap may unenrol other users manually - requires enrol/autoenrol:unenrol.
         return true;
     }
 
     /**
+     * Users with manage cap may tweak period and status - requires enrol/autoenrol:manage.
+     *
      * @param stdClass $instance
      *
      * @return bool
      */
     public function allow_manage(stdClass $instance) {
-        // Users with manage cap may tweak period and status - requires enrol/autoenrol:manage.
         return false;
     }
 
     /**
+     * Must show enrolme link.
+     *
      * @param stdClass $instance
      *
      * @return bool
@@ -111,17 +120,15 @@ class enrol_autoenrol_plugin extends enrol_plugin {
         if ($instance->enrol !== 'autoenrol') {
             throw new coding_exception('Invalid enrol instance type!');
         }
-//        if ($instance->customint1 == 0) {
-            if ($this->enrol_allowed($USER, $instance)) {
-                $this->enrol_user($instance, $USER->id, $instance->customint3, time(), 0);
+        if ($this->enrol_allowed($USER, $instance)) {
+            $this->enrol_user($instance, $USER->id, $instance->customint3, time(), 0);
+            $this->process_group($instance, $USER);
+            return 9999999999;
+        } else {
+            if ($DB->record_exists('user_enrolments', array('userid' => $USER->id, 'enrolid' => $instance->id))) {
                 $this->process_group($instance, $USER);
-                return 9999999999;
-            } else {
-                if ($DB->record_exists('user_enrolments', array('userid' => $USER->id, 'enrolid' => $instance->id))) {
-                    $this->process_group($instance, $USER);
-                }
             }
-//        }
+        }
         return false;
     }
 
@@ -130,7 +137,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      * Custom function, checks to see if user fulfills
      * our requirements before enrolling them.
      *
-     * @param          $USER
+     * @param object $user
      * @param stdClass $instance
      *
      * @return bool
@@ -179,6 +186,14 @@ class enrol_autoenrol_plugin extends enrol_plugin {
         return true;
     }
 
+    /**
+     * Checks if user field match the rule.
+     *
+     * @param stdClass $instance
+     * @param object   $user
+     *
+     * @return bool
+     */
     private function check_rule($instance, $user) {
         global $CFG;
 
@@ -272,7 +287,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
     /**
      * Sets up navigation entries.
      *
-     * @param          $instancesnode
+     * @param object   $instancesnode
      * @param stdClass $instance
      *
      * @throws coding_exception
@@ -334,6 +349,12 @@ class enrol_autoenrol_plugin extends enrol_plugin {
     }
 
 
+    /**
+     * Unenrol user from an instance and the related group.
+     *
+     * @param stdClass $instance
+     * @param int      $userid
+     */
     public function unenrol_user(stdClass $instance, $userid) {
         global $CFG;
 
@@ -364,7 +385,6 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      *
      * @param object         $user user record
      *
-     * @type moodle_database $DB
      * @return void
      */
     public function sync_user_enrolments($user) {
@@ -444,6 +464,8 @@ class enrol_autoenrol_plugin extends enrol_plugin {
     /**
      * Intercepts the instance deletion call and gives some
      * custom instructions before resuming the parent function
+     *
+     * @param stdClass $instance
      */
     public function delete_instance($instance) {
         global $DB;
@@ -487,7 +509,10 @@ class enrol_autoenrol_plugin extends enrol_plugin {
     }
 
     /**
+     * Check and add or remove user from/to related groups
+     *
      * @param stdClass $instance
+     * @param object   $user
      */
     private function process_group(stdClass $instance, $user) {
         global $CFG, $DB;
@@ -523,7 +548,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
 
             $groupid = 0;
             if (!empty($name)) {
-                $groupid = $this->get_group($instance, $name, $DB);
+                $groupid = $this->get_group($instance, $name);
             }
 
             // Check if this instance already added this user to a group and remove membership if group is changed.
@@ -552,24 +577,28 @@ class enrol_autoenrol_plugin extends enrol_plugin {
     }
 
     /**
+     * Get group id named groupname if not exists create it
+     *
      * @param stdClass $instance
-     * @param $name
-     * @param moodle_database $DB
+     * @param string   $groupname
+     *
      * @return int|mixed id of the group
+     *
      * @throws coding_exception
      * @throws moodle_exception
      */
-    private function get_group(stdClass $instance, $name, moodle_database $DB) {
+    private function get_group(stdClass $instance, $groupname) {
+        global $DB;
 
         // Group idnumber must be no more than 100 characters.
-        $idnumber = substr("autoenrol|$instance->id|$name", 0, 100);
+        $idnumber = substr("autoenrol|$instance->id|$groupname", 0, 100);
 
         $group = $DB->get_record('groups', array('idnumber' => $idnumber, 'courseid' => $instance->courseid));
 
         if ($group == null) {
             $newgroupdata = new stdclass();
             $newgroupdata->courseid = $instance->courseid;
-            $newgroupdata->name = $name;
+            $newgroupdata->name = $groupname;
             $newgroupdata->idnumber = $idnumber;
             $newgroupdata->description = get_string('auto_desc', 'enrol_autoenrol');
             $groupid = groups_create_group($newgroupdata);

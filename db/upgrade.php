@@ -19,15 +19,19 @@
  *
  * This plugin automatically enrols a user onto a course the first time they try to access it.
  *
- * @package    enrol
- * @subpackage autoenrol
- * @author     Mark Ward (me@moodlemark.com) - based on code by Martin Dougiamas, Petr Skoda, Eugene Venter and others
- * @date       November 2014
+ * @package    enrol_autoenrol
+ * @copyright  2014 Mark Ward - based on code by Martin Dougiamas, Petr Skoda, Eugene Venter and others
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Auto Enrol pluing upgrade task
+ *
+ * @param int $oldversion the version we are upgrading from
+ * @return bool always true
+ */
 function xmldb_enrol_autoenrol_upgrade($oldversion) {
     global $DB;
     $dbman = $DB->get_manager();

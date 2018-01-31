@@ -19,10 +19,8 @@
  *
  * This plugin automatically enrols a user onto a course the first time they try to access it.
  *
- * @package    enrol
- * @subpackage autoenrol
- * @author     Mark Ward & Matthew Cannings - based on code by Martin Dougiamas, Petr Skoda, Eugene Venter and others
- * @date       July 2013
+ * @package    enrol_autoenrol
+ * @copyright  2013 Mark Ward, Roberto Pinna & Matthew Cannings - based on code by Martin Dougiamas, Petr Skoda, Eugene Venter and others
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -32,4 +30,4 @@ $plugin->version = 2016122000;
 $plugin->requires = 2013111800.00;      // Requires this Moodle version (2.6).
 $plugin->release = '2.0';               // Plugin release.
 $plugin->component = 'enrol_autoenrol'; // Full name of the plugin (used for diagnostics).
-$plugin->maturity = MATURITY_ALPHA;    // The moodle.org release.
+$plugin->maturity = MATURITY_STABLE;    // The moodle.org release.
