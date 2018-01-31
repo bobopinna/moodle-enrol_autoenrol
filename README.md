@@ -57,16 +57,9 @@ relating to the plugin which should be reviewed through Moodle's "Define Roles" 
 
 ## Maintainer
 
-The module was authored and is being maintained by Mark Ward.
+The module was authored by Mark Ward and is being maintained by Roberto Pinna.
 
-I now work with the Moodle community full time, supporting Moodle sites and developing free 
-plugins! You can find more about my work at http://www.moodlemark.com or if you'd like my help
-with something you can get in touch via me@moodlemark.com.
-
-If you find my plugins useful and would like to support my efforts you can now donate to me through 
-[PayPal](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=DW9R2WX3W73TG). 
-
-Thank you!
+The original module developed by Mark Ward can be found on [his GitHub](https://github.com/markward/enrol_autoenrol). 
 
 ## Thanks to
 
@@ -76,7 +69,7 @@ Thanks also to users who have taken the time to share feedback and improve the m
 
 ## Technical Support
 
-Issue tracker can be found on [GitHub](https://github.com/markward/enrol_autoenrol/issues). Please
+Issue tracker can be found on [GitHub](https://github.com/bobopinna/enrol_autoenrol/issues). Please
 try to give as much detail about your problem as possible and I'll do what I can to help.
 
 ## License
