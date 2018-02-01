@@ -21,6 +21,7 @@
  *
  * @package    enrol_autoenrol
  * @copyright  2013 Mark Ward & Matthew Cannings - based on code by Martin Dougiamas, Petr Skoda, Eugene Venter and others
+ * @copyright  2017 onwards Roberto Pinna
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -59,6 +60,17 @@ if ($ADMIN->fulltree) {
             get_string('removegroups', 'enrol_autoenrol'),
             get_string('removegroups_desc', 'enrol_autoenrol'),
             1
+        )
+    );
+
+    $options = enrol_send_welcome_email_options();
+    unset($options[ENROL_SEND_EMAIL_FROM_KEY_HOLDER]);
+    $settings->add(
+        new admin_setting_configselect('enrol_autoenrol/sendcoursewelcomemessage',
+            get_string('sendcoursewelcomemessage', 'enrol_autoenrol'),
+            get_string('sendcoursewelcomemessage_help', 'enrol_autoenrol'),
+            ENROL_DO_NOT_SEND_EMAIL,
+            $options
         )
     );
 }

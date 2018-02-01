@@ -20,7 +20,8 @@
  * This plugin automatically enrols a user onto a course the first time they try to access it.
  *
  * @package    enrol_autoenrol
- * @copyright  2013 Mark Ward, Roberto Pinna & Matthew Cannings - based on code by Martin Dougiamas, Petr Skoda, Eugene Venter and others
+ * @copyright  2013 Mark Ward & Matthew Cannings - based on code by Martin Dougiamas, Petr Skoda, Eugene Venter and others
+ * @copyright  2017 onwards Roberto Pinna
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -30,7 +31,8 @@ defined('MOODLE_INTERNAL') || die();
  * Class enrol_autoenrol_edit_form
  *
  * @package    enrol_autoenrol
- * @copyright  2013 Mark Ward, Roberto Pinna & Matthew Cannings - based on code by Martin Dougiamas, Petr Skoda, Eugene Venter and others
+ * @copyright  2013 Mark Ward & Matthew Cannings - based on code by Martin Dougiamas, Petr Skoda, Eugene Venter and others
+ * @copyright  2017 onwards Roberto Pinna
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class enrol_autoenrol_edit_form extends moodleform {
@@ -74,7 +76,7 @@ class enrol_autoenrol_edit_form extends moodleform {
         $img = html_writer::empty_tag(
                 'img',
                 array(
-                        'src'   => $OUTPUT->pix_url('logo', 'enrol_autoenrol'),
+                        'src'   => $OUTPUT->image_url('logo', 'enrol_autoenrol'),
                         'alt'   => 'AutoEnrol Logo',
                         'title' => 'AutoEnrol Logo'
                 )
@@ -128,6 +130,15 @@ class enrol_autoenrol_edit_form extends moodleform {
         $this->_form->addElement('date_time_selector', 'enrolenddate', get_string('enrolenddate', 'enrol_autoenrol'), $options);
         $this->_form->setDefault('enrolenddate', 0);
         $this->_form->addHelpButton('enrolenddate', 'enrolenddate', 'enrol_autoenrol');
+
+        $options = enrol_send_welcome_email_options();
+        unset($options[ENROL_SEND_EMAIL_FROM_KEY_HOLDER]);
+        $this->_form->addElement('select', 'customint7',
+                get_string('sendcoursewelcomemessage', 'enrol_autoenrol'), $options);
+        $this->_form->setDefault('customint7', $plugin->get_config('sendcoursewelcomemessage'));
+        $this->_form->addElement('textarea', 'customtext1',
+                get_string('customwelcomemessage', 'enrol_autoenrol'), array('cols' => '60', 'rows' => '8'));
+        $this->_form->addHelpButton('customtext1', 'customwelcomemessage', 'enrol_autoenrol');
     }
 
     /**

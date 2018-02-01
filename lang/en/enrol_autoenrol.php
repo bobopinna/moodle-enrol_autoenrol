@@ -28,11 +28,25 @@ $string['pluginname'] = 'Auto Enrol ';
 $string['pluginname_desc'] = 'The automatic enrolment module allows an option for logged in users to be automatically granted entry to a course and enrolled. This is similar to allowing guest access but the students will be permanently enrolled and therefore able to participate in forum and activities within the area.';
 
 $string['config'] = 'Configuration';
+$string['customwelcomemessage'] = 'Custom welcome message';
+$string['customwelcomemessage_help'] = 'A custom welcome message may be added as plain text or Moodle-auto format, including HTML tags and multi-lang tags.
+
+The following placeholders may be included in the message:
+
+* Course name {$a->coursename}
+* Link to user\'s profile page {$a->profileurl}
+* User email {$a->email}
+* User fullname {$a->fullname}';
 $string['general'] = 'General';
 $string['filtering'] = 'User Filtering';
 
+$string['sendcoursewelcomemessage'] = 'Send course welcome message';
+$string['sendcoursewelcomemessage_help'] = 'When a user is auto enrolled in the course, they may be sent a welcome message email. If sent from the course contact (by default the teacher), and more than one user has this role, the email is sent from the first user to be assigned the role.';
+
 $string['warning'] = 'Caution!';
 $string['warning_message'] = 'Adding this plugin to your course will allow any registered Moodle users access to your course. Only install this plugin if you want to allow open access to your course for users who have logged in.';
+$string['welcomemessage'] = 'Welcome message';
+$string['welcometocourse'] = 'Welcome to {$a}';
 
 $string['role'] = 'Role';
 $string['role_help'] = 'Power users can use this setting to change the permission level at which users are enrolled.';

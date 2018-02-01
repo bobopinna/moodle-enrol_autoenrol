@@ -21,6 +21,7 @@
  *
  * @package    enrol_autoenrol
  * @copyright  2013 Mark Ward & Matthew Cannings - based on code by Martin Dougiamas, Petr Skoda, Eugene Venter and others
+ * @copyright  2017 onwards Roberto Pinna
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -83,10 +84,12 @@ if ($mform->is_cancelled()) {
             $instance->customint3 = $data->customint3;
         }
         $instance->customint4 = $data->customint4;
+        $instance->customint7 = $data->customint7;
         $instance->customint8 = $data->customint8;
         $instance->customchar1 = $data->customchar1;
         $instance->customchar2 = $data->customchar2;
         $instance->customchar3 = $data->customchar3;
+        $instance->customtext1 = $data->customtext1;
         $instance->enrolstartdate = $data->enrolstartdate;
         $instance->enrolenddate = $data->enrolenddate;
         $DB->update_record('enrol', $instance);
@@ -104,11 +107,13 @@ if ($mform->is_cancelled()) {
                         'customint3' => 5,
                         'customint4' => $data->customint4,
                         'customint5' => $data->customint5,
+                        'customint7' => $data->customint7,
                         'customint8' => $data->customint8,
                         'customchar1' => $data->customchar1,
                         'customchar2' => $data->customchar2,
                         'customchar3' => $data->customchar3,
-                         'enrolstartdate' => $data->enrolstartdate,
+                        'customtext1' => $data->customtext1,
+                        'enrolstartdate' => $data->enrolstartdate,
                         'enrolenddate' => $data->enrolenddate
         );
         if (has_capability('enrol/autoenrol:method', $context)) {
