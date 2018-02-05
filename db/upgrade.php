@@ -34,7 +34,6 @@ defined('MOODLE_INTERNAL') || die();
  */
 function xmldb_enrol_autoenrol_upgrade($oldversion) {
     global $DB;
-    $dbman = $DB->get_manager();
 
     if ($oldversion < 2014113000) {
 

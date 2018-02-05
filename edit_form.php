@@ -68,7 +68,7 @@ class enrol_autoenrol_edit_form extends moodleform {
      * @throws coding_exception
      */
     protected function add_general_section($instance, $plugin, $context) {
-        global $CFG, $OUTPUT;
+        global $OUTPUT;
 
         $this->_form->addElement('header', 'generalsection', get_string('general', 'enrol_autoenrol'));
         $this->_form->setExpanded('generalsection');
@@ -161,7 +161,6 @@ class enrol_autoenrol_edit_form extends moodleform {
         $fields['city'] = get_string('city');
         $fields['email'] = get_string('email');
 
-        $standardfieldcount = count($fields);
         $customfields = $DB->get_records('user_info_field');
         if (!empty($customfields)) {
             foreach ($customfields as $customfield) {

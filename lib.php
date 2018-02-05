@@ -299,7 +299,6 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      * @throws coding_exception
      */
     public function add_course_navigation($instancesnode, stdClass $instance) {
-        global $USER;
         if ($instance->enrol !== 'autoenrol') {
             throw new coding_exception('Invalid enrol instance type!');
         }
@@ -433,8 +432,6 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      * @return moodle_url page url
      */
     public function get_newinstance_link($courseid) {
-        global $DB;
-
         $context = context_course::instance($courseid);
 
         if (!has_capability('moodle/course:enrolconfig', $context) or !has_capability('enrol/autoenrol:config', $context)) {
@@ -521,7 +518,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      * @param object   $user
      */
     private function process_group(stdClass $instance, $user) {
-        global $CFG, $DB;
+        global $CFG;
 
         $profileattribute = '';
         if (isset($instance->customchar3) && ($instance->customchar3 != '-')) {
