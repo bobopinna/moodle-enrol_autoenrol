@@ -252,7 +252,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
                 }
             }
 
-            if ($instance->customint7) {
+            if ($instance->customint4) {
                 // Allow partial.
                 $match = mb_strpos(mb_strtolower($uservalue), mb_strtolower($instance->customchar1));
             } else {
