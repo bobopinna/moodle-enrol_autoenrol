@@ -57,7 +57,7 @@ relating to the plugin which should be reviewed through Moodle's "Define Roles" 
 
 ## Maintainer
 
-The module was authored by Mark Ward and is being maintained by Roberto Pinna.
+The module was authored by Mark Ward and is being maintained by Roberto Pinna and Angelo Calò.
 
 The original module developed by Mark Ward can be found on [his GitHub](https://github.com/markward/enrol_autoenrol). 
 
