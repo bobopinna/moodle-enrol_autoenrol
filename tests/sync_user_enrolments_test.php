@@ -16,17 +16,35 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Autoenrol enrolment plugin tests.
+ *
+ * @package    enrol_autoenrol
+ * @category   phpunit
+ * @copyright  2013 Mark Ward & Matthew Cannings - based on code by Martin Dougiamas, Petr Skoda, Eugene Venter and others
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 require_once('autoenrol_base.php');
 
 /**
  * Class sync_user_enrolments_test
+ *
+ * @package    enrol_autoenrol
+ * @category   phpunit
+ * @copyright  2013 Mark Ward & Matthew Cannings - based on code by Martin Dougiamas, Petr Skoda, Eugene Venter and others
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class sync_user_enrolments_test extends autoenrol_base {
 
     /**
+     * Test constructor 
+     *
      * @param null   $name
      * @param array  $data
      * @param string $dataName
+     *
+     * @return object
      */
     public function __construct($name = null, array $data = array(), $dataName = '') {
         require(dirname(__DIR__) . '/lib.php');
