@@ -77,6 +77,9 @@ if ($mform->is_cancelled()) {
         if ($data->customint8 != 0 && $data->customint8 != 1) {
             $data->customint8 = 0;
         }
+        if (!isset($data->customint7)) {
+            $data->customint7 = 0;
+        }
 
         $instance->timemodified = time();
         if (has_capability('enrol/autoenrol:method', $context)) {
@@ -103,6 +106,10 @@ if ($mform->is_cancelled()) {
         if ($data->customint8 != 0 && $data->customint8 != 1) {
             $data->customint8 = 0;
         }
+        if (!isset($data->customint7)) {
+            $data->customint7 = 0;
+        }
+
         $fields = array('customint1' => 0,
                         'customint3' => 5,
                         'customint4' => $data->customint4,

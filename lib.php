@@ -87,7 +87,11 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      * @return bool
      */
     public function show_enrolme_link(stdClass $instance) {
-        return false;
+        if ($instance->customint1 > 0) {
+            // Don't offer enrolself if we are going to enrol them on login.
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -117,22 +121,17 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      * @return bool|int false means not enrolled, integer means timeend
      * @throws coding_exception
      */
+    
     public function try_autoenrol(stdClass $instance) {
-        global $USER, $DB;
-        if ($instance->enrol !== 'autoenrol') {
-            throw new coding_exception('Invalid enrol instance type!');
+        global $USER, $CFG;
+
+        if (!defined('ENROL_DO_NOT_SEND_EMAIL')) {
+            define('ENROL_DO_NOT_SEND_EMAIL', 0);
         }
-        if ($this->enrol_allowed($USER, $instance)) {
-            $this->enrol_user($instance, $USER->id, $instance->customint3, time(), 0);
-            $this->process_group($instance, $USER);
-            // Send welcome message.
-            if ($instance->customint7 != ENROL_DO_NOT_SEND_EMAIL) {
-                $this->email_welcome_message($instance, $USER);
-            }
-            return 9999999999;
-        } else {
-            if ($DB->record_exists('user_enrolments', array('userid' => $USER->id, 'enrolid' => $instance->id))) {
-                $this->process_group($instance, $USER);
+
+        if (($CFG->branch < 32) || ($instance->customint7 == ENROL_DO_NOT_SEND_EMAIL)) {
+            if ($this->user_autoenrol($instance, $USER)) {
+                return 0;
             }
         }
         return false;
@@ -252,6 +251,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
                 }
             }
 
+            $match = false;
             if ($instance->customint4) {
                 // Allow partial.
                 $match = mb_strpos(mb_strtolower($uservalue), mb_strtolower($instance->customchar1));
@@ -265,6 +265,37 @@ class enrol_autoenrol_plugin extends enrol_plugin {
             }
         }
         return true;
+    }
+
+    /**
+     * Attempt to enrol a user in course and update groups enrolments,
+     * calling code has to make sure the plugin and instance are active.
+     *
+     * @param stdClass $instance course enrol instance
+     * @param stdClass $user     user data
+     *
+     * @return bool true means enrolled, false means not enrolled
+     * @throws coding_exception
+     */
+    public function user_autoenrol(stdClass $instance, stdClass $user) {
+        global $DB;
+
+        if (!defined('ENROL_DO_NOT_SEND_EMAIL')) {
+            define('ENROL_DO_NOT_SEND_EMAIL', 0);
+        }
+        if ($instance->enrol !== 'autoenrol') {
+            throw new coding_exception('Invalid enrol instance type!');
+        }
+        if ($this->enrol_allowed($user, $instance)) {
+            $this->enrol_user($instance, $user->id, $instance->customint3, time(), 0);
+            $this->process_group($instance, $user);
+            // Send welcome message.
+            if ($instance->customint7 != ENROL_DO_NOT_SEND_EMAIL) {
+                $this->email_welcome_message($instance, $user);
+            }
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -393,13 +424,13 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      * @return void
      */
     public function sync_user_enrolments($user) {
-        global $DB;
+        global $DB, $PAGE;
 
-        // Get records of all the AutoEnrol instances which are set to enrol at login.
-        $instances = $DB->get_records('enrol', array('enrol' => 'autoenrol', 'customint1' => 1), null, '*');
+        // Get records of all the AutoEnrol instances.
+        $instances = $DB->get_records('enrol', array('enrol' => 'autoenrol'), null, '*');
         // Now get a record of all of the users enrolments.
         $userenrolments = $DB->get_records('user_enrolments', array('userid' => $user->id), null, '*');
-        // Run throuch all of the autoenrolment instances and check that the user has been enrolled.
+        // Run through all of the autoenrolment instances and check that the user has been enrolled.
         foreach ($instances as $instance) {
             $found = false;
             foreach ($userenrolments as $userenrolment) {
@@ -408,15 +439,17 @@ class enrol_autoenrol_plugin extends enrol_plugin {
                 }
             }
 
-            if (!$found) {
-                if ($this->enrol_allowed($user, $instance)) {
-                    $this->enrol_user($instance, $user->id, $instance->customint3, time(), 0);
-                    $this->process_group($instance, $user);
-                }
-            } else {
+            if (!$found && ($instance->customint1 == 1)) {
+                // If user is not enrolled and this instance enrol on login, try to enrol.
+                $PAGE->set_context(context_course::instance($instance->courseid));
+                $this->user_autoenrol($instance, $user);
+            } else if ($found) {
+                // If user is enrolled check if the rule still verified.
                 if (!$this->check_rule($instance, $user)) {
+                    // If rule is not verified unenrol the user.
                     $this->unenrol_user($instance, $user->id);
                 } else {
+                    // If rule is verified update user group enrolments.
                     $this->process_group($instance, $user);
                 }
             }
@@ -496,7 +529,9 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      * @return string html text, usually a form in a text box
      */
     public function enrol_page_hook(stdClass $instance) {
-        return null;
+        global $USER;
+
+        return $this->user_autoenrol($instance, $USER);
     }
 
     /**
@@ -668,6 +703,13 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      */
     public function get_welcome_email_contact($sendoption, $context) {
         global $CFG;
+
+        if (!defined('ENROL_SEND_EMAIL_FROM_COURSE_CONTACT')) {
+            define('ENROL_SEND_EMAIL_FROM_COURSE_CONTACT', 1);
+        }
+        if (!defined('ENROL_SEND_EMAIL_FROM_NOREPLY')) {
+            define('ENROL_SEND_EMAIL_FROM_NOREPLY', 3);
+        }
 
         $contact = null;
         // Send as the first user assigned as the course contact.

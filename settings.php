@@ -63,14 +63,24 @@ if ($ADMIN->fulltree) {
         )
     );
 
-    $options = enrol_send_welcome_email_options();
-    unset($options[ENROL_SEND_EMAIL_FROM_KEY_HOLDER]);
-    $settings->add(
-        new admin_setting_configselect('enrol_autoenrol/sendcoursewelcomemessage',
-            get_string('sendcoursewelcomemessage', 'enrol_autoenrol'),
-            get_string('sendcoursewelcomemessage_help', 'enrol_autoenrol'),
-            ENROL_DO_NOT_SEND_EMAIL,
-            $options
-        )
-    );
+    if (function_exists('enrol_send_welcome_email_options')) {
+        $options = enrol_send_welcome_email_options();
+        unset($options[ENROL_SEND_EMAIL_FROM_KEY_HOLDER]);
+        $settings->add(
+            new admin_setting_configselect('enrol_autoenrol/sendcoursewelcomemessage',
+                get_string('sendcoursewelcomemessage', 'enrol_autoenrol'),
+                get_string('sendcoursewelcomemessage_help', 'enrol_autoenrol'),
+                ENROL_DO_NOT_SEND_EMAIL,
+                $options
+            )
+        );
+    } else {
+        $settings->add(
+            new admin_setting_configcheckbox('enrol_autoenrol/sendcoursewelcomemessage',
+                get_string('sendcoursewelcomemessage', 'enrol_autoenrol'),
+                get_string('sendcoursewelcomemessage_help', 'enrol_autoenrol'),
+                0
+            )
+        );
+    }
 }
