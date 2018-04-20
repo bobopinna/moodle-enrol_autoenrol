@@ -67,13 +67,15 @@ if ($mform->is_cancelled()) {
 
 } else if ($data = $mform->get_data()) {
     if ($instance->id) {
+        if (!isset($data->customchar3)) {
+            $data->customchar3 = '';
+        }
         if ($data->customint4 != 0 && $data->customint4 != 1) {
             $data->customint4 = 0;
         }
         if ($data->customint5 < 0) {
             $data->customint5 = 0;
         }
-        $instance->customint5 = $data->customint5;
         if ($data->customint8 != 0 && $data->customint8 != 1) {
             $data->customint8 = 0;
         }
@@ -87,6 +89,7 @@ if ($mform->is_cancelled()) {
             $instance->customint3 = $data->customint3;
         }
         $instance->customint4 = $data->customint4;
+        $instance->customint5 = $data->customint5;
         $instance->customint7 = $data->customint7;
         $instance->customint8 = $data->customint8;
         $instance->customchar1 = $data->customchar1;
@@ -100,6 +103,12 @@ if ($mform->is_cancelled()) {
 
         // Do not add a new instance if one already exists (someone may have added one while we are looking at the edit form).
     } else {
+        if (!isset($data->customchar3)) {
+            $data->customchar3 = '';
+        }
+        if ($data->customint4 != 0 && $data->customint4 != 1) {
+            $data->customint4 = 0;
+        }
         if ($data->customint5 < 0) {
             $data->customint5 = 0;
         }
