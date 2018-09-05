@@ -104,3 +104,4 @@ $string['enrolstartdate_help'] = 'If enabled, users will be enrolled from this d
 $string['enrolenddate'] = 'End date';
 $string['enrolenddate_help'] = 'If enabled, users will be enrolled until this date only.';
 $string['cannotenrol'] = 'You can\'t enrol to this course using auto enrol.';
+$string['privacy:metadata:core_group'] = 'Autoenrol plugin can create new groups or use existing groups to add participants that match the Autoenrol filter.';
