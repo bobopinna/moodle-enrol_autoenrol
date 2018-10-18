@@ -63,6 +63,22 @@ if ($ADMIN->fulltree) {
         )
     );
 
+    $options = array(
+        ENROL_EXT_REMOVED_UNENROL        => get_string('extremovedunenrol', 'enrol'),
+        ENROL_EXT_REMOVED_KEEP           => get_string('extremovedkeep', 'enrol'),
+        ENROL_EXT_REMOVED_SUSPEND        => get_string('extremovedsuspend', 'enrol'),
+        ENROL_EXT_REMOVED_SUSPENDNOROLES => get_string('extremovedsuspendnoroles', 'enrol')
+    );
+    $settings->add(
+        new admin_setting_configselect(
+            'enrol_autoenrol/autounenrolaction',
+            get_string('autounenrolaction', 'enrol_autoenrol'),
+            get_string('autounenrolaction_help', 'enrol_autoenrol'),
+            ENROL_EXT_REMOVED_UNENROL,
+            $options
+        )
+    );
+
     if (function_exists('enrol_send_welcome_email_options')) {
         $options = enrol_send_welcome_email_options();
         unset($options[ENROL_SEND_EMAIL_FROM_KEY_HOLDER]);

@@ -121,7 +121,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      * @return bool|int false means not enrolled, integer means timeend
      * @throws coding_exception
      */
-    
+
     public function try_autoenrol(stdClass $instance) {
         global $USER, $CFG;
 
@@ -446,8 +446,35 @@ class enrol_autoenrol_plugin extends enrol_plugin {
             } else if ($found) {
                 // If user is enrolled check if the rule still verified.
                 if (!$this->check_rule($instance, $user)) {
-                    // If rule is not verified unenrol the user.
-                    $this->unenrol_user($instance, $user->id);
+                    // Deal with enrolments of users that no more match the rule.
+                    $unenrolaction = get_config('autounenrolaction', 'enrol_autoenrol');
+                    if ($unenrolaction === false) {
+                        $unenrolaction = ENROL_EXT_REMOVED_UNENROL;
+                    }
+                    if ($unenrolaction == ENROL_EXT_REMOVED_UNENROL) {
+                        $this->unenrol_user($instance, $user->id);
+
+                    } else if ($unenrolaction == ENROL_EXT_REMOVED_KEEP) {
+                        // Keep - only adding enrolments.
+
+                    } else if ($unenrolaction == ENROL_EXT_REMOVED_SUSPEND || $unenrolaction == ENROL_EXT_REMOVED_SUSPENDNOROLES) {
+                        // Suspend users.
+                        if ($instance->ustatus != ENROL_USER_SUSPENDED) {
+                            $this->update_user_enrol($instance, $user->id, ENROL_USER_SUSPENDED);
+                        }
+                        if ($unenrolaction == ENROL_EXT_REMOVED_SUSPENDNOROLES) {
+                            if (!empty($roleassigns[$instance->courseid])) {
+                                // We want this "other user" to keep their roles.
+                                continue;
+                            }
+                            role_unassign_all(array(
+                                    'contextid'=>$context->id,
+                                    'userid'=>$user->id,
+                                    'component'=>'enrol_autoenrol',
+                                    'itemid'=>$instance->id
+                            ));
+                        }
+                    }
                 } else {
                     // If rule is verified update user group enrolments.
                     $this->process_group($instance, $user);

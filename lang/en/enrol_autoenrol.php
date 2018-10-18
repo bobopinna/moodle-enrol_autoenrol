@@ -28,6 +28,8 @@ $string['pluginname'] = 'Auto Enrol ';
 $string['pluginname_desc'] = 'The automatic enrolment module allows an option for logged in users to be automatically granted entry to a course and enrolled. This is similar to allowing guest access but the students will be permanently enrolled and therefore able to participate in forum and activities within the area.';
 
 $string['config'] = 'Configuration';
+$string['autounenrolaction'] = 'Auto unenrol action';
+$string['autounenrolaction_help'] = 'Select the action to carry out when the user filtering rule is no more matched. Please note that some user data and settings are purged from course during course unenrolment.';
 $string['customwelcomemessage'] = 'Custom welcome message';
 $string['customwelcomemessage_help'] = 'A custom welcome message may be added as plain text or Moodle-auto format, including HTML tags and multi-lang tags.
 
