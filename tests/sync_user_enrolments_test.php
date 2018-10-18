@@ -38,7 +38,7 @@ require_once('autoenrol_base.php');
 class sync_user_enrolments_test extends autoenrol_base {
 
     /**
-     * Test constructor 
+     * Test constructor
      *
      * @param null   $name
      * @param array  $data
@@ -46,9 +46,9 @@ class sync_user_enrolments_test extends autoenrol_base {
      *
      * @return object
      */
-    public function __construct($name = null, array $data = array(), $dataName = '') {
+    public function __construct($name = null, array $data = array(), $dataname = '') {
         require(dirname(__DIR__) . '/lib.php');
-        return parent::__construct($name, $data, $dataName);
+        return parent::__construct($name, $data, $dataname);
     }
 
     /**
