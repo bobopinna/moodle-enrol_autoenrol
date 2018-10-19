@@ -16,6 +16,10 @@ enrolment it will be (ie something other than student). There are further permis
 relating to the plugin which should be reviewed through Moodle's "Define Roles" page.
 
 ## Changelog
+* v2.1
+  * Added bulk operations
+  * Added API Privacy support
+  * Added self unenrol
 * v2.0
   * Added custom profile fields support
   * Added method delete feature
