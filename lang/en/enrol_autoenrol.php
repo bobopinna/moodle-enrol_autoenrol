@@ -73,6 +73,9 @@ $string['countlimit_help'] = 'This instance will count the number of enrolments 
 $string['alwaysenrol'] = 'Always Enrol';
 $string['alwaysenrol_help'] = 'When set to Yes the plugins will always enrol users, even if they already have access to the course through another method.';
 
+$string['selfunenrol'] = 'Enable self unenrol';
+$string['selfunenrol_help'] = 'When set to Yes the users can unenrol by themself.';
+
 $string['softmatch'] = 'Soft Match';
 $string['softmatch_help'] = 'When enabled AutoEnrol will enrol a user when they partially match the "Allow Only" value instead of requiring an exact match. Soft matches are also case-insensitive. The value of "Filter By" will be used for the group name.';
 

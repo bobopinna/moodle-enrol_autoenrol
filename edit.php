@@ -66,23 +66,26 @@ if ($mform->is_cancelled()) {
     redirect($return);
 
 } else if ($data = $mform->get_data()) {
-    if ($instance->id) {
-        if (!isset($data->customchar3)) {
-            $data->customchar3 = '';
-        }
-        if ($data->customint4 != 0 && $data->customint4 != 1) {
-            $data->customint4 = 0;
-        }
-        if ($data->customint5 < 0) {
-            $data->customint5 = 0;
-        }
-        if ($data->customint8 != 0 && $data->customint8 != 1) {
-            $data->customint8 = 0;
-        }
-        if (!isset($data->customint7)) {
-            $data->customint7 = 0;
-        }
+    if (!isset($data->customchar3)) {
+        $data->customchar3 = '';
+    }
+    if ($data->customint4 != 0 && $data->customint4 != 1) {
+        $data->customint4 = 0;
+    }
+    if ($data->customint5 < 0) {
+        $data->customint5 = 0;
+    }
+    if ($data->customint8 != 0 && $data->customint8 != 1) {
+        $data->customint8 = 0;
+    }
+    if (($data->customint6 != 0 && $data->customint6 != 1) || ($data->customint1 == 1)) {
+        $data->customint6 = 0;
+    }
+    if (!isset($data->customint7)) {
+        $data->customint7 = 0;
+    }
 
+    if ($instance->id) {
         $instance->timemodified = time();
         if (has_capability('enrol/autoenrol:method', $context)) {
             $instance->customint1 = $data->customint1;
@@ -90,6 +93,7 @@ if ($mform->is_cancelled()) {
         }
         $instance->customint4 = $data->customint4;
         $instance->customint5 = $data->customint5;
+        $instance->customint6 = $data->customint6;
         $instance->customint7 = $data->customint7;
         $instance->customint8 = $data->customint8;
         $instance->customchar1 = $data->customchar1;
@@ -100,29 +104,13 @@ if ($mform->is_cancelled()) {
         $instance->enrolenddate = $data->enrolenddate;
         $DB->update_record('enrol', $instance);
 
-
         // Do not add a new instance if one already exists (someone may have added one while we are looking at the edit form).
     } else {
-        if (!isset($data->customchar3)) {
-            $data->customchar3 = '';
-        }
-        if ($data->customint4 != 0 && $data->customint4 != 1) {
-            $data->customint4 = 0;
-        }
-        if ($data->customint5 < 0) {
-            $data->customint5 = 0;
-        }
-        if ($data->customint8 != 0 && $data->customint8 != 1) {
-            $data->customint8 = 0;
-        }
-        if (!isset($data->customint7)) {
-            $data->customint7 = 0;
-        }
-
         $fields = array('customint1' => 0,
                         'customint3' => 5,
                         'customint4' => $data->customint4,
                         'customint5' => $data->customint5,
+                        'customint6' => $data->customint6,
                         'customint7' => $data->customint7,
                         'customint8' => $data->customint8,
                         'customchar1' => $data->customchar1,

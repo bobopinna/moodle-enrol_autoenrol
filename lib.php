@@ -102,8 +102,8 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      * @return moodle_url or NULL if self unenrolment not supported
      */
     public function get_unenrolself_link($instance) {
-        if ($instance->customint1 > 0) {
-            // Don't offer unenrolself if we are going to re-enrol them on login.
+        if (($instance->customint1 > 0) || ($instance->customint6 == 0)) {
+            // Don't offer unenrolself if we are going to re-enrol them on login or if not permitted.
             return null;
         }
         return parent::get_unenrolself_link($instance);
