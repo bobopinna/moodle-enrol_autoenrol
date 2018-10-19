@@ -446,6 +446,11 @@ class enrol_autoenrol_plugin extends enrol_plugin {
             } else if ($found) {
                 // If user is enrolled check if the rule still verified.
                 if (!$this->check_rule($instance, $user)) {
+                    if (!$context = context_course::instance($instance->courseid, IGNORE_MISSING)) {
+                        // Very weird.
+                        continue;
+                    }
+
                     // Deal with enrolments of users that no more match the rule.
                     $unenrolaction = $this->get_config('autounenrolaction');
                     if ($unenrolaction === false) {
@@ -459,8 +464,12 @@ class enrol_autoenrol_plugin extends enrol_plugin {
 
                     } else if ($unenrolaction == ENROL_EXT_REMOVED_SUSPEND || $unenrolaction == ENROL_EXT_REMOVED_SUSPENDNOROLES) {
                         // Suspend users.
-                        if ($instance->ustatus != ENROL_USER_SUSPENDED) {
-                            $this->update_user_enrol($instance, $user->id, ENROL_USER_SUSPENDED);
+                        foreach ($userenrolments as $userenrolment) {
+                            if ($userenrolment->enrolid == $instance->id) {
+                                if ($userenrolment->status != ENROL_USER_SUSPENDED) {
+                                    $this->update_user_enrol($instance, $user->id, ENROL_USER_SUSPENDED);
+                                }
+                            }
                         }
                         if ($unenrolaction == ENROL_EXT_REMOVED_SUSPENDNOROLES) {
                             if (!empty($roleassigns[$instance->courseid])) {
@@ -468,10 +477,10 @@ class enrol_autoenrol_plugin extends enrol_plugin {
                                 continue;
                             }
                             role_unassign_all(array(
-                                    'contextid'=>$context->id,
-                                    'userid'=>$user->id,
-                                    'component'=>'enrol_autoenrol',
-                                    'itemid'=>$instance->id
+                                    'contextid' => $context->id,
+                                    'userid' => $user->id,
+                                    'component' => 'enrol_autoenrol',
+                                    'itemid' =>$instance->id
                             ));
                         }
                     }
