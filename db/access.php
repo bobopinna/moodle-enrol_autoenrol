@@ -59,7 +59,9 @@ $capabilities = array(
     'enrol/autoenrol:unenrolself' => array(
         'captype'      => 'write',
         'contextlevel' => CONTEXT_COURSE,
-        'archetypes'   => array()
+        'archetypes'   => array(
+            'student' => CAP_ALLOW,
+        )
     ),
 
     'enrol/autoenrol:method'      => array(
