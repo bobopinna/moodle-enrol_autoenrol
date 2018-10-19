@@ -447,7 +447,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
                 // If user is enrolled check if the rule still verified.
                 if (!$this->check_rule($instance, $user)) {
                     // Deal with enrolments of users that no more match the rule.
-                    $unenrolaction = get_config('autounenrolaction', 'enrol_autoenrol');
+                    $unenrolaction = $this->get_config('autounenrolaction');
                     if ($unenrolaction === false) {
                         $unenrolaction = ENROL_EXT_REMOVED_UNENROL;
                     }
