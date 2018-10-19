@@ -76,7 +76,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      * @return bool
      */
     public function allow_manage(stdClass $instance) {
-        return false;
+        return true;
     }
 
     /**
@@ -509,6 +509,24 @@ class enrol_autoenrol_plugin extends enrol_plugin {
 
         // Multiple instances supported.
         return new moodle_url('/enrol/autoenrol/edit.php', array('courseid' => $courseid));
+    }
+
+    /**
+     * The autoenrol plugin has several bulk operations that can be performed.
+     * @param course_enrolment_manager $manager
+     * @return array
+     */
+    public function get_bulk_operations(course_enrolment_manager $manager) {
+        $context = $manager->get_context();
+
+        $bulkoperations = array();
+        if (has_capability("enrol/autoenrol:manage", $context)) {
+            $bulkoperations['editselectedusers'] = new enrol_autoenrol_editselectedusers_operation($manager, $this);
+        }
+        if (has_capability("enrol/autoenrol:unenrol", $context)) {
+            $bulkoperations['deleteselectedusers'] = new enrol_autoenrol_deleteselectedusers_operation($manager, $this);
+        }
+        return $bulkoperations;
     }
 
     /**

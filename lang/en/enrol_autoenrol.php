@@ -110,3 +110,7 @@ $string['enrolenddate'] = 'End date';
 $string['enrolenddate_help'] = 'If enabled, users will be enrolled until this date only.';
 $string['cannotenrol'] = 'You can\'t enrol to this course using auto enrol.';
 $string['privacy:metadata:core_group'] = 'Autoenrol plugin can create new groups or use existing groups to add participants that match the Autoenrol filter.';
+$string['deleteselectedusers'] = 'Delete selected user enrolments';
+$string['editselectedusers'] = 'Edit selected user enrolments';
+$string['unenrolusers'] = 'Unenrol users';
+$string['confirmbulkdeleteenrolment'] = 'Are you sure you want to delete these user enrolments?';
