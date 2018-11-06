@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 /**
  * Privacy Subsystem implementation for enrol_autoenrol.
  *
@@ -20,11 +21,16 @@
  * @copyright  Roberto Pinna
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 namespace enrol_autoenrol\privacy;
+
 defined('MOODLE_INTERNAL') || die();
+
 use \core_privacy\local\metadata\collection;
+use core_privacy\local\request\approved_userlist;
 use \core_privacy\local\request\contextlist;
 use \core_privacy\local\request\approved_contextlist;
+use core_privacy\local\request\userlist;
 
 /**
  * Privacy provider for enrol_autoenrol.
@@ -33,8 +39,14 @@ use \core_privacy\local\request\approved_contextlist;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class provider implements
-    \core_privacy\local\metadata\provider,
-    \core_privacy\local\request\plugin\provider {
+        // This plugin stores user data.
+        \core_privacy\local\metadata\provider,
+
+        // This plugin contains user's enrolments.
+        \core_privacy\local\request\plugin\provider,
+
+        // This plugin is capable of determining which users have data within it.
+        \core_privacy\local\request\core_userlist_provider {
     /**
      * Returns meta data about this system.
      *
@@ -71,6 +83,21 @@ class provider implements
         $contextlist->add_from_sql($sql, $params);
 
         return $contextlist;
+    }
+
+    /**
+     * Get the list of users who have data within a context.
+     *
+     * @param   userlist    $userlist   The userlist containing the list of users who have data in this context/plugin combination.
+     */
+    public static function get_users_in_context(userlist $userlist) {
+        $context = $userlist->get_context();
+
+        if (!$context instanceof \context_course) {
+            return;
+        }
+
+        \core_group\privacy\provider::get_group_members_in_context($userlist, 'enrol_autoenrol');
     }
 
     /**
@@ -119,4 +146,14 @@ class provider implements
         }
         \core_group\privacy\provider::delete_groups_for_user($contextlist, 'enrol_autoenrol');
     }
+
+    /**
+     * Delete multiple users within a single context.
+     *
+     * @param   approved_userlist   $userlist   The approved context and user information to delete information for.
+     */
+    public static function delete_data_for_users(approved_userlist $userlist) {
+        \core_group\privacy\provider::delete_groups_for_users($userlist, 'enrol_autoenrol');
+    }
+
 }
