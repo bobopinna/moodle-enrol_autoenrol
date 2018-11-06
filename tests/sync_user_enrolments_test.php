@@ -14,8 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Autoenrol enrolment plugin tests.
  *
@@ -24,6 +22,8 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright  2013 Mark Ward & Matthew Cannings - based on code by Martin Dougiamas, Petr Skoda, Eugene Venter and others
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+defined('MOODLE_INTERNAL') || die();
 
 require_once('autoenrol_base.php');
 
@@ -65,7 +65,7 @@ class sync_user_enrolments_test extends autoenrol_base {
 
         $user = $this->get_example_user(2);
 
-        $this->assertMethodExists($enrol, 'sync_user_enrolments');
+        $this->assert_method_exists($enrol, 'sync_user_enrolments');
 
         $enrol->sync_user_enrolments($user);
 

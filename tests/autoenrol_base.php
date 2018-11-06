@@ -20,13 +20,16 @@ require_once('testlib.php');
 
 /**
  * Class autoenrol_base
+ *
+ * @copyright  2013 Mark Ward & Matthew Cannings - based on code by Martin Dougiamas, Petr Skoda, Eugene Venter and others
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class autoenrol_base extends PHPUnit_Framework_TestCase {
     /**
      * @param $obj
      * @param $method
      */
-    protected function assertMethodExists($obj, $method) {
+    protected function assert_method_exists($obj, $method) {
         if (!method_exists($obj, $method)) {
             $classname = get_class($obj);
             $this->fail("method $classname::$method does not exist");

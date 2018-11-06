@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * autoenrol enrolment plugin.
+ * Autoenrol enrolment plugin.
  *
  * This plugin automatically enrols a user onto a course the first time they try to access it.
  *
@@ -121,7 +121,6 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      * @return bool|int false means not enrolled, integer means timeend
      * @throws coding_exception
      */
-
     public function try_autoenrol(stdClass $instance) {
         global $USER, $CFG;
 
@@ -459,9 +458,6 @@ class enrol_autoenrol_plugin extends enrol_plugin {
                     if ($unenrolaction == ENROL_EXT_REMOVED_UNENROL) {
                         $this->unenrol_user($instance, $user->id);
 
-                    } else if ($unenrolaction == ENROL_EXT_REMOVED_KEEP) {
-                        // Keep - only adding enrolments.
-
                     } else if ($unenrolaction == ENROL_EXT_REMOVED_SUSPEND || $unenrolaction == ENROL_EXT_REMOVED_SUSPENDNOROLES) {
                         // Suspend users.
                         foreach ($userenrolments as $userenrolment) {
@@ -480,7 +476,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
                                     'contextid' => $context->id,
                                     'userid' => $user->id,
                                     'component' => 'enrol_autoenrol',
-                                    'itemid' =>$instance->id
+                                    'itemid' => $instance->id
                             ));
                         }
                     }
