@@ -19,6 +19,9 @@ defined('MOODLE_INTERNAL') || die();
 if (!class_exists('enrol_plugin')) {
     /**
      * Class enrol_plugin
+     *
+     * @copyright  2013 Mark Ward & Matthew Cannings - based on code by Martin Dougiamas, Petr Skoda, Eugene Venter and others
+     * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
      */
     class enrol_plugin {
 
@@ -28,6 +31,9 @@ if (!class_exists('enrol_plugin')) {
 if (!class_exists('moodle_database')) {
     /**
      * Class moodle_database
+     *
+     * @copyright  2013 Mark Ward & Matthew Cannings - based on code by Martin Dougiamas, Petr Skoda, Eugene Venter and others
+     * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
      */
     abstract class moodle_database {
         abstract public function get_records();
