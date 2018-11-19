@@ -1,4 +1,4 @@
-# AutoEnrol Enrolment Method
+# AutoEnrol Enrolment Method [![Build Status](https://travis-ci.org/bobopinna/moodle-enrol_autoenrol.svg?branch=master)](https://travis-ci.org/bobopinna/moodle-enrol_autoenrol)
 
 When added to a course this enrolment plugin can enrol users onto a course automatically,
 either as they log into your Moodle site or as they click on the course. It is intended 
