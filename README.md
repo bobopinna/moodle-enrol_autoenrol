@@ -73,7 +73,7 @@ Thanks also to users who have taken the time to share feedback and improve the m
 
 ## Technical Support
 
-Issue tracker can be found on [GitHub](https://github.com/bobopinna/enrol_autoenrol/issues). Please
+Issue tracker can be found on [GitHub](https://github.com/bobopinna/moodle-enrol_autoenrol/issues). Please
 try to give as much detail about your problem as possible and I'll do what I can to help.
 
 ## License
