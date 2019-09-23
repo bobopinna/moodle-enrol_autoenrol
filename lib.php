@@ -253,7 +253,19 @@ class enrol_autoenrol_plugin extends enrol_plugin {
             $match = false;
             if ($instance->customint4) {
                 // Allow partial.
-                $match = mb_strpos(mb_strtolower($uservalue), mb_strtolower($instance->customchar1));
+                $allowOnly = mb_strtolower($instance->customchar1);
+                $uservalue = mb_strtolower($uservalue);
+                $uservalue = preg_quote($uservalue);
+
+                //append \b operator to the end of string
+                $uservalue .= "\b";
+
+                //replace comma with regex operators
+                $regex = str_replace(",", "\b|", $b);
+
+                preg_match("/". $regex . "/", $str, $match);
+
+                if(count($match) == 0) $match = false;
             } else {
                 // Require exact.
                 $match = $instance->customchar1 == $uservalue;
