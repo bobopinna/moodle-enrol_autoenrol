@@ -261,9 +261,9 @@ class enrol_autoenrol_plugin extends enrol_plugin {
                 $uservalue .= "\b";
 
                 //replace comma with regex operators
-                $regex = str_replace(",", "\b|", $b);
+                $regex = str_replace(",", "\b|", $uservalue);
 
-                preg_match("/". $regex . "/", $str, $match);
+                preg_match("/". $regex . "/", $allowOnly, $match);
 
                 if(count($match) == 0) $match = false;
             } else {
