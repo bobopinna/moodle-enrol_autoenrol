@@ -4,11 +4,6 @@ sudo: false
 
 addons:
   firefox: "47.0.1"
-  postgresql: "9.3"
-  apt:
-    packages:
-      - oracle-java8-installer
-      - oracle-java8-set-default
 
 cache:
   directories:
