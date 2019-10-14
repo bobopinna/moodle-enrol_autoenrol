@@ -17,7 +17,7 @@ relating to the plugin which should be reviewed through Moodle's "Define Roles" 
 
 
 **_Note:_** When you set to enrol users on site login, the users will be enrolled at first login but they see the new course in their dashboard from the second login. 
-This can be fixed because moodle loads the users courses and then calls the enrol hook.
+This can't be fixed because moodle loads the users courses and then calls the enrol hook.
 
 ## Changelog
 * v2.1
