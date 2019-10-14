@@ -15,11 +15,9 @@ users the ability to change when the user will be enrolled on a course, and what
 enrolment it will be (ie something other than student). There are further permissions 
 relating to the plugin which should be reviewed through Moodle's "Define Roles" page.
 
-**_
-Note 
-When you set to enrol users on site login, the users will be enrolled at first login but they see the new course in their dashboard from the second login. 
+
+**_Note:_** When you set to enrol users on site login, the users will be enrolled at first login but they see the new course in their dashboard from the second login. 
 This can be fixed because moodle loads the users courses and then calls the enrol hook.
-_**
 
 ## Changelog
 * v2.1
