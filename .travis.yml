@@ -1,9 +1,14 @@
 language: php
 
-sudo: false
+sudo: true
 
 addons:
   firefox: "47.0.1"
+  postgresql: "9.4"
+
+services:
+  - mysql
+  - postgresql
 
 cache:
   directories:
@@ -19,17 +24,26 @@ env:
   - DB=mysqli
  matrix:
   - MOODLE_BRANCH=master
+  - MOODLE_BRANCH=MOODLE_38_STABLE
+  - MOODLE_BRANCH=MOODLE_37_STABLE
+  - MOODLE_BRANCH=MOODLE_36_STABLE
   - MOODLE_BRANCH=MOODLE_35_STABLE
   - MOODLE_BRANCH=MOODLE_34_STABLE
   - MOODLE_BRANCH=MOODLE_33_STABLE
   - MOODLE_BRANCH=MOODLE_32_STABLE
+  - MOODLE_BRANCH=MOODLE_31_STABLE
+  - MOODLE_BRANCH=MOODLE_30_STABLE
+  - MOODLE_BRANCH=MOODLE_29_STABLE
+  - MOODLE_BRANCH=MOODLE_28_STABLE
+  - MOODLE_BRANCH=MOODLE_27_STABLE
+  - MOODLE_BRANCH=MOODLE_26_STABLE
 
 before_install:
   - phpenv config-rm xdebug.ini
   - nvm install 8.9
   - nvm use 8.9
   - cd ../..
-  - composer create-project -n --no-dev --prefer-dist moodlerooms/moodle-plugin-ci ci ^2
+  - composer create-project -n --no-dev --prefer-dist blackboard-open-source/moodle-plugin-ci ci ^2
   - export PATH="$(cd ci/bin; pwd):$(cd ci/vendor/bin; pwd):$PATH"
 
 install:
@@ -44,5 +58,6 @@ script:
   - moodle-plugin-ci savepoints
   - moodle-plugin-ci mustache
   - moodle-plugin-ci grunt
+  - moodle-plugin-ci phpdoc
   - moodle-plugin-ci phpunit
   - moodle-plugin-ci behat
