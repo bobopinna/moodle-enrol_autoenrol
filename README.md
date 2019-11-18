@@ -20,11 +20,12 @@ relating to the plugin which should be reviewed through Moodle's "Define Roles" 
 This can't be fixed because moodle loads the users courses and then calls the enrol hook.
 
 ## Changelog
+* v2.1.1
+  * Added backup and restore support
 * v2.1
   * Added bulk operations
   * Added API Privacy support
   * Added self unenrol
-  * Added backup and restore support
 * v2.0
   * Added custom profile fields support
   * Added method delete feature
