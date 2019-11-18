@@ -24,6 +24,7 @@ This can't be fixed because moodle loads the users courses and then calls the en
   * Added bulk operations
   * Added API Privacy support
   * Added self unenrol
+  * Added backup and restore support
 * v2.0
   * Added custom profile fields support
   * Added method delete feature
