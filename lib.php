@@ -526,6 +526,77 @@ class enrol_autoenrol_plugin extends enrol_plugin {
     }
 
     /**
+     * Restore instance and map settings.
+     *
+     * @param restore_enrolments_structure_step $step
+     * @param stdClass $data
+     * @param stdClass $course
+     * @param int $oldid
+     */
+    public function restore_instance(restore_enrolments_structure_step $step, stdClass $data, $course, $oldid) {
+        global $DB;
+        if ($step->get_task()->get_target() == backup::TARGET_NEW_COURSE) {
+            $merge = false;
+        } else {
+            $merge = array(
+                'courseid'   => $data->courseid,
+                'enrol'      => $this->get_name(),
+                'status'     => $data->status,
+                'roleid'     => $data->roleid,
+            );
+        }
+        if ($merge and $instances = $DB->get_records('enrol', $merge, 'id')) {
+            $instance = reset($instances);
+            $instanceid = $instance->id;
+        } else {
+            $instanceid = $this->add_instance($course, (array)$data);
+        }
+        $step->set_mapping('enrol', $oldid, $instanceid);
+    }
+
+    /**
+     * Restore user enrolment.
+     *
+     * @param restore_enrolments_structure_step $step
+     * @param stdClass $data
+     * @param stdClass $instance
+     * @param int $oldinstancestatus
+     * @param int $userid
+     */
+    public function restore_user_enrolment(restore_enrolments_structure_step $step, $data, $instance, $userid, $oldinstancestatus) {
+        $this->enrol_user($instance, $userid, null, $data->timestart, $data->timeend, $data->status);
+    }
+
+    /**
+     * Restore role assignment.
+     *
+     * @param stdClass $instance
+     * @param int $roleid
+     * @param int $userid
+     * @param int $contextid
+     */
+    public function restore_role_assignment($instance, $roleid, $userid, $contextid) {
+        // This is necessary only because we may migrate other types to this instance,
+        // we do not use component in manual or self enrol.
+        role_assign($roleid, $userid, $contextid, '', 0);
+    }
+
+    /**
+     * Restore user group membership.
+     * @param stdClass $instance
+     * @param int $groupid
+     * @param int $userid
+     */
+    public function restore_group_member($instance, $groupid, $userid) {
+        global $CFG;
+        require_once("$CFG->dirroot/group/lib.php");
+
+        // This might be called when forcing restore as manual enrolments.
+
+        groups_add_member($groupid, $userid);
+    }
+
+    /**
      * Is it possible to delete enrol instance via standard UI?
      *
      * @param stdClass $instance
