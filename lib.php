@@ -425,8 +425,8 @@ class enrol_autoenrol_plugin extends enrol_plugin {
     public function sync_user_enrolments($user) {
         global $DB, $PAGE;
 
-        // Get records of all the AutoEnrol instances.
-        $instances = $DB->get_records('enrol', array('enrol' => 'autoenrol'), null, '*');
+        // Get records of all enabled the AutoEnrol instances.
+        $instances = $DB->get_records('enrol', array('enrol' => 'autoenrol', 'status' => 0), null, '*');
         // Now get a record of all of the users enrolments.
         $userenrolments = $DB->get_records('user_enrolments', array('userid' => $user->id), null, '*');
         // Run through all of the autoenrolment instances and check that the user has been enrolled.
