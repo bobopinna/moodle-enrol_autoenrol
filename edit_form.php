@@ -187,7 +187,7 @@ class enrol_autoenrol_edit_form extends moodleform {
         }
 
         $this->_form->addElement('select', 'customchar3', get_string('groupon', 'enrol_autoenrol'), $fields);
-        $this->_form->setType('customchar3', PARAM_ALPHA);
+        $this->_form->setType('customchar3', PARAM_TEXT);
         $this->_form->addHelpButton('customchar3', 'groupon', 'enrol_autoenrol');
 
         $this->_form->addElement('text', 'customchar1', get_string('filter', 'enrol_autoenrol'));
