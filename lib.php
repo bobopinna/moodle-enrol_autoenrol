@@ -697,7 +697,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
                 } else {
                     require_once($CFG->dirroot.'/user/profile/lib.php');
                     $userdata = profile_user_record($user->id);
-                    if (!empty($userdata)) {
+                    if (!empty($userdata) && isset($userdata->$profileattribute)) {
                         $name = $userdata->$profileattribute;
                     } else {
                         $name = get_string('emptyfield', 'enrol_autoenrol', $profileattribute);
