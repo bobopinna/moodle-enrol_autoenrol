@@ -625,10 +625,10 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      * @param stdClass $instance
      */
     public function delete_instance($instance) {
-        global $DB;
+        global $DB, $CFG;
 
         if ($this->get_config('removegroups')) {
-            require_once("../group/lib.php");
+            require_once("$CFG->dirroot/group/lib.php");
 
             $groups = $DB->get_records_sql("SELECT * FROM {groups} WHERE " . $DB->sql_like('idnumber', ':idnumber'),
                     array('idnumber' => "autoenrol|$instance->id|%"));
