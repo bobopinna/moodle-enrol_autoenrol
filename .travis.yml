@@ -1,6 +1,7 @@
-language: php
+os: linux
+dist: xenial
 
-sudo: true
+language: php
 
 addons:
   firefox: "47.0.1"
@@ -16,21 +17,15 @@ cache:
     - $HOME/.npm
 
 php:
- - 7.0
- - 7.1
+ - 7.2
+ - 7.3
 
 env:
  global:
   - DB=mysqli
- matrix:
-  - MOODLE_BRANCH=master
+ jobs:
+  - MOODLE_BRANCH=MOODLE_39_STABLE
   - MOODLE_BRANCH=MOODLE_38_STABLE
-  - MOODLE_BRANCH=MOODLE_37_STABLE
-  - MOODLE_BRANCH=MOODLE_36_STABLE
-  - MOODLE_BRANCH=MOODLE_35_STABLE
-  - MOODLE_BRANCH=MOODLE_34_STABLE
-  - MOODLE_BRANCH=MOODLE_33_STABLE
-  - MOODLE_BRANCH=MOODLE_32_STABLE
 
 before_install:
   - phpenv config-rm xdebug.ini
