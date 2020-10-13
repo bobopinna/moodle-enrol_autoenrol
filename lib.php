@@ -423,7 +423,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      * @return void
      */
     public function sync_user_enrolments($user) {
-        global $DB, $PAGE;
+        global $DB, $PAGE, $USER;
 
         // Get records of all enabled the AutoEnrol instances.
         $instances = $DB->get_records('enrol', array('enrol' => 'autoenrol', 'status' => 0), null, '*');
@@ -441,7 +441,10 @@ class enrol_autoenrol_plugin extends enrol_plugin {
             if (!$found && ($instance->customint1 == 1)) {
                 // If user is not enrolled and this instance enrol on login, try to enrol.
                 $PAGE->set_context(context_course::instance($instance->courseid));
-                $this->user_autoenrol($instance, $user);
+                if ($this->user_autoenrol($instance, $user)) {
+                    // Workaround to permit user display of just enrolled course.
+                    usleep(1000000); 
+                }             
             } else if ($found) {
                 // If user is enrolled check if the rule still verified.
                 if (!$this->check_rule($instance, $user)) {
