@@ -443,8 +443,8 @@ class enrol_autoenrol_plugin extends enrol_plugin {
                 $PAGE->set_context(context_course::instance($instance->courseid));
                 if ($this->user_autoenrol($instance, $user)) {
                     // Workaround to permit user display of just enrolled course.
-                    usleep(1000000); 
-                }             
+                    usleep(1000000);
+                }
             } else if ($found) {
                 // If user is enrolled check if the rule still verified.
                 if (!$this->check_rule($instance, $user)) {
