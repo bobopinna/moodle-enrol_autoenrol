@@ -15,20 +15,24 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * autoenrol enrolment plugin.
- *
- * This plugin automatically enrols a user onto a course the first time they try to access it.
- *
- * @package    enrol_autoenrol
- * @copyright  2013 Mark Ward & Matthew Cannings - based on code by Martin Dougiamas, Petr Skoda, Eugene Venter and others
- * @copyright  2017 onwards Roberto Pinna
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * Task definition for enrol_autoenrol.
+ * @copyright 2021 Roberto Pinna
+ * @package   enrol_autoenrol
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2021030800;
-$plugin->requires = 2013111800.00;      // Requires this Moodle version (2.6).
-$plugin->release = '2.2';             // Plugin release.
-$plugin->component = 'enrol_autoenrol'; // Full name of the plugin (used for diagnostics).
-$plugin->maturity = MATURITY_STABLE;    // The moodle.org release.
+$tasks = array(
+    array(
+        'classname' => '\enrol_autoenrol\task\sync_enrolments',
+        'blocking' => 0,
+        'minute' => 'R',
+        'hour' => 'R',
+        'day' => '*',
+        'month' => '*',
+        'dayofweek' => '*',
+        'disabled' => 1
+    )
+);
+
