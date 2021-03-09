@@ -58,6 +58,9 @@ $string['m_site'] = 'Logging into Site';
 $string['m_course'] = 'Loading the Course';
 $string['method_help'] = 'Power users can use this setting to change the plugin\'s behaviour so that users are enrolled to the course upon logging in rather than waiting for them to access the course. This is helpful for courses which should be visible on a users "my courses" list by default.';
 
+$string['userfilter'] = 'User Filter';
+$string['userfilter_help'] = 'When is set Autoenrol will enrol users only when they match the rules.';
+
 $string['groupon'] = 'Group By';
 $string['g_none'] = 'Select...';
 $string['g_auth'] = 'Auth Method';
@@ -75,6 +78,9 @@ $string['alwaysenrol_help'] = 'When set to Yes the plugins will always enrol use
 
 $string['selfunenrol'] = 'Enable self unenrol';
 $string['selfunenrol_help'] = 'When set to Yes the users can unenrol by themself.';
+
+$string['groupname'] = 'Group name';
+$string['groupname_help'] = 'When you group by User Filter only a group will be created and this will be the name of the group.';
 
 $string['softmatch'] = 'Soft Match';
 $string['softmatch_help'] = 'When enabled AutoEnrol will enrol a user when they partially match the "Allow Only" value instead of requiring an exact match. Soft matches are also case-insensitive. The value of "Filter By" will be used for the group name.';

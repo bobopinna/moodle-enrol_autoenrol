@@ -165,12 +165,21 @@ class enrol_autoenrol_edit_form extends moodleform {
      * @throws coding_exception
      */
     protected function add_filtering_section() {
-        global $DB;
+        global $DB, $COURSE;
 
         $this->_form->addElement('header', 'filtersection', get_string('filtering', 'enrol_autoenrol'));
         $this->_form->setExpanded('filtersection', true);
 
+        // Use this code to add the 'Restrict access' section.
+        // NOTE: Due to limitations in the JavaScript and CSS, you may only
+        // have one of these fields on a page! Sorry.
+        $this->_form->addElement('textarea', 'availabilityconditionsjson',
+                get_string('userfilter', 'enrol_autoenrol'));
+        $this->_form->addHelpButton('availabilityconditionsjson', 'userfilter', 'enrol_autoenrol');
+        \enrol_autoenrol\frontend::include_all_javascript($COURSE);
+
         $fields = array('-' => get_string('choose'));
+        $fields['userfilter'] = get_string('userfilter', 'enrol_autoenrol');
         $fields['auth'] = get_string('authentication');
         $fields['lang'] = get_string('language');
         $fields['department'] = get_string('department');
@@ -190,11 +199,11 @@ class enrol_autoenrol_edit_form extends moodleform {
         $this->_form->setType('customchar3', PARAM_TEXT);
         $this->_form->addHelpButton('customchar3', 'groupon', 'enrol_autoenrol');
 
-        $this->_form->addElement('text', 'customchar1', get_string('filter', 'enrol_autoenrol'));
+        $this->_form->addElement('text', 'customchar1', get_string('groupname', 'enrol_autoenrol'));
         $this->_form->setDefault('customchar1', '');
         $this->_form->setType('customchar1', PARAM_TEXT);
-        $this->_form->addHelpButton('customchar1', 'filter', 'enrol_autoenrol');
-        $this->_form->disabledIf('customchar1', 'customchar3', 'eq', '-');
+        $this->_form->addHelpButton('customchar1', 'groupname', 'enrol_autoenrol');
+        $this->_form->disabledIf('customchar1', 'customchar3', 'ne', 'userfilter');
 
         $this->_form->addElement('selectyesno', 'customint4', get_string('softmatch', 'enrol_autoenrol'));
         $this->_form->setDefault('customint4', 0);
@@ -214,5 +223,47 @@ class enrol_autoenrol_edit_form extends moodleform {
         $this->_form->setType('id', PARAM_INT);
         $this->_form->addElement('hidden', 'courseid');
         $this->_form->setType('courseid', PARAM_INT);
+    }
+
+    public function validation($data, $files) {
+        $errors = array();
+ 
+        // Use this code to validate the 'Restrict access' section.
+        \core_availability\frontend::report_validation_errors($data, $errors);
+ 
+        return $errors;
+    }
+
+    public function set_data($defaultvalues) {
+        if (is_object($defaultvalues)) {
+            $defaultvalues = (array)$defaultvalues;
+        }
+
+        if (isset($defaultvalues['customtext2'])) {
+            $defaultvalues['availabilityconditionsjson'] = $defaultvalues['customtext2'];
+        }
+
+error_log(print_r($defaultvalues, true));
+        parent::set_data($defaultvalues);
+    }
+
+    /**
+     * Return submitted data if properly submitted or returns NULL if validation fails or
+     * if there is no submitted data.
+     *
+     * @return object submitted data; NULL if not valid or not submitted or cancelled
+     */
+    public function get_data() {
+        $data = parent::get_data();
+
+        if ($data) {
+            if (!empty($data->availabilityconditionsjson)) {
+                $data->customtext2 = $data->availabilityconditionsjson;
+                unset($data->availabilityconditionsjson);
+            }
+        }
+
+error_log(print_r($data, true));
+        return $data;
     }
 }
