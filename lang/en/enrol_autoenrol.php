@@ -114,3 +114,6 @@ $string['deleteselectedusers'] = 'Delete selected user enrolments';
 $string['editselectedusers'] = 'Edit selected user enrolments';
 $string['unenrolusers'] = 'Unenrol users';
 $string['confirmbulkdeleteenrolment'] = 'Are you sure you want to delete these user enrolments?';
+$string['syncenrolmentstask'] = 'Synchronise Autoenrol task'; 
+$string['checksync'] = 'Check for syncronization to $a users';
+$string['pluginnotenabled'] = 'Autoenrol plugin not enabled';

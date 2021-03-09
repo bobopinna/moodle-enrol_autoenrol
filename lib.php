@@ -422,8 +422,8 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      *
      * @return void
      */
-    public function sync_user_enrolments($user) {
-        global $DB, $PAGE, $USER;
+    public function sync_user_enrolments($user, $onlogin=true) {
+        global $DB, $PAGE;
 
         // Get records of all enabled the AutoEnrol instances.
         $instances = $DB->get_records('enrol', array('enrol' => 'autoenrol', 'status' => 0), null, '*');
@@ -442,8 +442,10 @@ class enrol_autoenrol_plugin extends enrol_plugin {
                 // If user is not enrolled and this instance enrol on login, try to enrol.
                 $PAGE->set_context(context_course::instance($instance->courseid));
                 if ($this->user_autoenrol($instance, $user)) {
-                    // Workaround to permit user display of just enrolled course.
-                    usleep(1000000);
+                    if ($onlogin) {
+                        // Workaround to permit user display of just enrolled course.
+                        usleep(1000000);
+                    }
                 }
             } else if ($found) {
                 // If user is enrolled check if the rule still verified.
@@ -490,6 +492,32 @@ class enrol_autoenrol_plugin extends enrol_plugin {
             }
 
         }
+    }
+
+    /**  
+     * Forces synchronisation of all autoenrol instances for all users.
+     *
+     * @param progress_trace $trace
+     *
+     * @return void
+     */
+    public function sync_enrolments(progress_trace $trace) {
+        global $DB;
+
+        // we may need a lot of memory here
+        core_php_time_limit::raise();
+        raise_memory_limit(MEMORY_HUGE);
+
+        // Get records of all active users.
+        $users = $DB->get_records('user', array('deleted' => '0', 'suspended' => 0), null, '*');
+
+        $trace->output(get_string('checksync', 'enrol_autoenrol', count($users)));
+        foreach ($users as $user) {
+            if (!is_siteadmin($user) && (!isguestuser($user))) {
+                $this->sync_user_enrolments($user, false);
+            }
+        }
+        
     }
 
     /**
