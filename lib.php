@@ -422,11 +422,17 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      *
      * @return void
      */
-    public function sync_user_enrolments($user, $onlogin=true) {
+    public function sync_user_enrolments($user, $onlogin=true, $course = null) {
         global $DB, $PAGE;
 
-        // Get records of all enabled the AutoEnrol instances.
-        $instances = $DB->get_records('enrol', array('enrol' => 'autoenrol', 'status' => 0), null, '*');
+        $instances = array();
+        if (!empty($course)) {
+            // Get records of all enabled the AutoEnrol instances in a specified course.
+            $instances = $DB->get_records('enrol', array('enrol' => 'autoenrol', 'status' => 0, 'courseid' => $course), null, '*');
+        } else {
+            // Get records of all enabled the AutoEnrol instances.
+            $instances = $DB->get_records('enrol', array('enrol' => 'autoenrol', 'status' => 0), null, '*');
+        }
         // Now get a record of all of the users enrolments.
         $userenrolments = $DB->get_records('user_enrolments', array('userid' => $user->id), null, '*');
         // Run through all of the autoenrolment instances and check that the user has been enrolled.
@@ -438,8 +444,8 @@ class enrol_autoenrol_plugin extends enrol_plugin {
                 }
             }
 
-            if (!$found && ($instance->customint1 == 1)) {
-                // If user is not enrolled and this instance enrol on login, try to enrol.
+            if (!$found && (($instance->customint1 == 1) || !$onlogin)) {
+                // If user is not enrolled and this instance enrol on login or called with sync task, try to enrol.
                 $PAGE->set_context(context_course::instance($instance->courseid));
                 if ($this->user_autoenrol($instance, $user)) {
                     if ($onlogin) {
@@ -501,7 +507,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      *
      * @return void
      */
-    public function sync_enrolments(progress_trace $trace) {
+    public function sync_enrolments(progress_trace $trace, $course) {
         global $DB;
 
         // we may need a lot of memory here
@@ -514,7 +520,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
         $trace->output(get_string('checksync', 'enrol_autoenrol', count($users)));
         foreach ($users as $user) {
             if (!is_siteadmin($user) && (!isguestuser($user))) {
-                $this->sync_user_enrolments($user, false);
+                $this->sync_user_enrolments($user, false, $course);
             }
         }
         
