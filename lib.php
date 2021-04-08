@@ -449,8 +449,9 @@ class enrol_autoenrol_plugin extends enrol_plugin {
                 $PAGE->set_context(context_course::instance($instance->courseid));
                 if ($this->user_autoenrol($instance, $user)) {
                     if ($onlogin) {
-                        // Workaround to permit user display of just enrolled course.
-                        usleep(1000000);
+                        // Purge the associated caches for the current user only.
+                        $presignupcache = \cache::make('core', 'presignup');
+                        $presignupcache->purge_current_user();
                     }
                 }
             } else if ($found) {
