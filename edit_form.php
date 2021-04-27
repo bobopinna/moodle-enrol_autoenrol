@@ -233,37 +233,4 @@ class enrol_autoenrol_edit_form extends moodleform {
  
         return $errors;
     }
-
-    public function set_data($defaultvalues) {
-        if (is_object($defaultvalues)) {
-            $defaultvalues = (array)$defaultvalues;
-        }
-
-        if (isset($defaultvalues['customtext2'])) {
-            $defaultvalues['availabilityconditionsjson'] = $defaultvalues['customtext2'];
-        }
-
-error_log(print_r($defaultvalues, true));
-        parent::set_data($defaultvalues);
-    }
-
-    /**
-     * Return submitted data if properly submitted or returns NULL if validation fails or
-     * if there is no submitted data.
-     *
-     * @return object submitted data; NULL if not valid or not submitted or cancelled
-     */
-    public function get_data() {
-        $data = parent::get_data();
-
-        if ($data) {
-            if (!empty($data->availabilityconditionsjson)) {
-                $data->customtext2 = $data->availabilityconditionsjson;
-                unset($data->availabilityconditionsjson);
-            }
-        }
-
-error_log(print_r($data, true));
-        return $data;
-    }
 }

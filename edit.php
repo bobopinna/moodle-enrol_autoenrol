@@ -51,6 +51,7 @@ $plugin = enrol_get_plugin('autoenrol');
 if ($instanceid) {
     $instance = $DB->get_record(
             'enrol', array('courseid' => $course->id, 'enrol' => 'autoenrol', 'id' => $instanceid), '*', MUST_EXIST);
+    $instance->availabilityconditionsjson = $instance->customtext2;
 } else {
     require_capability('moodle/course:enrolconfig', $context);
     // No instance yet, we have to add new instance.
@@ -84,6 +85,9 @@ if ($mform->is_cancelled()) {
     if (!isset($data->customint7)) {
         $data->customint7 = 0;
     }
+    if (!empty($data->availabilityconditionsjson)) {
+        $data->customtext2 = $data->availabilityconditionsjson;
+    }
 
     if ($instance->id) {
         $instance->timemodified = time();
@@ -100,6 +104,7 @@ if ($mform->is_cancelled()) {
         $instance->customchar2 = $data->customchar2;
         $instance->customchar3 = $data->customchar3;
         $instance->customtext1 = $data->customtext1;
+        $instance->customtext2 = $data->customtext2;
         $instance->enrolstartdate = $data->enrolstartdate;
         $instance->enrolenddate = $data->enrolenddate;
         $DB->update_record('enrol', $instance);
@@ -117,6 +122,7 @@ if ($mform->is_cancelled()) {
                         'customchar2' => $data->customchar2,
                         'customchar3' => $data->customchar3,
                         'customtext1' => $data->customtext1,
+                        'customtext2' => $data->customtext2,
                         'enrolstartdate' => $data->enrolstartdate,
                         'enrolenddate' => $data->enrolenddate
         );
