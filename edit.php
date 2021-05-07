@@ -70,9 +70,6 @@ if ($mform->is_cancelled()) {
     if (!isset($data->customchar3)) {
         $data->customchar3 = '';
     }
-    if ($data->customint4 != 0 && $data->customint4 != 1) {
-        $data->customint4 = 0;
-    }
     if ($data->customint5 < 0) {
         $data->customint5 = 0;
     }
@@ -95,7 +92,6 @@ if ($mform->is_cancelled()) {
             $instance->customint1 = $data->customint1;
             $instance->customint3 = $data->customint3;
         }
-        $instance->customint4 = $data->customint4;
         $instance->customint5 = $data->customint5;
         $instance->customint6 = $data->customint6;
         $instance->customint7 = $data->customint7;
@@ -113,7 +109,6 @@ if ($mform->is_cancelled()) {
     } else {
         $fields = array('customint1' => 0,
                         'customint3' => 5,
-                        'customint4' => $data->customint4,
                         'customint5' => $data->customint5,
                         'customint6' => $data->customint6,
                         'customint7' => $data->customint7,

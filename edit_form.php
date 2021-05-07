@@ -176,7 +176,7 @@ class enrol_autoenrol_edit_form extends moodleform {
         $this->_form->addElement('textarea', 'availabilityconditionsjson',
                 get_string('userfilter', 'enrol_autoenrol'));
         $this->_form->addHelpButton('availabilityconditionsjson', 'userfilter', 'enrol_autoenrol');
-        \enrol_autoenrol\frontend::include_all_javascript($COURSE);
+        \enrol_autoenrol\filter_frontend::include_all_javascript($COURSE);
 
         $fields = array('-' => get_string('choose'));
         $fields['userfilter'] = get_string('userfilter', 'enrol_autoenrol');
@@ -204,10 +204,6 @@ class enrol_autoenrol_edit_form extends moodleform {
         $this->_form->setType('customchar1', PARAM_TEXT);
         $this->_form->addHelpButton('customchar1', 'groupname', 'enrol_autoenrol');
         $this->_form->disabledIf('customchar1', 'customchar3', 'ne', 'userfilter');
-
-        $this->_form->addElement('selectyesno', 'customint4', get_string('softmatch', 'enrol_autoenrol'));
-        $this->_form->setDefault('customint4', 0);
-        $this->_form->addHelpButton('customint4', 'softmatch', 'enrol_autoenrol');
 
         $this->_form->addElement('text', 'customint5', get_string('countlimit', 'enrol_autoenrol'));
         $this->_form->setType('customint5', PARAM_INT);

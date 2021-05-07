@@ -15,13 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Class with front-end (editing form) functionality.
+ * Class with filter frontend (editing form) functionality.
  *
- * This is a base class of a class implemented by each component, and also has
- * static methods.
- *
- * @package core_availability
- * @copyright 2014 The Open University
+ * @package ernrol_autoenrol
+ * @copyright 2021 Roberto Pinna
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -30,16 +27,13 @@ namespace enrol_autoenrol;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Class with front-end (editing form) functionality.
+ * Class with filter frontend (editing form) functionality.
  *
- * This is a base class of a class implemented by each component, and also has
- * static methods.
- *
- * @package core_availability
- * @copyright 2014 The Open University
+ * @package ernrol_autoenrol
+ * @copyright 2021 Roberto Pinna
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-abstract class frontend extends \core_availability\frontend {
+class filter_frontend extends \core_availability\frontend {
     /**
      * Includes JavaScript for the main system and all plugins.
      *

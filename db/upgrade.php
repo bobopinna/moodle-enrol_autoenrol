@@ -123,5 +123,38 @@ function xmldb_enrol_autoenrol_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2019111800, 'enrol', 'autoenrol');
     }
 
+    if ($oldversion < 2021050500) {
+        $instances = $DB->get_records('enrol', array('enrol' => 'autoenrol'));
+
+        foreach ($instances as $instance) {
+            // A match string was defined.
+            if (isset($instance->customchar1) && !empty($instance->customchar1)) {
+                $oldmatchvalue = $instance->customchar1;
+                // Get old filtering field.
+                if (isset($instance->customchar3) && !empty($instance->customchar3)) {
+                    $oldfield = $instance->customchar3;
+                    $instance->customchar3 = 'userfilter';
+
+                    // Check field type.
+                    $fieldtype = 'cf';
+                    if (in_array($oldfield, array('auth', 'lang', 'department', 'institution', 'address', 'city', 'email'))) {
+                        $fieldtype = 'sf';
+                    }
+                    // Check the old soft match.
+                    $operator = 'isequalto';
+                    if (isset($instance->customint4) && !empty($instance->customint4)) {
+                        $operator = 'contains';
+                    }
+                    $instance->customtext2 = '{"op":"|","c":[{"type":"profile","' . $fieldtype . '":"' . $oldfield . 
+                                             '","op":"' . $operator . '","v":"'. $oldmatchvalue .'"}],"show":true}';
+                    $instance->customint4 = 0;
+                }
+            }
+
+            $DB->update_record('enrol', $instance);
+        }
+        upgrade_plugin_savepoint(true, 2021050500, 'enrol', 'autoenrol');
+    }
+
     return true;
 }
