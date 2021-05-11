@@ -156,5 +156,23 @@ function xmldb_enrol_autoenrol_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2021050500, 'enrol', 'autoenrol');
     }
 
+    if ($oldversion < 2021050600) {
+        $instances = $DB->get_records('enrol', array('enrol' => 'autoenrol'));
+ 
+        foreach ($instances as $instance) {
+            if (isset($instance->customchar2) && !empty($instance->customchar2)) {
+                $instance->name = $instance->customchar2;
+                $instance->customchar2 = '';
+            }
+
+            if (isset($instance->customint3) && !empty($instance->customint3)) {
+                $instance->roleid = $instance->customint3;
+                $instance->customint3 = 0;
+            }
+            $DB->update_record('enrol', $instance);
+        }
+        upgrade_plugin_savepoint(true, 2021050600, 'enrol', 'autoenrol');
+    }
+
     return true;
 }

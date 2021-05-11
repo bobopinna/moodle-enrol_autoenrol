@@ -95,25 +95,28 @@ class enrol_autoenrol_edit_form extends moodleform {
                 'static', 'description', html_writer::tag('strong', get_string('warning', 'enrol_autoenrol')),
                 get_string('warning_message', 'enrol_autoenrol'));
 
-        $this->_form->addElement('text', 'customchar2', get_string('instancename', 'enrol_autoenrol'));
-        $this->_form->setType('customchar2', PARAM_TEXT);
-        $this->_form->setDefault('customchar2', '');
-        $this->_form->addHelpButton('customchar2', 'instancename', 'enrol_autoenrol');
+        // Custom instance name.
+        $nameattribs = array('size' => '20', 'maxlength' => '255');
+        $this->_form->addElement('text', 'name', get_string('custominstancename', 'enrol_autoenrol'), $nameattribs);
+        $this->_form->setType('name', PARAM_TEXT);
+        $this->_form->setDefault('name', '');
+        $this->_form->addHelpButton('name', 'instancename', 'enrol_autoenrol');
+        $mform->addRule('name', get_string('maximumchars', '', 255), 'maxlength', 255, 'server');
 
         if ($instance->id) {
             $roles = get_default_enrol_roles($context, $instance->roleid);
         } else {
             $roles = get_default_enrol_roles($context, $plugin->get_config('roleid'));
         }
-        $this->_form->addElement('select', 'customint3', get_string('role', 'enrol_autoenrol'), $roles);
-        $this->_form->setAdvanced('customint3');
-        $this->_form->addHelpButton('customint3', 'role', 'enrol_autoenrol');
+        $this->_form->addElement('select', 'roleid', get_string('role', 'enrol_autoenrol'), $roles);
+        $this->_form->addHelpButton('roleid', 'role', 'enrol_autoenrol');
         if (!has_capability('enrol/autoenrol:method', $context)) {
-            $this->_form->disabledIf('customint3', 'customchar3', 'eq', '-');
+            $this->_form->disabledIf('roleid', 'customchar3', 'eq', '-');
         }
-        $this->_form->setDefault('customint3', $plugin->get_config('defaultrole'));
-        $this->_form->setType('customint3', PARAM_INT);
+        $this->_form->setDefault('roleid', $plugin->get_config('defaultrole'));
+        $this->_form->setType('roleid', PARAM_INT);
 
+        // Enrol When.
         $method = array(get_string('m_course', 'enrol_autoenrol'), get_string('m_site', 'enrol_autoenrol'));
         $this->_form->addElement('select', 'customint1', get_string('method', 'enrol_autoenrol'), $method);
         if (!has_capability('enrol/autoenrol:method', $context)) {
@@ -123,12 +126,14 @@ class enrol_autoenrol_edit_form extends moodleform {
         $this->_form->setType('customint1', PARAM_INT);
         $this->_form->addHelpButton('customint1', 'method', 'enrol_autoenrol');
 
+        // Enrol always.
         $this->_form->addElement('selectyesno', 'customint8', get_string('alwaysenrol', 'enrol_autoenrol'));
         $this->_form->setAdvanced('customint8');
         $this->_form->setType('customint8', PARAM_INT);
         $this->_form->setDefault('customint8', 0);
         $this->_form->addHelpButton('customint8', 'alwaysenrol', 'enrol_autoenrol');
 
+        // Self unenrol.
         $this->_form->addElement('selectyesno', 'customint6', get_string('selfunenrol', 'enrol_autoenrol'));
         $this->_form->setAdvanced('customint6');
         $this->_form->setType('customint6', PARAM_INT);
@@ -141,6 +146,7 @@ class enrol_autoenrol_edit_form extends moodleform {
         $this->_form->setDefault('enrolstartdate', 0);
         $this->_form->addHelpButton('enrolstartdate', 'enrolstartdate', 'enrol_autoenrol');
 
+        // End date.
         $this->_form->addElement('date_time_selector', 'enrolenddate', get_string('enrolenddate', 'enrol_autoenrol'), $options);
         $this->_form->setDefault('enrolenddate', 0);
         $this->_form->addHelpButton('enrolenddate', 'enrolenddate', 'enrol_autoenrol');
@@ -154,6 +160,8 @@ class enrol_autoenrol_edit_form extends moodleform {
             $this->_form->addElement('checkbox', 'customint7', get_string('sendcoursewelcomemessage', 'enrol_autoenrol'));
         }
         $this->_form->setDefault('customint7', $plugin->get_config('sendcoursewelcomemessage'));
+
+        // Welcome message text.
         $this->_form->addElement('textarea', 'customtext1',
                 get_string('customwelcomemessage', 'enrol_autoenrol'), array('cols' => '60', 'rows' => '8'));
         $this->_form->addHelpButton('customtext1', 'customwelcomemessage', 'enrol_autoenrol');

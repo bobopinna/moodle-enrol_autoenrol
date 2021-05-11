@@ -38,6 +38,20 @@ defined('MOODLE_INTERNAL') || die();
 class enrol_autoenrol_plugin extends enrol_plugin {
 
     /**
+     * Database fields mapping
+     *
+     * customint1 => Enrol on course access or on login
+     * customint5 => Enrolment Limit number
+     * customint6 => Enable self unenrol
+     * customint7 => Welcome message enabled
+     * customint8 => Always enrol
+     * customchar1 => Group Name
+     * customchar3 => Group by field name
+     * customtext1 => Welcome message
+     * customtext2 => Conditional rules
+     */
+
+    /**
      * Get enrol method icon
      *
      * @param array $instances
@@ -235,7 +249,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
             throw new coding_exception('Invalid enrol instance type!');
         }
         if ($this->enrol_allowed($user, $instance)) {
-            $this->enrol_user($instance, $user->id, $instance->customint3, time(), 0);
+            $this->enrol_user($instance, $user->id, $instance->roleid, time(), 0);
             $this->process_group($instance, $user);
             // Send welcome message.
             if ($instance->customint7 != ENROL_DO_NOT_SEND_EMAIL) {
@@ -299,10 +313,19 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      * @return string
      */
     public function get_instance_name($instance) {
-        if ($instance->customchar2 != '') {
-            return get_string('auto', 'enrol_autoenrol') . ' (' . $instance->customchar2 . ')';
+        global $DB;
+
+        if (empty($instance->name)) {
+            if (!empty($instance->roleid) and $role = $DB->get_record('role', array('id'=>$instance->roleid))) {
+                $role = ' (' . role_get_name($role, context_course::instance($instance->courseid, IGNORE_MISSING)) . ')';
+            } else {
+                $role = '';
+            }
+            $enrol = $this->get_name();
+            return get_string('pluginname', 'enrol_'.$enrol) . $role;
+        } else {
+            return format_string($instance->name);
         }
-        return get_string('pluginname', 'enrol_autoenrol');
     }
 
     /**
@@ -651,7 +674,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      * @return int id of new instance, null if can not be created
      */
     public function add_default_instance($course) {
-        $fields = array('status' => 0, 'customint3' => $this->get_config('defaultrole'), 'customint5' => 0, 'customint8' => 0);
+        $fields = array('status' => 0, 'roleid' => $this->get_config('defaultrole'), 'customint5' => 0, 'customint8' => 0);
         return $this->add_instance($course, $fields);
     }
 

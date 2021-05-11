@@ -90,17 +90,17 @@ if ($mform->is_cancelled()) {
         $instance->timemodified = time();
         if (has_capability('enrol/autoenrol:method', $context)) {
             $instance->customint1 = $data->customint1;
-            $instance->customint3 = $data->customint3;
+            $instance->roleid = $data->roleid;
         }
         $instance->customint5 = $data->customint5;
         $instance->customint6 = $data->customint6;
         $instance->customint7 = $data->customint7;
         $instance->customint8 = $data->customint8;
         $instance->customchar1 = $data->customchar1;
-        $instance->customchar2 = $data->customchar2;
         $instance->customchar3 = $data->customchar3;
         $instance->customtext1 = $data->customtext1;
         $instance->customtext2 = $data->customtext2;
+        $instance->name = $data->name;
         $instance->enrolstartdate = $data->enrolstartdate;
         $instance->enrolenddate = $data->enrolenddate;
         $DB->update_record('enrol', $instance);
@@ -108,22 +108,22 @@ if ($mform->is_cancelled()) {
         // Do not add a new instance if one already exists (someone may have added one while we are looking at the edit form).
     } else {
         $fields = array('customint1' => 0,
-                        'customint3' => 5,
                         'customint5' => $data->customint5,
                         'customint6' => $data->customint6,
                         'customint7' => $data->customint7,
                         'customint8' => $data->customint8,
                         'customchar1' => $data->customchar1,
-                        'customchar2' => $data->customchar2,
                         'customchar3' => $data->customchar3,
                         'customtext1' => $data->customtext1,
                         'customtext2' => $data->customtext2,
+                        'name' => $data->name,
+                        'roleid' => 5,
                         'enrolstartdate' => $data->enrolstartdate,
                         'enrolenddate' => $data->enrolenddate
         );
         if (has_capability('enrol/autoenrol:method', $context)) {
             $fields['customint1'] = $data->customint1;
-            $fields['customint3'] = $data->customint3;
+            $fields['roleid'] = $data->roleid;
         }
 
         $plugin->add_instance($course, $fields);

@@ -57,7 +57,7 @@ class filter_info extends \core_availability\info {
      * @return string This thing name
      */
     protected function get_thing_name() {
-        return $this->instance->name;
+        return get_instance_name($this->instance);
     }
 
     /**
