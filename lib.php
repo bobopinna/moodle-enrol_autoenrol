@@ -40,15 +40,27 @@ class enrol_autoenrol_plugin extends enrol_plugin {
     /**
      * Database fields mapping
      *
+     * name => Instance name
+     * status => Instance status (enabled/disabled)
+     * roleid => User role id
+     * enrolperiod => Enrolment duration
+     * expirenotify => Who need to be notified on expire
+     * expirethreshold => How many minutes before expire need to send notify
+     * enrolstartdate => When start to enrol
+     * enrolenddate => When stop to enrol
      * customint1 => Enrol on course access or on login
+     * customint2 => -- NOT USED -- Old group field filter
+     * customint3 => Longtime no see unenrol
+     * customint4 => New enrolment enabled
      * customint5 => Enrolment Limit number
      * customint6 => Enable self unenrol
      * customint7 => Welcome message enabled
      * customint8 => Always enrol
      * customchar1 => Group Name
+     * customchar2 => -- NOT USED --
      * customchar3 => Group by field name
      * customtext1 => Welcome message
-     * customtext2 => Conditional rules
+     * customtext2 => Conditional rules     
      */
 
     /**
@@ -101,7 +113,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      * @return bool
      */
     public function show_enrolme_link(stdClass $instance) {
-        if ($instance->customint1 > 0) {
+        if ($this->get_config('loginenrol') && $instance->customint1 > 0) {
             // Don't offer enrolself if we are going to enrol them on login.
             return false;
         }
@@ -116,7 +128,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      * @return moodle_url or NULL if self unenrolment not supported
      */
     public function get_unenrolself_link($instance) {
-        if (($instance->customint1 > 0) || ($instance->customint6 == 0)) {
+        if (($this->get_config('loginenrol') && ($instance->customint1 > 0)) || ($instance->customint6 == 0)) {
             // Don't offer unenrolself if we are going to re-enrol them on login or if not permitted.
             return null;
         }
@@ -168,6 +180,11 @@ class enrol_autoenrol_plugin extends enrol_plugin {
             return false;
         }
 
+        // Do not reenrol if already enrolled with this method.
+        if ($DB->record_exists('user_enrolments', array('userid' => $user->id, 'enrolid' => $instance->id))) {
+            return false;
+        }
+
         if (!$instance->customint8) {
             // Do not reenrol if already enrolled with another method.
             $context = context_course::instance($instance->courseid);
@@ -177,8 +194,20 @@ class enrol_autoenrol_plugin extends enrol_plugin {
             }
         }
 
-        // Do not reenrol if already enrolled with this method.
-        if ($DB->record_exists('user_enrolments', array('userid' => $user->id, 'enrolid' => $instance->id))) {
+        if ($instance->status != ENROL_INSTANCE_ENABLED) {
+            return false;
+        }
+
+        if (!$instance->customint4) {
+            // New enrols not allowed.
+            return false;
+        }
+
+        if ($instance->enrolstartdate != 0 and $instance->enrolstartdate > time()) {
+            return false;
+        }
+
+        if ($instance->enrolenddate != 0 and $instance->enrolenddate < time()) {
             return false;
         }
 
@@ -194,13 +223,6 @@ class enrol_autoenrol_plugin extends enrol_plugin {
             return false;
         }
 
-        if ($instance->enrolstartdate != 0 and $instance->enrolstartdate > time()) {
-            return false;
-        }
-
-        if ($instance->enrolenddate != 0 and $instance->enrolenddate < time()) {
-            return false;
-        }
         return true;
     }
 
@@ -416,7 +438,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
                 }
             }
 
-            if (!$found && (($instance->customint1 == 1) || !$onlogin)) {
+            if (!$found && (($this->get_config('loginenrol') && ($instance->customint1 == 1)) || !$onlogin)) {
                 // If user is not enrolled and this instance enrol on login or called with sync task, try to enrol.
                 $PAGE->set_context(context_course::instance($instance->courseid));
                 if ($this->user_autoenrol($instance, $user)) {
@@ -497,6 +519,78 @@ class enrol_autoenrol_plugin extends enrol_plugin {
             }
         }
         
+    }
+
+    /**
+     * Process long time not seen user and expiration
+     *
+     * @param progress_trace $trace
+     * @param int $courseid one course, empty mean all
+     * @return int 0 means ok, 1 means error, 2 means plugin disabled
+     */
+    public function sync_expirations(progress_trace $trace, $courseid = null) {
+        global $DB;
+
+        if (!enrol_is_enabled('autoenrol')) {
+            $trace->finished();
+            return 2;
+        }
+
+        // Unfortunately this may take a long time, execution can be interrupted safely here.
+        core_php_time_limit::raise();
+        raise_memory_limit(MEMORY_HUGE);
+
+        $trace->output('Verifying autoenrolments expiration...');
+
+        $params = array('now'=>time(), 'useractive'=>ENROL_USER_ACTIVE, 'courselevel'=>CONTEXT_COURSE);
+        $coursesql = "";
+        if ($courseid) {
+            $coursesql = "AND e.courseid = :courseid";
+            $params['courseid'] = $courseid;
+        }
+
+        // First deal with users that did not log in for a really long time - they do not have user_lastaccess records.
+        $sql = "SELECT e.*, ue.userid
+                  FROM {user_enrolments} ue
+                  JOIN {enrol} e ON (e.id = ue.enrolid AND e.enrol = 'autoenrol' AND e.customint3 > 0)
+                  JOIN {user} u ON u.id = ue.userid
+                 WHERE :now - u.lastaccess > e.customint3
+                       $coursesql";
+        $rs = $DB->get_recordset_sql($sql, $params);
+        foreach ($rs as $instance) {
+            $userid = $instance->userid;
+            unset($instance->userid);
+            $this->unenrol_user($instance, $userid);
+            $days = $instance->customint3 / DAYSECS;
+            $trace->output("unenrolling user $userid from course $instance->courseid " .
+                "as they did not log in for at least $days days", 1);
+        }
+        $rs->close();
+
+        // Now unenrol from course user did not visit for a long time.
+        $sql = "SELECT e.*, ue.userid
+                  FROM {user_enrolments} ue
+                  JOIN {enrol} e ON (e.id = ue.enrolid AND e.enrol = 'autoenrol' AND e.customint3 > 0)
+                  JOIN {user_lastaccess} ul ON (ul.userid = ue.userid AND ul.courseid = e.courseid)
+                 WHERE :now - ul.timeaccess > e.customint3
+                       $coursesql";
+        $rs = $DB->get_recordset_sql($sql, $params);
+        foreach ($rs as $instance) {
+            $userid = $instance->userid;
+            unset($instance->userid);
+            $this->unenrol_user($instance, $userid);
+            $days = $instance->customint3 / DAYSECS;
+            $trace->output("unenrolling user $userid from course $instance->courseid " .
+                "as they did not access the course for at least $days days", 1);
+        }
+        $rs->close();
+
+        $trace->output('...user autoenrolment updates finished.');
+        $trace->finished();
+
+        $this->process_expirations($trace, $courseid);
+
+        return 0;
     }
 
     /**

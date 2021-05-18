@@ -21,6 +21,7 @@
  *
  * @package    enrol_autoenrol
  * @copyright  2013 Mark Ward & Matthew Cannings - based on code by Martin Dougiamas, Petr Skoda, Eugene Venter and others
+ * @copyright  2017 onward Roberto Pinna
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -123,3 +124,37 @@ $string['confirmbulkdeleteenrolment'] = 'Are you sure you want to delete these u
 $string['syncenrolmentstask'] = 'Synchronise Autoenrol task'; 
 $string['checksync'] = 'Check for syncronization to {$a} users';
 $string['pluginnotenabled'] = 'Autoenrol plugin not enabled';
+$string['status'] = 'Allow existing enrolments';
+$string['status_desc'] = 'Enable Autoenrol method in new courses.';
+$string['status_help'] = 'If enabled together with \'Allow new enrolments\' disabled, only users who Autoenrolled previously can access the course. If disabled, this Autoenrolment method is effectively disabled, since all existing Autoenrolments are suspended and new users cannot Autoenrol.';
+$string['newenrols'] = 'Allow new enrolments';
+$string['newenrols_desc'] = 'Allow users to Autoenrol into new courses by default.';
+$string['newenrols_help'] = 'This setting determines whether a user can enrol into this course.';
+$string['enrolperiod'] = 'Enrolment duration';
+$string['enrolperiod_desc'] = 'Default length of time that the enrolment is valid. If set to zero, the enrolment duration will be unlimited by default.';
+$string['enrolperiod_help'] = 'Length of time that the enrolment is valid, starting with the moment the user enrols themselves. If disabled, the enrolment duration will be unlimited.';
+$string['longtimenosee'] = 'Unenrol inactive after';
+$string['longtimenosee_help'] = 'If users haven\'t accessed a course for a long time, then they are automatically unenrolled. This parameter specifies that time limit.';
+$string['expiredaction'] = 'Enrolment expiry action';
+$string['expiredaction_help'] = 'Select action to carry out when user enrolment expires. Please note that some user data and settings are purged from course during course unenrolment.';
+$string['expirymessageenrollersubject'] = 'Autoenrolment expiry notification';
+$string['expirymessageenrollerbody'] = 'Autoenrolment in the course \'{$a->course}\' will expire within the next {$a->threshold} for the following users:
+
+{$a->users}
+
+To extend their enrolment, go to {$a->extendurl}';
+$string['expirymessageenrolledsubject'] = 'Selft enrolment expiry notification';
+$string['expirymessageenrolledbody'] = 'Dear {$a->user},
+
+This is a notification that your enrolment in the course \'{$a->course}\' is due to expire on {$a->timeend}.
+
+If you need help, please contact {$a->enroller}.';
+$string['expirynotifyall'] = 'Teacher and enrolled user';
+$string['expirynotifyenroller'] = 'Teacher only';
+$string['maxenrolled'] = 'Max enrolled users';
+$string['maxenrolled_help'] = 'Specifies the maximum number of users that can autoenrol. 0 means no limit.';
+$string['loginenrol'] = 'Allow enrolments on login';
+$string['loginenrol_desc'] = 'Allow enrolment on login could slowdown your site performance. As an alternative you can use the scheduled task to update enrolments for all courses or the cli command for specific courses.';
+$string['messageprovider:expiry_notification'] = 'Autoenrol enrolment expiry notifications';
+$string['sendexpirynotificationstask'] = 'Autoenrol enrolment send expiry notifications task';
+$string['syncexpirationstask'] = 'Autoenrol expirations check task';

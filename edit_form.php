@@ -52,7 +52,7 @@ class enrol_autoenrol_edit_form extends moodleform {
 
         $this->add_hidden_fields();
         $this->add_general_section($instance, $plugin, $context);
-        $this->add_filtering_section();
+        $this->add_filtering_section($plugin);
         $this->add_action_buttons(true, ($instance->id ? null : get_string('addinstance', 'enrol')));
 
         $this->set_data($instance);
@@ -97,16 +97,30 @@ class enrol_autoenrol_edit_form extends moodleform {
 
         // Custom instance name.
         $nameattribs = array('size' => '20', 'maxlength' => '255');
-        $this->_form->addElement('text', 'name', get_string('custominstancename', 'enrol_autoenrol'), $nameattribs);
+        $this->_form->addElement('text', 'name', get_string('instancename', 'enrol_autoenrol'), $nameattribs);
         $this->_form->setType('name', PARAM_TEXT);
         $this->_form->setDefault('name', '');
         $this->_form->addHelpButton('name', 'instancename', 'enrol_autoenrol');
-        $mform->addRule('name', get_string('maximumchars', '', 255), 'maxlength', 255, 'server');
+        $this->_form->addRule('name', get_string('maximumchars', '', 255), 'maxlength', 255, 'server');
 
+        // Auto Enrol enabled status.
+        $options = array(ENROL_INSTANCE_ENABLED  => get_string('yes'),
+                         ENROL_INSTANCE_DISABLED => get_string('no'));
+        $this->_form->addElement('select', 'status', get_string('status', 'enrol_autoenrol'), $options);
+        $this->_form->addHelpButton('status', 'status', 'enrol_autoenrol');
+
+        // New enrolment enabled.
+        $options = array(1 => get_string('yes'), 0 => get_string('no'));
+        $this->_form->addElement('select', 'customint4', get_string('newenrols', 'enrol_autoenrol'), $options);
+        $this->_form->addHelpButton('customint4', 'newenrols', 'enrol_autoenrol');
+        $this->_form->setDefault('customint4', $plugin->get_config('newenrols'));
+        $this->_form->disabledIf('customint4', 'status', 'eq', ENROL_INSTANCE_DISABLED);
+
+        // Role id.
         if ($instance->id) {
             $roles = get_default_enrol_roles($context, $instance->roleid);
         } else {
-            $roles = get_default_enrol_roles($context, $plugin->get_config('roleid'));
+            $roles = get_default_enrol_roles($context, $plugin->get_config('defaultrole'));
         }
         $this->_form->addElement('select', 'roleid', get_string('role', 'enrol_autoenrol'), $roles);
         $this->_form->addHelpButton('roleid', 'role', 'enrol_autoenrol');
@@ -117,30 +131,51 @@ class enrol_autoenrol_edit_form extends moodleform {
         $this->_form->setType('roleid', PARAM_INT);
 
         // Enrol When.
-        $method = array(get_string('m_course', 'enrol_autoenrol'), get_string('m_site', 'enrol_autoenrol'));
-        $this->_form->addElement('select', 'customint1', get_string('method', 'enrol_autoenrol'), $method);
-        if (!has_capability('enrol/autoenrol:method', $context)) {
-            $this->_form->disabledIf('customint1', 'customchar3', 'eq', '-');
+        if ($plugin->get_config('loginenrol')) {
+            $method = array(get_string('m_course', 'enrol_autoenrol'), get_string('m_site', 'enrol_autoenrol'));
+            $this->_form->addElement('select', 'customint1', get_string('method', 'enrol_autoenrol'), $method);
+            if (!has_capability('enrol/autoenrol:method', $context)) {
+                $this->_form->disabledIf('customint1', 'customchar3', 'eq', '-');
+            }
+            $this->_form->setType('customint1', PARAM_INT);
+            $this->_form->addHelpButton('customint1', 'method', 'enrol_autoenrol');
         }
-        $this->_form->setAdvanced('customint1');
-        $this->_form->setType('customint1', PARAM_INT);
-        $this->_form->addHelpButton('customint1', 'method', 'enrol_autoenrol');
 
         // Enrol always.
         $this->_form->addElement('selectyesno', 'customint8', get_string('alwaysenrol', 'enrol_autoenrol'));
-        $this->_form->setAdvanced('customint8');
         $this->_form->setType('customint8', PARAM_INT);
         $this->_form->setDefault('customint8', 0);
         $this->_form->addHelpButton('customint8', 'alwaysenrol', 'enrol_autoenrol');
 
         // Self unenrol.
         $this->_form->addElement('selectyesno', 'customint6', get_string('selfunenrol', 'enrol_autoenrol'));
-        $this->_form->setAdvanced('customint6');
         $this->_form->setType('customint6', PARAM_INT);
         $this->_form->setDefault('customint6', 0);
         $this->_form->addHelpButton('customint6', 'selfunenrol', 'enrol_autoenrol');
         $this->_form->disabledIf('customint6', 'customint1', 'eq', '1');
 
+        // Enrol duration.
+        $options = array('optional' => true, 'defaultunit' => 86400);
+        $this->_form->addElement('duration', 'enrolperiod', get_string('enrolperiod', 'enrol_autoenrol'), $options);
+        $this->_form->addHelpButton('enrolperiod', 'enrolperiod', 'enrol_autoenrol');
+        $this->_form->setDefault('enrolperiod', $plugin->get_config('enrolperiod'));
+
+        // Expire notify.
+        $options = array(0 => get_string('no'),
+                         1 => get_string('expirynotifyenroller', 'enrol_autoenrol'),
+                         2 => get_string('expirynotifyall', 'enrol_autoenrol'));
+        $this->_form->addElement('select', 'expirynotify', get_string('expirynotify', 'core_enrol'), $options);
+        $this->_form->addHelpButton('expirynotify', 'expirynotify', 'core_enrol');
+        $this->_form->setDefault('expirynotify', $plugin->get_config('expirynotify'));
+
+        // Expire threshold.
+        $options = array('optional' => false, 'defaultunit' => 86400);
+        $this->_form->addElement('duration', 'expirythreshold', get_string('expirythreshold', 'core_enrol'), $options);
+        $this->_form->addHelpButton('expirythreshold', 'expirythreshold', 'core_enrol');
+        $this->_form->disabledIf('expirythreshold', 'expirynotify', 'eq', 0);
+        $this->_form->setDefault('expirythreshold', $plugin->get_config('expirythreshold'));
+
+        // Start date.
         $options = array('optional' => true);
         $this->_form->addElement('date_time_selector', 'enrolstartdate', get_string('enrolstartdate', 'enrol_autoenrol'), $options);
         $this->_form->setDefault('enrolstartdate', 0);
@@ -151,6 +186,25 @@ class enrol_autoenrol_edit_form extends moodleform {
         $this->_form->setDefault('enrolenddate', 0);
         $this->_form->addHelpButton('enrolenddate', 'enrolenddate', 'enrol_autoenrol');
 
+        // Longtime no see.
+        $options = array(0 => get_string('never'),
+                         1800 * 3600 * 24 => get_string('numdays', '', 1800),
+                         1000 * 3600 * 24 => get_string('numdays', '', 1000),
+                         365 * 3600 * 24 => get_string('numdays', '', 365),
+                         180 * 3600 * 24 => get_string('numdays', '', 180),
+                         150 * 3600 * 24 => get_string('numdays', '', 150),
+                         120 * 3600 * 24 => get_string('numdays', '', 120),
+                         90 * 3600 * 24 => get_string('numdays', '', 90),
+                         60 * 3600 * 24 => get_string('numdays', '', 60),
+                         30 * 3600 * 24 => get_string('numdays', '', 30),
+                         21 * 3600 * 24 => get_string('numdays', '', 21),
+                         14 * 3600 * 24 => get_string('numdays', '', 14),
+                         7 * 3600 * 24 => get_string('numdays', '', 7));
+        $this->_form->addElement('select', 'customint3', get_string('longtimenosee', 'enrol_autoenrol'), $options);
+        $this->_form->addHelpButton('customint3', 'longtimenosee', 'enrol_autoenrol');
+        $this->_form->setDefault('customint3', $plugin->get_config('longtimenosee'));
+
+        // Welcome message sending.
         if (function_exists('enrol_send_welcome_email_options')) {
             $options = enrol_send_welcome_email_options();
             unset($options[ENROL_SEND_EMAIL_FROM_KEY_HOLDER]);
@@ -172,7 +226,7 @@ class enrol_autoenrol_edit_form extends moodleform {
      *
      * @throws coding_exception
      */
-    protected function add_filtering_section() {
+    protected function add_filtering_section($plugin) {
         global $DB, $COURSE;
 
         $this->_form->addElement('header', 'filtersection', get_string('filtering', 'enrol_autoenrol'));
@@ -215,7 +269,7 @@ class enrol_autoenrol_edit_form extends moodleform {
 
         $this->_form->addElement('text', 'customint5', get_string('countlimit', 'enrol_autoenrol'));
         $this->_form->setType('customint5', PARAM_INT);
-        $this->_form->setDefault('customint5', 0);
+        $this->_form->setDefault('customint5', $plugin->get_config('maxenrolled'));
         $this->_form->addHelpButton('customint5', 'countlimit', 'enrol_autoenrol');
     }
 

@@ -39,6 +39,14 @@ if ($ADMIN->fulltree) {
             0)
     );
 
+    $options = array(1  => get_string('yes'), 0 => get_string('no'));
+    $settings->add(new admin_setting_configselect('enrol_autoenrol/newenrols',
+        get_string('newenrols', 'enrol_autoenrol'), get_string('newenrols_desc', 'enrol_autoenrol'), 1, $options));
+
+    $options = array(1  => get_string('yes'), 0 => get_string('no'));
+    $settings->add(new admin_setting_configselect('enrol_autoenrol/loginenrol',
+        get_string('loginenrol', 'enrol_autoenrol'), get_string('loginenrol_desc', 'enrol_autoenrol'), 1, $options));
+
     if (!during_initial_install()) {
         $options = get_default_enrol_roles(context_system::instance());
         $student = get_archetype_roles('student');
@@ -78,6 +86,53 @@ if ($ADMIN->fulltree) {
             $options
         )
     );
+
+    $settings->add(
+        new admin_setting_configselect(
+            'enrol_autoenrol/expiredaction',
+            get_string('expiredaction', 'enrol_autoenrol'),
+            get_string('expiredaction_help', 'enrol_autoenrol'),
+            ENROL_EXT_REMOVED_UNENROL,
+            $options
+        )
+    );
+
+    $options = array();
+    for ($i=0; $i<24; $i++) {
+        $options[$i] = $i;
+    }
+    $settings->add(new admin_setting_configselect('enrol_autoenrol/expirynotifyhour', get_string('expirynotifyhour', 'core_enrol'), '', 6, $options));
+
+    $settings->add(new admin_setting_configduration('enrol_autoenrol/enrolperiod',
+        get_string('enrolperiod', 'enrol_autoenrol'), get_string('enrolperiod_desc', 'enrol_autoenrol'), 0));
+
+    $options = array(0 => get_string('no'),
+                     1 => get_string('expirynotifyenroller', 'enrol_autoenrol'),
+                     2 => get_string('expirynotifyall', 'enrol_autoenrol'));
+    $settings->add(new admin_setting_configselect('enrol_autoenrol/expirynotify',
+        get_string('expirynotify', 'core_enrol'), get_string('expirynotify_help', 'core_enrol'), 0, $options));
+
+    $settings->add(new admin_setting_configduration('enrol_autoenrol/expirythreshold',
+        get_string('expirythreshold', 'core_enrol'), get_string('expirythreshold_help', 'core_enrol'), 86400, 86400));
+
+    $options = array(0 => get_string('never'),
+                     1800 * 3600 * 24 => get_string('numdays', '', 1800),
+                     1000 * 3600 * 24 => get_string('numdays', '', 1000),
+                     365 * 3600 * 24 => get_string('numdays', '', 365),
+                     180 * 3600 * 24 => get_string('numdays', '', 180),
+                     150 * 3600 * 24 => get_string('numdays', '', 150),
+                     120 * 3600 * 24 => get_string('numdays', '', 120),
+                     90 * 3600 * 24 => get_string('numdays', '', 90),
+                     60 * 3600 * 24 => get_string('numdays', '', 60),
+                     30 * 3600 * 24 => get_string('numdays', '', 30),
+                     21 * 3600 * 24 => get_string('numdays', '', 21),
+                     14 * 3600 * 24 => get_string('numdays', '', 14),
+                     7 * 3600 * 24 => get_string('numdays', '', 7));
+    $settings->add(new admin_setting_configselect('enrol_autoenrol/longtimenosee',
+        get_string('longtimenosee', 'enrol_autoenrol'), get_string('longtimenosee_help', 'enrol_autoenrol'), 0, $options));
+
+    $settings->add(new admin_setting_configtext('enrol_autoenrol/maxenrolled',
+        get_string('maxenrolled', 'enrol_autoenrol'), get_string('maxenrolled_help', 'enrol_autoenrol'), 0, PARAM_INT));
 
     if (function_exists('enrol_send_welcome_email_options')) {
         $options = enrol_send_welcome_email_options();

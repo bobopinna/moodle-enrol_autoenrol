@@ -33,6 +33,26 @@ $tasks = array(
         'month' => '*',
         'dayofweek' => '*',
         'disabled' => 1
+    ),
+    array(
+        'classname' => '\enrol_autoenrol\task\sync_expirations',
+        'blocking' => 0,
+        'minute' => '*/10',
+        'hour' => '*',
+        'day' => '*',
+        'month' => '*',
+        'dayofweek' => '*',
+        'disabled' => 0
+    ),
+    array(
+        'classname' => '\enrol_autoenrol\task\send_expiry_notifications',
+        'blocking' => 0,
+        'minute' => '*/10',
+        'hour' => '*',
+        'day' => '*',
+        'month' => '*',
+        'dayofweek' => '*',
+        'disabled' => 0
     )
 );
 

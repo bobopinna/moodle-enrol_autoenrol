@@ -15,20 +15,15 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * autoenrol enrolment plugin.
- *
- * This plugin automatically enrols a user onto a course the first time they try to access it.
+ * Defines message providers for autoenrol enrolments.
  *
  * @package    enrol_autoenrol
- * @copyright  2013 Mark Ward & Matthew Cannings - based on code by Martin Dougiamas, Petr Skoda, Eugene Venter and others
- * @copyright  2017 onwards Roberto Pinna
+ * @copyright  2021 Roberto Pinna
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+$messageproviders = array (
 
-$plugin->version = 2021051400;
-$plugin->requires = 2013111800.00;      // Requires this Moodle version (2.6).
-$plugin->release = '2.3';             // Plugin release.
-$plugin->component = 'enrol_autoenrol'; // Full name of the plugin (used for diagnostics).
-$plugin->maturity = MATURITY_STABLE;    // The moodle.org release.
+    'expiry_notification' => array(),
+
+);

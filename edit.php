@@ -67,6 +67,7 @@ if ($mform->is_cancelled()) {
     redirect($return);
 
 } else if ($data = $mform->get_data()) {
+    // Set default group name.
     if (!isset($data->customchar3)) {
         $data->customchar3 = '';
     }
@@ -86,12 +87,22 @@ if ($mform->is_cancelled()) {
         $data->customtext2 = $data->availabilityconditionsjson;
     }
 
+    // In the form we are representing 2 db columns with one field.
+    if ($data->expirynotify == 2) {
+        $data->expirynotify = 1;
+        $data->notifyall = 1;
+    } else {
+        $data->notifyall = 0;
+    }
+
     if ($instance->id) {
         $instance->timemodified = time();
         if (has_capability('enrol/autoenrol:method', $context)) {
             $instance->customint1 = $data->customint1;
             $instance->roleid = $data->roleid;
         }
+        $instance->customint3 = $data->customint3;
+        $instance->customint4 = $data->customint4;
         $instance->customint5 = $data->customint5;
         $instance->customint6 = $data->customint6;
         $instance->customint7 = $data->customint7;
@@ -101,13 +112,20 @@ if ($mform->is_cancelled()) {
         $instance->customtext1 = $data->customtext1;
         $instance->customtext2 = $data->customtext2;
         $instance->name = $data->name;
+        $instance->status = $data->status;
+        $instance->enrolperiod = $data->enrolperiod;
         $instance->enrolstartdate = $data->enrolstartdate;
         $instance->enrolenddate = $data->enrolenddate;
+        $instance->expirynotify = $data->expirynotify;
+        $instance->expirythreshold = $data->expirythreshold;
+        $instance->notifyall = $data->notifyall;
         $DB->update_record('enrol', $instance);
 
         // Do not add a new instance if one already exists (someone may have added one while we are looking at the edit form).
     } else {
         $fields = array('customint1' => 0,
+                        'customint3' => $data->customint3,
+                        'customint4' => $data->customint4,
                         'customint5' => $data->customint5,
                         'customint6' => $data->customint6,
                         'customint7' => $data->customint7,
@@ -117,9 +135,14 @@ if ($mform->is_cancelled()) {
                         'customtext1' => $data->customtext1,
                         'customtext2' => $data->customtext2,
                         'name' => $data->name,
-                        'roleid' => 5,
+                        'roleid' => $this->get_config('roleid'),
+                        'status' => $data->status,
+                        'enrolperiod' => $data->enrolperiod,
                         'enrolstartdate' => $data->enrolstartdate,
-                        'enrolenddate' => $data->enrolenddate
+                        'enrolenddate' => $data->enrolenddate,
+                        'expirynotify' => $data->expirynotify,
+                        'expirythreshold' => $data->expirythreshold,
+                        'notifyall' => $data->notifyall
         );
         if (has_capability('enrol/autoenrol:method', $context)) {
             $fields['customint1'] = $data->customint1;
