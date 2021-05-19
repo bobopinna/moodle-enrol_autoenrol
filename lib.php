@@ -346,7 +346,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
             $enrol = $this->get_name();
             return get_string('pluginname', 'enrol_'.$enrol) . $role;
         } else {
-            return format_string($instance->name);
+            return get_string('auto', 'enrol_autoenrol') . ' ' . format_string($instance->name);
         }
     }
 
