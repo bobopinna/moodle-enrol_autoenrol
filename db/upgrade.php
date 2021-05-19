@@ -169,6 +169,7 @@ function xmldb_enrol_autoenrol_upgrade($oldversion) {
                 $instance->roleid = $instance->customint3;
                 $instance->customint3 = 0;
             }
+            $instance->customint2 = 0;
             $DB->update_record('enrol', $instance);
         }
         upgrade_plugin_savepoint(true, 2021050600, 'enrol', 'autoenrol');
@@ -176,6 +177,20 @@ function xmldb_enrol_autoenrol_upgrade($oldversion) {
 
     if ($oldversion < 2021051400) {
         upgrade_plugin_savepoint(true, 2021051400, 'enrol', 'autoenrol');
+    }
+
+    if ($oldversion < 2021051700) {
+        $instances = $DB->get_records('enrol', array('enrol' => 'autoenrol'));
+ 
+        foreach ($instances as $instance) {
+            $groups = $DB->get_records_select('groups', 'idnumber LIKE "autoenrol|' . $instance->id . '|%"');
+            foreach ($groups as $group) {
+                $hash = md5($group->name);
+                $newidnumber = 'autoenrol|' . $instance->id . '|' .$hash;
+                $DB->set_field('groups', 'idnumber', $newidnumber, array('id' => $group->id));
+            }
+        }
+        upgrade_plugin_savepoint(true, 2021051700, 'enrol', 'autoenrol');
     }
 
     return true;

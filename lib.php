@@ -377,36 +377,6 @@ class enrol_autoenrol_plugin extends enrol_plugin {
         return $icons;
     }
 
-
-    /**
-     * Unenrol user from an instance and the related group.
-     *
-     * @param stdClass $instance
-     * @param int      $userid
-     */
-    public function unenrol_user(stdClass $instance, $userid) {
-        global $CFG;
-
-        // Remove user from enrol method related group.
-        $usergroups = groups_get_all_groups($instance->courseid, $userid);
-        if (!empty($usergroups)) {
-            require_once($CFG->dirroot . '/group/lib.php');
-
-            foreach ($usergroups as $usergroupid => $usergroup) {
-                if (strpos($usergroup->idnumber, 'autoenrol|'.$instance->id.'|') === false) {
-                    unset($usergroups[$usergroupid]);
-                }
-            }
-
-            if (!empty($usergroups) && (count($usergroups) == 1)) {
-                $usergroup = reset($usergroups);
-                groups_remove_member($usergroup->id, $userid);
-            }
-        }
-
-        parent::unenrol_user($instance, $userid);
-    }
-
     /**
      * This is important especially for external enrol plugins,
      * this function is called for all enabled enrol plugins
@@ -735,8 +705,9 @@ class enrol_autoenrol_plugin extends enrol_plugin {
         if ($this->get_config('removegroups')) {
             require_once($CFG->dirroot . '/group/lib.php');
 
-            $groups = $DB->get_records_sql('SELECT * FROM {groups} WHERE ' . $DB->sql_like('idnumber', ':idnumber'),
-                    array('idnumber' => 'autoenrol|' . $instance->id . '|%'));
+            $groups = $DB->get_records_sql('SELECT * FROM {groups} WHERE "courseid" = :courseid AND ' . 
+                    $DB->sql_like('idnumber', ':idnumber'),
+                    array('idnumber' => 'autoenrol|' . $instance->id . '|%', 'courseid' => $instance->courseid));
 
             foreach ($groups as $group) {
                 groups_delete_group($group);
@@ -815,13 +786,15 @@ class enrol_autoenrol_plugin extends enrol_plugin {
                 $groupid = $this->get_group($instance, $name);
             }
 
-            // Check if this instance already added this user to a group and remove membership if group is changed.
+            // Check if this instance already added this user to a group and remove membership if needed.
             $usergroups = groups_get_all_groups($instance->courseid, $user->id);
             if (!empty($usergroups)) {
                 foreach ($usergroups as $usergroupid => $usergroup) {
+                    // Check if each group with this user as member was created by Autoenrol.
                     if (strpos($usergroup->idnumber, 'autoenrol|'.$instance->id.'|') === false) {
                         unset($usergroups[$usergroupid]);
                     }
+                    // ATTENTION!! - We can't remove user membership from groups not created by Autoenrol.
                 }
 
                 if (!empty($usergroups) && (count($usergroups) == 1)) {
@@ -854,11 +827,17 @@ class enrol_autoenrol_plugin extends enrol_plugin {
     private function get_group(stdClass $instance, $groupname) {
         global $DB;
 
-        // Group idnumber must be no more than 100 characters.
-        $idnumber = substr('autoenrol|' . $instance->id . '|' .$groupname, 0, 100);
+        // Try to get group from idnumber.
+        $hash = md5($groupname);
+        $idnumber = 'autoenrol|' . $instance->id . '|' .$hash;
 
         $group = $DB->get_record('groups', array('idnumber' => $idnumber, 'courseid' => $instance->courseid));
 
+        if ($group == null) {
+            // If not exists idnumber Try to get group from name.
+            $group = $DB->get_record('groups', array('name' => $groupname, 'courseid' => $instance->courseid));
+        }
+           
         if ($group == null) {
             $newgroupdata = new stdclass();
             $newgroupdata->courseid = $instance->courseid;
