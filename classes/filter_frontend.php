@@ -17,7 +17,7 @@
 /**
  * Class with filter frontend (editing form) functionality.
  *
- * @package ernrol_autoenrol
+ * @package enrol_autoenrol
  * @copyright 2021 Roberto Pinna
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -29,7 +29,7 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Class with filter frontend (editing form) functionality.
  *
- * @package ernrol_autoenrol
+ * @package enrol_autoenrol
  * @copyright 2021 Roberto Pinna
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -67,16 +67,16 @@ class filter_frontend extends \core_availability\frontend {
                 // Create plugin front-end object.
                 $class = '\availability_' . $plugin . '\frontend';
                 $frontend = new $class();
-    
+
                 // Add to array of required YUI modules.
                 $component = $frontend->get_component();
                 $modules[] = 'moodle-' . $component . '-form';
-    
+
                 // Get parameters for this plugin.
                 $componentparams->{$plugin} = array($component,
                         $frontend->allow_add($course, $cm, $section),
                         $frontend->get_javascript_init_params($course, $cm, $section));
-    
+
                 // Include strings for this plugin.
                 $identifiers = $frontend->get_javascript_strings();
                 $identifiers[] = 'title';

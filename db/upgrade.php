@@ -145,7 +145,7 @@ function xmldb_enrol_autoenrol_upgrade($oldversion) {
                     if (isset($instance->customint4) && !empty($instance->customint4)) {
                         $operator = 'contains';
                     }
-                    $instance->customtext2 = '{"op":"|","c":[{"type":"profile","' . $fieldtype . '":"' . $oldfield . 
+                    $instance->customtext2 = '{"op":"|","c":[{"type":"profile","' . $fieldtype . '":"' . $oldfield .
                                              '","op":"' . $operator . '","v":"'. $oldmatchvalue .'"}],"show":true}';
                     $instance->customint4 = 0;
                 }
@@ -158,7 +158,7 @@ function xmldb_enrol_autoenrol_upgrade($oldversion) {
 
     if ($oldversion < 2021050600) {
         $instances = $DB->get_records('enrol', array('enrol' => 'autoenrol'));
- 
+
         foreach ($instances as $instance) {
             if (isset($instance->customchar2) && !empty($instance->customchar2)) {
                 $instance->name = $instance->customchar2;
@@ -181,7 +181,7 @@ function xmldb_enrol_autoenrol_upgrade($oldversion) {
 
     if ($oldversion < 2021051700) {
         $instances = $DB->get_records('enrol', array('enrol' => 'autoenrol'));
- 
+
         foreach ($instances as $instance) {
             $groups = $DB->get_records_select('groups', 'idnumber LIKE "autoenrol|' . $instance->id . '|%"');
             foreach ($groups as $group) {

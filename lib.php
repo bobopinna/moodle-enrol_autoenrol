@@ -60,7 +60,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      * customchar2 => -- NOT USED --
      * customchar3 => Group by field name
      * customtext1 => Welcome message
-     * customtext2 => Conditional rules     
+     * customtext2 => Conditional rule
      */
 
     /**
@@ -338,7 +338,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
         global $DB;
 
         if (empty($instance->name)) {
-            if (!empty($instance->roleid) and $role = $DB->get_record('role', array('id'=>$instance->roleid))) {
+            if (!empty($instance->roleid) and $role = $DB->get_record('role', array('id' => $instance->roleid))) {
                 $role = ' (' . role_get_name($role, context_course::instance($instance->courseid, IGNORE_MISSING)) . ')';
             } else {
                 $role = '';
@@ -383,6 +383,8 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      * right after every user login.
      *
      * @param object         $user user record
+     * @param boolean        $onlogin standard on login or scheduled call
+     * @param int            $course course id
      *
      * @return void
      */
@@ -465,17 +467,18 @@ class enrol_autoenrol_plugin extends enrol_plugin {
         }
     }
 
-    /**  
+    /**
      * Forces synchronisation of all autoenrol instances for all users.
      *
      * @param progress_trace $trace
+     * @param int            $course course id
      *
      * @return void
      */
     public function sync_enrolments(progress_trace $trace, $course) {
         global $DB;
 
-        // we may need a lot of memory here
+        // We may need a lot of memory here.
         core_php_time_limit::raise();
         raise_memory_limit(MEMORY_HUGE);
 
@@ -488,7 +491,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
                 $this->sync_user_enrolments($user, false, $course);
             }
         }
-        
+
     }
 
     /**
@@ -512,7 +515,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
 
         $trace->output('Verifying autoenrolments expiration...');
 
-        $params = array('now'=>time(), 'useractive'=>ENROL_USER_ACTIVE, 'courselevel'=>CONTEXT_COURSE);
+        $params = array('now' => time(), 'useractive' => ENROL_USER_ACTIVE, 'courselevel' => CONTEXT_COURSE);
         $coursesql = "";
         if ($courseid) {
             $coursesql = "AND e.courseid = :courseid";
@@ -705,7 +708,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
         if ($this->get_config('removegroups')) {
             require_once($CFG->dirroot . '/group/lib.php');
 
-            $groups = $DB->get_records_sql('SELECT * FROM {groups} WHERE "courseid" = :courseid AND ' . 
+            $groups = $DB->get_records_sql('SELECT * FROM {groups} WHERE "courseid" = :courseid AND ' .
                     $DB->sql_like('idnumber', ':idnumber'),
                     array('idnumber' => 'autoenrol|' . $instance->id . '|%', 'courseid' => $instance->courseid));
 
@@ -837,7 +840,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
             // If not exists idnumber Try to get group from name.
             $group = $DB->get_record('groups', array('name' => $groupname, 'courseid' => $instance->courseid));
         }
-           
+
         if ($group == null) {
             $newgroupdata = new stdclass();
             $newgroupdata->courseid = $instance->courseid;

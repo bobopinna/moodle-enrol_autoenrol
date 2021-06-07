@@ -17,7 +17,7 @@
 /**
  * Class with filter check functionality.
  *
- * @package ernrol_autoenrol
+ * @package enrol_autoenrol
  * @copyright 2021 Roberto Pinna
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -29,12 +29,17 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Class with filter check functionality.
  *
- * @package ernrol_autoenrol
+ * @package enrol_autoenrol
  * @copyright 2021 Roberto Pinna
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class filter_info extends \core_availability\info {
 
+    /**
+     * Autoenrol instance that use filter
+     *
+     * @var object $instance
+     */
     protected $instance;
 
     /**
@@ -44,9 +49,9 @@ class filter_info extends \core_availability\info {
      */
     public function __construct($instance) {
         global $DB;
-        
+
         $course = $DB->get_record('course', array('id' => $instance->courseid));
-        $visible = $instance->status==0 ? true : false;
+        $visible = $instance->status == 0 ? true : false;
 
         parent::__construct($course, $visible, $instance->customtext2);
     }

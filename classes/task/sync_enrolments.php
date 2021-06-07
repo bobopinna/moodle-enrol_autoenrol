@@ -44,12 +44,16 @@ class sync_enrolments extends \core\task\scheduled_task {
 
     /**
      * Run task for synchronising users.
+     *
+     * @param int $course course id
+     *
+     * @return void
      */
     public function execute($course = null) {
 
         if (!enrol_is_enabled('autoenrol')) {
             mtrace(get_string('pluginnotenabled', 'enrol_autoenrol'));
-            exit(0); 
+            exit(0);
             // Note, exit with success code, this is not an error - it's just disabled.
         }
 
@@ -57,7 +61,7 @@ class sync_enrolments extends \core\task\scheduled_task {
 
         $trace = new \text_progress_trace();
 
-        // Update enrolments
+        // Update enrolments.
         $enrol->sync_enrolments($trace, $course);
     }
 

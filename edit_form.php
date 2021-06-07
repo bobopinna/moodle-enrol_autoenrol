@@ -224,7 +224,10 @@ class enrol_autoenrol_edit_form extends moodleform {
     /**
      * Add filtering section to form
      *
+     * @param object $plugin plugin object
+     *
      * @throws coding_exception
+     * return void
      */
     protected function add_filtering_section($plugin) {
         global $DB, $COURSE;
@@ -275,6 +278,8 @@ class enrol_autoenrol_edit_form extends moodleform {
 
     /**
      * Add hidden fields
+     *
+     * @return void
      */
     protected function add_hidden_fields() {
         $this->_form->addElement('hidden', 'id');
@@ -283,12 +288,21 @@ class enrol_autoenrol_edit_form extends moodleform {
         $this->_form->setType('courseid', PARAM_INT);
     }
 
+
+    /**
+     * Validate submitted settings
+     *
+     * @param array $data Submitted data
+     * @param array $files Submitted files
+     *
+     * @return array Errors list
+     */
     public function validation($data, $files) {
         $errors = array();
- 
+
         // Use this code to validate the 'Restrict access' section.
         \core_availability\frontend::report_validation_errors($data, $errors);
- 
+
         return $errors;
     }
 }

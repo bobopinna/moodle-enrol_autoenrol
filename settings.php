@@ -98,10 +98,11 @@ if ($ADMIN->fulltree) {
     );
 
     $options = array();
-    for ($i=0; $i<24; $i++) {
+    for ($i = 0; $i < 24; $i++) {
         $options[$i] = $i;
     }
-    $settings->add(new admin_setting_configselect('enrol_autoenrol/expirynotifyhour', get_string('expirynotifyhour', 'core_enrol'), '', 6, $options));
+    $strexpirynotifyhour = get_string('expirynotifyhour', 'core_enrol');
+    $settings->add(new admin_setting_configselect('enrol_autoenrol/expirynotifyhour', $strexpirynotifyhour, '', 6, $options));
 
     $settings->add(new admin_setting_configduration('enrol_autoenrol/enrolperiod',
         get_string('enrolperiod', 'enrol_autoenrol'), get_string('enrolperiod_desc', 'enrol_autoenrol'), 0));
