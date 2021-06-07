@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * autoenrol enrolment plugin.
+ * Autoenrol enrolment plugin.
  *
  * This plugin automatically enrols a user onto a course the first time they try to access it.
  *
@@ -135,7 +135,7 @@ if ($mform->is_cancelled()) {
                         'customtext1' => $data->customtext1,
                         'customtext2' => $data->customtext2,
                         'name' => $data->name,
-                        'roleid' => get_config('roleid'),
+                        'roleid' => $plugin->get_config('roleid'),
                         'status' => $data->status,
                         'enrolperiod' => $data->enrolperiod,
                         'enrolstartdate' => $data->enrolstartdate,
