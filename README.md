@@ -15,6 +15,8 @@ users the ability to change when the user will be enrolled on a course, and what
 enrolment it will be (ie something other than student). There are further permissions 
 relating to the plugin which should be reviewed through Moodle's "Define Roles" page.
 
+## [Changelog](CHANGES.md)
+
 ## Install
 
 1. Copy the plugin directory "autoenrol" into moodle\enrol\. 
