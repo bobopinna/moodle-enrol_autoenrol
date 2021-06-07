@@ -15,52 +15,6 @@ users the ability to change when the user will be enrolled on a course, and what
 enrolment it will be (ie something other than student). There are further permissions 
 relating to the plugin which should be reviewed through Moodle's "Define Roles" page.
 
-## Changelog
-* v2.3
-  * Renewed user filtering, now with Moodle standard availability interface
-  * Added Enrolment duration
-  * Added Unenrol inactive after
-* v2.2
-  * Added commad line script and scheduled task for batch auto enrolment
-  * Fixed just enrolled courses in Dashboard with auto enrol on login 
-* v2.1.1
-  * Added backup and restore support
-* v2.1
-  * Added bulk operations
-  * Added API Privacy support
-  * Added self unenrol
-* v2.0
-  * Added custom profile fields support
-  * Added method delete feature
-  * Added auto unenrol when profile field changes and it do not match the filter
-  * Added group remove/change when profile field change
-  * Fixed code style to pass Moodle code checker tests
-* v1.3.1
-  * Tweaks to the Readme to improve readability and installation instructions.
-  * Added new capability to control whether user can enable or disable instances.
-* v1.3
-  * Release for Moodle 2.6, 2.7 and 2.8.
-  * Groups now identified by group idnumber instead of name (so feel free to rename groups!).
-  * New setting option to control the group cleanup behaviour.
-* v1.2
-  * New functionality and tweaks:
-  * It is now possible to add multiple instances to a single course.
-  * Added an option to give instance a custom label.
-  * Filtering functions now allow for partial matches.
-  * Expanded filtering functions to include email address.
-  * Added an option to limit number of enrolments. 
-  * By default, users are now only enrolled if they aren't already enrolled on a course.
-  * Individual users can now be manually unenrolled through Users > Enrolled Users.
-  * Added a permission for users to unenrol themselves if not enrolling during login.
-* v1.1
-  * Minor update. Improved instance configuration form compatibility with Moodle 2.5.
-* v1.0
-  * Stable release. New config option to "Add instance to new courses".
-* v0.91
-  * Bug Fix - Filtering was being bypassed when enrolling on site-login.
-* v0.9
-  * Beta release.
-
 ## Install
 
 1. Copy the plugin directory "autoenrol" into moodle\enrol\. 
