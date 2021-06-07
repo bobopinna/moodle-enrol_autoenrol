@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
-## [v2.3]
+## [2.3] - 2021-05-17
 ### Added
 - Enrolment duration.
 - Unenrol inactive after.
@@ -11,48 +11,49 @@ All notable changes to this project will be documented in this file.
 ### Changed
 - Renewed user filtering, now with Moodle standard availability interface.
 
-## [v2.2]
+## [2.2] - 2021-03-08
 ### Added
 - Commad line script and scheduled task for batch auto enrolment.
 
-### Changed
-- Fixed just enrolled courses in Dashboard with auto enrol on login.
+### Fixed
+- Just enrolled courses in Dashboard with auto enrol on login.
 
-## [v2.1.1]
+## [2.1.1] - 2019-11-18
 ### Added
 - Backup and restore support.
 
-## [v2.1]
+## [2.1] - 2018-10-19
 ### Added
 - Bulk operations.
 - API Privacy support.
 - Self unenrol.
 
-## [v2.0]
+## [2.0] - 2016-12-20
 ### Added
 - Custom profile fields support.
 - Method delete feature.
 - Auto unenrol when profile field changes and it do not match the filter.
 - Group remove/change when profile field change.
 
-### Changed
-- Fixed code style to pass Moodle code checker tests.
+### Fixed
+- Coding style to pass Moodle code checker tests.
 
-## [v1.3.1]
+## [1.3.1] - 2015-02-20
 ### Added
 - New capability to control whether user can enable or disable instances.
 
 ### Changed
 - Tweaks to the Readme to improve readability and installation instructions.
 
-## [v1.3] - Release for Moodle 2.6, 2.7 and 2.8.
+## [1.3] - 2014-11-30
 ### Added
 - New setting option to control the group cleanup behaviour.
 
 ### Changed
+- Release for Moodle 2.6, 2.7 and 2.8.
 - Groups now identified by group idnumber instead of name (so feel free to rename groups!).
 
-## [v1.2]
+## [1.2] - 2013-07-01
 ### Added
 - It is now possible to add multiple instances to a single course.
 - An option to give instance a custom label.
@@ -65,18 +66,18 @@ All notable changes to this project will be documented in this file.
 - By default, users are now only enrolled if they aren't already enrolled on a course.
 - Individual users can now be manually unenrolled through Users > Enrolled Users.
 
-## [v1.1] - Minor update
+## [1.1] - 2013-05-08
 ### Changed
 - Improved instance configuration form compatibility with Moodle 2.5.
 
-## [v1.0] - Stable release
+## [1.0] - 2013-01-23
 ### Added
 - New config option to "Add instance to new courses".
 
-## [v0.91]
-### Changed
-- Bug Fix - Filtering was being bypassed when enrolling on site-login.
+## [0.9.1] - 2012-09-27
+### Fixed
+- Filtering was being bypassed when enrolling on site-login.
 
-## [v0.9] - Beta release
+## [0.9] - 2012-06-13
 ### Added
 - Initial commit
