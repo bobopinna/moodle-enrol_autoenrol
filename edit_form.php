@@ -70,9 +70,6 @@ class enrol_autoenrol_edit_form extends moodleform {
     protected function add_general_section($instance, $plugin, $context) {
         global $CFG, $OUTPUT;
 
-        $this->_form->addElement('header', 'generalsection', get_string('general', 'enrol_autoenrol'));
-        $this->_form->setExpanded('generalsection');
-
         $logourl = '';
         if (method_exists($OUTPUT, 'image_url')) {
             $logourl = $OUTPUT->image_url('logo', 'enrol_autoenrol');
@@ -95,6 +92,9 @@ class enrol_autoenrol_edit_form extends moodleform {
                 'static', 'description', html_writer::tag('strong', get_string('warning', 'enrol_autoenrol')),
                 get_string('warning_message', 'enrol_autoenrol'));
 
+        $this->_form->addElement('header', 'generalsection', get_string('general'));
+        $this->_form->setExpanded('generalsection');
+
         // Custom instance name.
         $nameattribs = array('size' => '20', 'maxlength' => '255');
         $this->_form->addElement('text', 'name', get_string('instancename', 'enrol_autoenrol'), $nameattribs);
@@ -104,36 +104,30 @@ class enrol_autoenrol_edit_form extends moodleform {
         $this->_form->addRule('name', get_string('maximumchars', '', 255), 'maxlength', 255, 'server');
 
         // Auto Enrol enabled status.
-        $options = array(ENROL_INSTANCE_ENABLED  => get_string('yes'),
-                         ENROL_INSTANCE_DISABLED => get_string('no'));
+        $options = $this->get_status_options();
         $this->_form->addElement('select', 'status', get_string('status', 'enrol_autoenrol'), $options);
         $this->_form->addHelpButton('status', 'status', 'enrol_autoenrol');
 
         // New enrolment enabled.
-        $options = array(1 => get_string('yes'), 0 => get_string('no'));
-        $this->_form->addElement('select', 'customint4', get_string('newenrols', 'enrol_autoenrol'), $options);
+        $this->_form->addElement('selectyesno', 'customint4', get_string('newenrols', 'enrol_autoenrol'));
         $this->_form->addHelpButton('customint4', 'newenrols', 'enrol_autoenrol');
         $this->_form->setDefault('customint4', $plugin->get_config('newenrols'));
         $this->_form->disabledIf('customint4', 'status', 'eq', ENROL_INSTANCE_DISABLED);
 
         // Role id.
         if ($instance->id) {
-            $roles = get_default_enrol_roles($context, $instance->roleid);
+            $options = $this->extend_assignable_roles($context, $instance->roleid);
         } else {
-            $roles = get_default_enrol_roles($context, $plugin->get_config('defaultrole'));
+            $options = $this->extend_assignable_roles($context, $plugin->get_config('defaultrole'));
         }
-        $this->_form->addElement('select', 'roleid', get_string('role', 'enrol_autoenrol'), $roles);
-        $this->_form->addHelpButton('roleid', 'role', 'enrol_autoenrol');
-        if (!has_capability('enrol/autoenrol:method', $context)) {
-            $this->_form->disabledIf('roleid', 'customchar3', 'eq', '-');
-        }
+        $this->_form->addElement('select', 'roleid', get_string('role', 'enrol_autoenrol'), $options);
         $this->_form->setDefault('roleid', $plugin->get_config('defaultrole'));
         $this->_form->setType('roleid', PARAM_INT);
 
         // Enrol When.
         if ($plugin->get_config('loginenrol')) {
-            $method = array(get_string('m_course', 'enrol_autoenrol'), get_string('m_site', 'enrol_autoenrol'));
-            $this->_form->addElement('select', 'customint1', get_string('method', 'enrol_autoenrol'), $method);
+            $options = $this->get_enrolmethod_options();
+            $this->_form->addElement('select', 'customint1', get_string('method', 'enrol_autoenrol'), $options);
             if (!has_capability('enrol/autoenrol:method', $context)) {
                 $this->_form->disabledIf('customint1', 'customchar3', 'eq', '-');
             }
@@ -161,9 +155,7 @@ class enrol_autoenrol_edit_form extends moodleform {
         $this->_form->setDefault('enrolperiod', $plugin->get_config('enrolperiod'));
 
         // Expire notify.
-        $options = array(0 => get_string('no'),
-                         1 => get_string('expirynotifyenroller', 'enrol_autoenrol'),
-                         2 => get_string('expirynotifyall', 'enrol_autoenrol'));
+        $options = $this->get_expirynotify_options();
         $this->_form->addElement('select', 'expirynotify', get_string('expirynotify', 'core_enrol'), $options);
         $this->_form->addHelpButton('expirynotify', 'expirynotify', 'core_enrol');
         $this->_form->setDefault('expirynotify', $plugin->get_config('expirynotify'));
@@ -187,19 +179,7 @@ class enrol_autoenrol_edit_form extends moodleform {
         $this->_form->addHelpButton('enrolenddate', 'enrolenddate', 'enrol_autoenrol');
 
         // Longtime no see.
-        $options = array(0 => get_string('never'),
-                         1800 * 3600 * 24 => get_string('numdays', '', 1800),
-                         1000 * 3600 * 24 => get_string('numdays', '', 1000),
-                         365 * 3600 * 24 => get_string('numdays', '', 365),
-                         180 * 3600 * 24 => get_string('numdays', '', 180),
-                         150 * 3600 * 24 => get_string('numdays', '', 150),
-                         120 * 3600 * 24 => get_string('numdays', '', 120),
-                         90 * 3600 * 24 => get_string('numdays', '', 90),
-                         60 * 3600 * 24 => get_string('numdays', '', 60),
-                         30 * 3600 * 24 => get_string('numdays', '', 30),
-                         21 * 3600 * 24 => get_string('numdays', '', 21),
-                         14 * 3600 * 24 => get_string('numdays', '', 14),
-                         7 * 3600 * 24 => get_string('numdays', '', 7));
+        $options = $this->get_longtimenosee_options();
         $this->_form->addElement('select', 'customint3', get_string('longtimenosee', 'enrol_autoenrol'), $options);
         $this->_form->addHelpButton('customint3', 'longtimenosee', 'enrol_autoenrol');
         $this->_form->setDefault('customint3', $plugin->get_config('longtimenosee'));
@@ -243,32 +223,19 @@ class enrol_autoenrol_edit_form extends moodleform {
         $this->_form->addHelpButton('availabilityconditionsjson', 'userfilter', 'enrol_autoenrol');
         \enrol_autoenrol\filter_frontend::include_all_javascript($COURSE);
 
-        $fields = array('-' => get_string('choose'));
-        $fields['userfilter'] = get_string('userfilter', 'enrol_autoenrol');
-        $fields['auth'] = get_string('authentication');
-        $fields['lang'] = get_string('language');
-        $fields['department'] = get_string('department');
-        $fields['institution'] = get_string('institution');
-        $fields['address'] = get_string('address');
-        $fields['city'] = get_string('city');
-        $fields['email'] = get_string('email');
-
-        $customfields = $DB->get_records('user_info_field');
-        if (!empty($customfields)) {
-            foreach ($customfields as $customfield) {
-                $fields[$customfield->shortname] = $customfield->name;
-            }
-        }
-
-        $this->_form->addElement('select', 'customchar3', get_string('groupon', 'enrol_autoenrol'), $fields);
+        $options = $this->get_groupon_options();
+        $this->_form->addElement('select', 'customchar3', get_string('groupon', 'enrol_autoenrol'), $options);
         $this->_form->setType('customchar3', PARAM_TEXT);
         $this->_form->addHelpButton('customchar3', 'groupon', 'enrol_autoenrol');
+        $this->_form->addRule('customchar3', get_string('nogroupon', 'enrol_autoenrol'), 'required');
 
-        $this->_form->addElement('text', 'customchar1', get_string('groupname', 'enrol_autoenrol'));
+        $groupnameattribs = array('size' => '20', 'maxlength' => '100');
+        $this->_form->addElement('text', 'customchar1', get_string('groupname', 'enrol_autoenrol'), $groupnameattribs);
         $this->_form->setDefault('customchar1', '');
         $this->_form->setType('customchar1', PARAM_TEXT);
         $this->_form->addHelpButton('customchar1', 'groupname', 'enrol_autoenrol');
         $this->_form->disabledIf('customchar1', 'customchar3', 'ne', 'userfilter');
+        $this->_form->addRule('customchar1', get_string('maximumchars', '', 100), 'maxlength', 100, 'server');
 
         $this->_form->addElement('text', 'customint5', get_string('countlimit', 'enrol_autoenrol'));
         $this->_form->setType('customint5', PARAM_INT);
@@ -300,9 +267,166 @@ class enrol_autoenrol_edit_form extends moodleform {
     public function validation($data, $files) {
         $errors = array();
 
-        // Use this code to validate the 'Restrict access' section.
+        list($instance, $plugin, $context) = $this->_customdata;
+
+        // Use this code to validate the 'User Filtering' section.
         \core_availability\frontend::report_validation_errors($data, $errors);
+
+        if ($data['status'] == ENROL_INSTANCE_ENABLED) {
+            if (!empty($data['enrolenddate']) and $data['enrolenddate'] < $data['enrolstartdate']) {
+                $errors['enrolenddate'] = get_string('enrolenddaterror', 'enrol_autoenrol');
+            }
+        }
+
+        if ($data['expirynotify'] > 0 and $data['expirythreshold'] < 86400) {
+            $errors['expirythreshold'] = get_string('errorthresholdlow', 'core_enrol');
+        }
+
+        // Now these ones are checked by quickforms, but we may be called by the upload enrolments tool, or a webservice.
+        if (core_text::strlen($data['name']) > 255) {
+            $errors['name'] = get_string('err_maxlength', 'form', 255);
+        }
+        if (core_text::strlen($data['customchar1']) > 100) {
+            $errors['customchar1'] = get_string('err_maxlength', 'form', 100);
+        }
+
+        $validstatus = array_keys($this->get_status_options());
+        $context = context_course::instance($instance->courseid);
+        $validroles = array_keys($this->extend_assignable_roles($context, $instance->roleid));
+        $validexpirynotify = array_keys($this->get_expirynotify_options());
+        $validenrolmethod = array_keys($this->get_enrolmethod_options());
+        $validlongtimenosee = array_keys($this->get_longtimenosee_options());
+        $validgroupon = array_keys($this->get_groupon_options());
+        unset($validgroupon[0]);
+        $validyesno = array(0, 1);
+        $tovalidate = array(
+            'name' => PARAM_TEXT,
+            'status' => $validstatus,
+            'roleid' => $validroles,
+            'enrolperiod' => PARAM_INT,
+            'expirynotify' => $validexpirynotify,
+            'enrolstartdate' => PARAM_INT,
+            'enrolenddate' => PARAM_INT,
+            'customint1' => $validenrolmethod,
+            'customint3' => $validlongtimenosee,
+            'customint4' => $validyesno,
+            'customint5' => PARAM_INT,
+            'customint6' => $validyesno,
+            'customint7' => $validyesno,
+            'customint8' => $validyesno,
+            'customchar1' => PARAM_TEXT,
+            'customchar3' => $validgroupon
+        );
+        if ($data['expirynotify'] != 0) {
+            $tovalidate['expirythreshold'] = PARAM_INT;
+        }
+        $typeerrors = $plugin->validate_param_types($data, $tovalidate);
+        $errors = array_merge($errors, $typeerrors);
 
         return $errors;
     }
+
+    /**
+     * Return an array of valid options for the status.
+     *
+     * @return array
+     */
+    protected function get_status_options() {
+        $options = array(ENROL_INSTANCE_ENABLED  => get_string('yes'),
+                         ENROL_INSTANCE_DISABLED => get_string('no'));
+        return $options;
+    }
+
+    /**
+     * Gets a list of roles that this user can assign for the course as the default for self-enrolment.
+     *
+     * @param context $context the context.
+     * @param integer $defaultrole the id of the role that is set as the default for self-enrolment
+     * @return array index is the role id, value is the role name
+     */
+    public function extend_assignable_roles($context, $defaultrole) {
+        global $DB;
+
+        $roles = get_assignable_roles($context, ROLENAME_BOTH);
+        if (!isset($roles[$defaultrole])) {
+            if ($role = $DB->get_record('role', array('id' => $defaultrole))) {
+                $roles[$defaultrole] = role_get_name($role, $context, ROLENAME_BOTH);
+            }
+        }
+        return $roles;
+    }
+
+    /**
+     * Return an array of valid options for the expirynotify property.
+     *
+     * @return array
+     */
+    protected function get_expirynotify_options() {
+        $options = array(0 => get_string('no'),
+                         1 => get_string('expirynotifyenroller', 'enrol_autoenrol'),
+                         2 => get_string('expirynotifyall', 'enrol_autoenrol'));
+        return $options;
+    }
+
+    /**
+     * Return an array of valid options for the enrol method property.
+     *
+     * @return array
+     */
+    protected function get_enrolmethod_options() {
+        $options = array( 0 => get_string('m_course', 'enrol_autoenrol'),
+                          1 => get_string('m_site', 'enrol_autoenrol'));
+        return $options;
+    }
+
+    /**
+     * Return an array of valid options for the longtimenosee property.
+     *
+     * @return array
+     */
+    protected function get_longtimenosee_options() {
+        $options = array(0 => get_string('never'),
+                         1800 * 3600 * 24 => get_string('numdays', '', 1800),
+                         1000 * 3600 * 24 => get_string('numdays', '', 1000),
+                         365 * 3600 * 24 => get_string('numdays', '', 365),
+                         180 * 3600 * 24 => get_string('numdays', '', 180),
+                         150 * 3600 * 24 => get_string('numdays', '', 150),
+                         120 * 3600 * 24 => get_string('numdays', '', 120),
+                         90 * 3600 * 24 => get_string('numdays', '', 90),
+                         60 * 3600 * 24 => get_string('numdays', '', 60),
+                         30 * 3600 * 24 => get_string('numdays', '', 30),
+                         21 * 3600 * 24 => get_string('numdays', '', 21),
+                         14 * 3600 * 24 => get_string('numdays', '', 14),
+                         7 * 3600 * 24 => get_string('numdays', '', 7));
+        return $options;
+    }
+
+    /**
+     * Return an array of valid options for the longtimenosee property.
+     *
+     * @return array
+     */
+    protected function get_groupon_options() {
+        global $DB;
+
+        $options = array('-' => get_string('choose'),
+                         0 => get_string('none'),
+                         'userfilter' => get_string('userfilter', 'enrol_autoenrol'),
+                         'auth' => get_string('authentication'),
+                         'lang' => get_string('language'),
+                         'department' => get_string('department'),
+                         'institution' => get_string('institution'),
+                         'address' => get_string('address'),
+                         'city' => get_string('city'),
+                         'email' => get_string('email'));
+
+        $customfields = $DB->get_records('user_info_field');
+        if (!empty($customfields)) {
+            foreach ($customfields as $customfield) {
+                $options[$customfield->shortname] = $customfield->name;
+            }
+        }
+        return $options;
+    }
+
 }
