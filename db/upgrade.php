@@ -183,7 +183,7 @@ function xmldb_enrol_autoenrol_upgrade($oldversion) {
         $instances = $DB->get_records('enrol', array('enrol' => 'autoenrol'));
 
         foreach ($instances as $instance) {
-            $groups = $DB->get_records_select('groups', 'idnumber LIKE "autoenrol|' . $instance->id . '|%"');
+            $groups = $DB->get_records_select('groups', 'idnumber LIKE \'autoenrol|' . $instance->id . '|%\'');
             foreach ($groups as $group) {
                 $hash = md5($group->name);
                 $newidnumber = 'autoenrol|' . $instance->id . '|' .$hash;
