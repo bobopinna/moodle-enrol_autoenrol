@@ -116,19 +116,10 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configduration('enrol_autoenrol/expirythreshold',
         get_string('expirythreshold', 'core_enrol'), get_string('expirythreshold_help', 'core_enrol'), 86400, 86400));
 
-    $options = array(0 => get_string('never'),
-                     1800 * 3600 * 24 => get_string('numdays', '', 1800),
-                     1000 * 3600 * 24 => get_string('numdays', '', 1000),
-                     365 * 3600 * 24 => get_string('numdays', '', 365),
-                     180 * 3600 * 24 => get_string('numdays', '', 180),
-                     150 * 3600 * 24 => get_string('numdays', '', 150),
-                     120 * 3600 * 24 => get_string('numdays', '', 120),
-                     90 * 3600 * 24 => get_string('numdays', '', 90),
-                     60 * 3600 * 24 => get_string('numdays', '', 60),
-                     30 * 3600 * 24 => get_string('numdays', '', 30),
-                     21 * 3600 * 24 => get_string('numdays', '', 21),
-                     14 * 3600 * 24 => get_string('numdays', '', 14),
-                     7 * 3600 * 24 => get_string('numdays', '', 7));
+    $options = array(0 => get_string('never'));
+    foreach (array(1800, 1000, 365, 180, 150, 120, 90, 60, 30, 21, 14, 7) as $daynum) {
+        $options[$daynum * 3600 * 24] = get_string('numdays', '', $daynum);
+    }
     $settings->add(new admin_setting_configselect('enrol_autoenrol/longtimenosee',
         get_string('longtimenosee', 'enrol_autoenrol'), get_string('longtimenosee_help', 'enrol_autoenrol'), 0, $options));
 

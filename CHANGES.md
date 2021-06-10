@@ -3,6 +3,16 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [2.3.1] - 2021-06-10
+### Added
+- Data validation to editing form
+
+### Changed
+- First option in Group by dropdown menu from *Choose* to a more easy to understand *Do not create groups*
+
+### Fixed
+- Removed double quote in SQL that broke 2.3 upgrade on PostgreSQL
+
 ## [2.3] - 2021-05-17
 ### Added
 - Enrolment duration.
