@@ -10,7 +10,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 - Renewed user filtering, now with Moodle standard availability interface.
-- No more available filtering by language and authenticantion method (addtional availability plugins needed).
+- No more available filtering by language and authenticantion method (additional availability plugins needed).
 
 ## [2.2] - 2021-03-08
 ### Added
