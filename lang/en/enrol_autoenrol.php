@@ -51,7 +51,7 @@ $string['warning_message'] = 'Adding this plugin to your course will allow any r
 $string['welcomemessage'] = 'Welcome message';
 $string['welcometocourse'] = 'Welcome to {$a}';
 
-$string['role'] = 'Role';
+$string['role'] = 'Default assigned role';
 $string['role_help'] = 'Power users can use this setting to change the permission level at which users are enrolled.';
 
 $string['method'] = 'Enrol When';
@@ -63,6 +63,7 @@ $string['userfilter'] = 'User Filter';
 $string['userfilter_help'] = 'When is set Autoenrol will enrol users only when they match the rules.';
 
 $string['groupon'] = 'Group By';
+$string['nogroupon'] = 'Do not create groups';
 $string['g_none'] = 'Select...';
 $string['g_auth'] = 'Auth Method';
 $string['g_dept'] = 'Department';

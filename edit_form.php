@@ -227,7 +227,6 @@ class enrol_autoenrol_edit_form extends moodleform {
         $this->_form->addElement('select', 'customchar3', get_string('groupon', 'enrol_autoenrol'), $options);
         $this->_form->setType('customchar3', PARAM_TEXT);
         $this->_form->addHelpButton('customchar3', 'groupon', 'enrol_autoenrol');
-        $this->_form->addRule('customchar3', get_string('nogroupon', 'enrol_autoenrol'), 'required');
 
         $groupnameattribs = array('size' => '20', 'maxlength' => '100');
         $this->_form->addElement('text', 'customchar1', get_string('groupname', 'enrol_autoenrol'), $groupnameattribs);
@@ -297,7 +296,6 @@ class enrol_autoenrol_edit_form extends moodleform {
         $validenrolmethod = array_keys($this->get_enrolmethod_options());
         $validlongtimenosee = array_keys($this->get_longtimenosee_options());
         $validgroupon = array_keys($this->get_groupon_options());
-        unset($validgroupon[0]);
         $validyesno = array(0, 1);
         $tovalidate = array(
             'name' => PARAM_TEXT,
@@ -409,8 +407,7 @@ class enrol_autoenrol_edit_form extends moodleform {
     protected function get_groupon_options() {
         global $DB;
 
-        $options = array('-' => get_string('choose'),
-                         0 => get_string('none'),
+        $options = array('-' => get_string('nogroupon', 'enrol_autoenrol'),
                          'userfilter' => get_string('userfilter', 'enrol_autoenrol'),
                          'auth' => get_string('authentication'),
                          'lang' => get_string('language'),
