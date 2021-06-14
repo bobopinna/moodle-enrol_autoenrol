@@ -310,7 +310,7 @@ class enrol_autoenrol_edit_form extends moodleform {
             'customint4' => $validyesno,
             'customint5' => PARAM_INT,
             'customint6' => $validyesno,
-            'customint7' => $validyesno,
+            'customint7' => PARAM_INT,
             'customint8' => $validyesno,
             'customchar1' => PARAM_TEXT,
             'customchar3' => $validgroupon
