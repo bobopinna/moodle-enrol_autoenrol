@@ -197,5 +197,27 @@ function xmldb_enrol_autoenrol_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2021061000, 'enrol', 'autoenrol');
     }
 
+    if ($oldversion < 2021061700) {
+        $brokenupdate = $DB->get_record('upgrade_log', array('plugin' => 'enrol_autoenrol', 'version' => '2021051400'));
+
+        $instances = $DB->get_records('enrol', array('enrol' => 'autoenrol'));
+        if (!empty($brokenupdate) && ($brokenupdate->targetversion != '2021061700')) {
+            $brokenupdatetime = $brokenupdate->timemodified;
+
+            foreach ($instances as $instance) {
+                if ($instance->timemodified < $brokenupdatetime) {
+                    $instance->customint4 = 1;
+                }
+                $DB->update_record('enrol', $instance);
+            }
+        } else {
+            foreach ($instances as $instance) {
+                $instance->customint4 = 1;
+                $DB->update_record('enrol', $instance);
+            }
+        }
+        upgrade_plugin_savepoint(true, 2021061700, 'enrol', 'autoenrol');
+    }
+
     return true;
 }

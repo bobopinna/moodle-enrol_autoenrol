@@ -27,8 +27,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2021061000;
+$plugin->version = 2021061700;
 $plugin->requires = 2018051700.00;      // Requires this Moodle version (3.5).
-$plugin->release = '2.3.1';             // Plugin release.
+$plugin->release = '2.3.2';             // Plugin release.
 $plugin->component = 'enrol_autoenrol'; // Full name of the plugin (used for diagnostics).
 $plugin->maturity = MATURITY_STABLE;    // The moodle.org release.
