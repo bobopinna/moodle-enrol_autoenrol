@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [2.3.2] - 2021-06-17
+### Fixed
+- Data validation for welcome message sender #26
+- Default value of customint4 (Allow new enrolments) in old instances
+
 ## [2.3.1] - 2021-06-10
 ### Added
 - Data validation to editing form
