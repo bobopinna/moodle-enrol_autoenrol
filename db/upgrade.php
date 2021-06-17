@@ -207,8 +207,8 @@ function xmldb_enrol_autoenrol_upgrade($oldversion) {
             foreach ($instances as $instance) {
                 if ($instance->timemodified < $brokenupdatetime) {
                     $instance->customint4 = 1;
+                    $DB->update_record('enrol', $instance);
                 }
-                $DB->update_record('enrol', $instance);
             }
         } else {
             foreach ($instances as $instance) {
