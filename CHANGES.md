@@ -2,6 +2,8 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added
+- a CLI script to check and enable new enrolments in all instances
 
 ## [2.3.2] - 2021-06-17
 ### Fixed
