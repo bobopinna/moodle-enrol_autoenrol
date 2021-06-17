@@ -742,8 +742,40 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      * @return int id of new instance, null if can not be created
      */
     public function add_default_instance($course) {
-        $fields = array('status' => 0, 'roleid' => $this->get_config('defaultrole'), 'customint5' => 0, 'customint8' => 0);
+        $fields = $this->get_instance_defaults();
+
         return $this->add_instance($course, $fields);
+    }
+
+    /**
+     * Returns defaults for new instances.
+     *
+     * @return array
+     */
+    public function get_instance_defaults() {
+        $expirynotify = $this->get_config('expirynotify');
+        if ($expirynotify == 2) {
+            $expirynotify = 1;
+            $notifyall = 1;
+        } else {
+            $notifyall = 0;
+        }
+
+        $fields = array();
+        $fields['roleid']          = $this->get_config('defaultrole');
+        $fields['enrolperiod']     = $this->get_config('enrolperiod');
+        $fields['expirynotify']    = $expirynotify;
+        $fields['notifyall']       = $notifyall;
+        $fields['expirythreshold'] = $this->get_config('expirythreshold');
+        $fields['customint1']      = 0;
+        $fields['customint3']      = $this->get_config('longtimenosee');
+        $fields['customint4']      = $this->get_config('newenrols');
+        $fields['customint5']      = $this->get_config('maxenrolled');
+        $fields['customint6']      = 0;
+        $fields['customint7']      = $this->get_config('sendcoursewelcomemessage');
+        $fields['customint8']      = 0;
+
+        return $fields;
     }
 
     /**
