@@ -56,7 +56,8 @@ class filter_frontend extends \core_availability\frontend {
         $pluginmanager = \core_plugin_manager::instance();
         $enabled = $pluginmanager->get_enabled_plugins('availability');
         $authorized = array();
-        if ($availabilityplugins = get_config('enrol_autoenrol', 'availabilityplugins') !== false) {
+        $availabilityplugins = get_config('enrol_autoenrol', 'availabilityplugins');
+        if ($availabilityplugins !== false) {
             $authorized = explode(',', $availabilityplugins);
         } else {
             $authorized = array('profile', 'grouping');

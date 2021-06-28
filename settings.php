@@ -146,4 +146,22 @@ if ($ADMIN->fulltree) {
             )
         );
     }
+
+    if (!during_initial_install()) {
+        $pluginmanager = \core_plugin_manager::instance();
+        $availabilities = array_keys($pluginmanager->get_enabled_plugins('availability'));
+        $options = array();
+        foreach ($availabilities as $availability) {
+                 $options[$availability] = get_string('pluginname', "availability_{$availability}");
+        }
+
+        $settings->add(
+            new admin_setting_configmultiselect('enrol_autoenrol/availabilityplugins',
+                get_string('availabilityplugins', 'enrol_autoenrol'),
+                get_string('availabilityplugins_help', 'enrol_autoenrol'),
+                array('profile', 'grouping'),
+                $options
+            )
+        );
+    }
 }
