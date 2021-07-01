@@ -34,7 +34,7 @@ All notable changes to this project will be documented in this file.
 
 ## [2.2] - 2021-03-08
 ### Added
-- Commad line script and scheduled task for batch auto enrolment.
+- Command line script and scheduled task for batch auto enrolment.
 
 ### Fixed
 - Just enrolled courses in Dashboard with auto enrol on login.
