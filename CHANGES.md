@@ -2,8 +2,11 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+
+## [2.3.3] - 2021-06-30
 ### Added
 - a CLI script to check and enable new enrolments in all instances
+- an admin setting to enable availability plugin used by autoenrol
 
 ## [2.3.2] - 2021-06-17
 ### Fixed
