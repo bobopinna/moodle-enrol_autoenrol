@@ -160,4 +160,4 @@ $string['messageprovider:expiry_notification'] = 'Autoenrol enrolment expiry not
 $string['sendexpirynotificationstask'] = 'Autoenrol enrolment send expiry notifications task';
 $string['syncexpirationstask'] = 'Autoenrol expirations check task';
 $string['availabilityplugins'] = 'Enabled availability plugins';
-$string['availabilityplugins_help'] = 'Select availability plugins that could be used in Autoenrol user filter';
+$string['availabilityplugins_help'] = 'Select availability plugins that could be used in Autoenrol user filter. Use Ctrl+click or Cmd+click for multiple selection.';
