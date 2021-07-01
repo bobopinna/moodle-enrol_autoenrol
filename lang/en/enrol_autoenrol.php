@@ -159,3 +159,5 @@ $string['loginenrol_desc'] = 'Allow enrolment on login could slowdown your site 
 $string['messageprovider:expiry_notification'] = 'Autoenrol enrolment expiry notifications';
 $string['sendexpirynotificationstask'] = 'Autoenrol enrolment send expiry notifications task';
 $string['syncexpirationstask'] = 'Autoenrol expirations check task';
+$string['availabilityplugins'] = 'Enabled availability plugins';
+$string['availabilityplugins_help'] = 'Select availability plugins that could be used in Autoenrol user filter';
