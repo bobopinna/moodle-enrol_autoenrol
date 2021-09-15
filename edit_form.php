@@ -373,7 +373,8 @@ class enrol_autoenrol_edit_form extends moodleform {
      */
     protected function get_enrolmethod_options() {
         $options = array( 0 => get_string('m_course', 'enrol_autoenrol'),
-                          1 => get_string('m_site', 'enrol_autoenrol'));
+                          1 => get_string('m_site', 'enrol_autoenrol'),
+                          2 => get_string('m_confirmation', 'enrol_autoenrol'));
         return $options;
     }
 
