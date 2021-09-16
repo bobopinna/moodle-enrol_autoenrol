@@ -25,6 +25,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use enrol_autoenrol\enrol_form;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -113,7 +115,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      * @return bool
      */
     public function show_enrolme_link(stdClass $instance) {
-        if ($this->get_config('loginenrol') && $instance->customint1 > 0) {
+        if ($this->get_config('loginenrol') && $instance->customint1 == 1) {
             // Don't offer enrolself if we are going to enrol them on login.
             return false;
         }
@@ -128,7 +130,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      * @return moodle_url or NULL if self unenrolment not supported
      */
     public function get_unenrolself_link($instance) {
-        if (($this->get_config('loginenrol') && ($instance->customint1 > 0)) || ($instance->customint6 == 0)) {
+        if (($this->get_config('loginenrol') && ($instance->customint1 == 1)) || ($instance->customint6 == 0)) {
             // Don't offer unenrolself if we are going to re-enrol them on login or if not permitted.
             return null;
         }
@@ -262,7 +264,9 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      * @throws coding_exception
      */
     public function user_autoenrol(stdClass $instance, stdClass $user) {
-        global $DB;
+        if ($instance->customint1 == 2) {
+            return false;
+        }
 
         if (!defined('ENROL_DO_NOT_SEND_EMAIL')) {
             define('ENROL_DO_NOT_SEND_EMAIL', 0);
@@ -729,9 +733,30 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      * @return string html text, usually a form in a text box
      */
     public function enrol_page_hook(stdClass $instance) {
-        global $USER;
+        global $USER, $OUTPUT;
 
-        return $this->user_autoenrol($instance, $USER);
+        if (!$this->enrol_allowed($USER, $instance)) {
+            return false;
+        }
+
+        if ($this->user_autoenrol($instance, $USER)) {
+            return true;
+        }
+
+        $form = new enrol_form(null, $instance);
+        $instanceid = optional_param('instance', 0, PARAM_INT);
+        if ($instance->id == $instanceid) {
+            if ($data = $form->get_data()) {
+                $this->enrol_user($instance, $USER->id, $instance->roleid, time(), 0);
+                $this->process_group($instance, $USER);
+                // Send welcome message.
+                if ($instance->customint7 != ENROL_DO_NOT_SEND_EMAIL) {
+                    $this->email_welcome_message($instance, $USER);
+                }
+            }
+        }
+
+        return $OUTPUT->box($form->render());
     }
 
     /**
