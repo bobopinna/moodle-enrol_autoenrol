@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 ### Added
 - user enrolment manual confirmation option by [Andrew Hancox](https://github.com/andrewhancox)
 
+### Changed
+- removed the displayed "Auto" prefix from instances with a custom name by [Andrew Hancox](https://github.com/andrewhancox)
+
+### Fixed
+- default value for roleid
+
 ## [2.3.3] - 2021-06-30
 ### Added
 - a CLI script to check and enable new enrolments in all instances
