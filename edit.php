@@ -135,7 +135,7 @@ if ($mform->is_cancelled()) {
                         'customtext1' => $data->customtext1,
                         'customtext2' => $data->customtext2,
                         'name' => $data->name,
-                        'roleid' => $plugin->get_config('roleid'),
+                        'roleid' => $plugin->get_config('defaultrole'),
                         'status' => $data->status,
                         'enrolperiod' => $data->enrolperiod,
                         'enrolstartdate' => $data->enrolstartdate,
