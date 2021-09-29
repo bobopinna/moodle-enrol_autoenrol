@@ -291,7 +291,7 @@ class enrol_autoenrol_edit_form extends moodleform {
 
         $validstatus = array_keys($this->get_status_options());
         $context = context_course::instance($instance->courseid);
-        $validroles = array_keys($this->extend_assignable_roles($context, $instance->roleid));
+        $validroles = array_keys($this->extend_assignable_roles($context, $data['roleid']));
         $validexpirynotify = array_keys($this->get_expirynotify_options());
         $validenrolmethod = array_keys($this->get_enrolmethod_options());
         $validlongtimenosee = array_keys($this->get_longtimenosee_options());
