@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 - default value for roleid
+- Fix #30 Undefined property: stdClass::$roleid by [Leon Stringer](https://github.com/leonstr)
 
 ## [2.3.3] - 2021-06-30
 ### Added
