@@ -2,6 +2,8 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+
+## [2.3.4] - 2021-10-13
 ### Added
 - user enrolment manual confirmation option by [Andrew Hancox](https://github.com/andrewhancox)
 
