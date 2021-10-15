@@ -227,7 +227,7 @@ function xmldb_enrol_autoenrol_upgrade($oldversion) {
         $instances = $DB->get_records('enrol', array('enrol' => 'autoenrol', 'roleid' => null));
         if (!empty($instances)) { 
             $query = array('plugin' => 'enrol_autoenrol', 'name' => 'defaultrole');
-            $roleid = $DB->get_field('config_plugin', 'value', $query);
+            $roleid = $DB->get_field('config_plugins', 'value', $query);
             foreach ($instances as $instance) {
                $context = context_course::instance($instance->courseid);
                $instance->roleid = $roleid;
