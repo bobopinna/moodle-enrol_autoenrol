@@ -77,7 +77,10 @@ if ($mform->is_cancelled()) {
     if ($data->customint8 != 0 && $data->customint8 != 1) {
         $data->customint8 = 0;
     }
-    if (($data->customint6 != 0 && $data->customint6 != 1) || ($data->customint1 == 1)) {
+    if ($data->customint6 != 0 && $data->customint6 != 1) {
+        $data->customint6 = $plugin->get_config('selfunenrol');
+    } else if ($data->customint1 == 1) {
+        // If enrol at login enabled, disable selfunenrol.
         $data->customint6 = 0;
     }
     if (!isset($data->customint7)) {

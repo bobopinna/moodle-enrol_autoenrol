@@ -144,7 +144,7 @@ class enrol_autoenrol_edit_form extends moodleform {
         // Self unenrol.
         $this->_form->addElement('selectyesno', 'customint6', get_string('selfunenrol', 'enrol_autoenrol'));
         $this->_form->setType('customint6', PARAM_INT);
-        $this->_form->setDefault('customint6', 0);
+        $this->_form->setDefault('customint6', $plugin->get_config('selfunenrol'));
         $this->_form->addHelpButton('customint6', 'selfunenrol', 'enrol_autoenrol');
         $this->_form->disabledIf('customint6', 'customint1', 'eq', '1');
 

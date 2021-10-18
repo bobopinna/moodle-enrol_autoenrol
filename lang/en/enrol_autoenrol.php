@@ -82,6 +82,7 @@ $string['alwaysenrol_help'] = 'When set to Yes the plugins will always enrol use
 
 $string['selfunenrol'] = 'Enable self unenrol';
 $string['selfunenrol_help'] = 'When set to Yes the users can unenrol by themself.';
+$string['selfunenrol_desc'] = 'Allow users to unenrol themself by default in new Autoenrol instances.';
 
 $string['groupname'] = 'Group name';
 $string['groupname_help'] = 'When you group by User Filter only a group will be created and this will be the name of the group.';

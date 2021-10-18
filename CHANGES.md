@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 
 ## [2.3.4] - 2021-10-13
 ### Added
+- default setting for selfunenrol in new instances
 - user enrolment manual confirmation option by [Andrew Hancox](https://github.com/andrewhancox)
 
 ### Changed
