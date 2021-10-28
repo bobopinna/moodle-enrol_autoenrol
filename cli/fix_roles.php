@@ -81,8 +81,10 @@ if (!empty($instances)) {
                       $count++;
                   }
               } else {
-                  role_assign($roleid, $enrolment->userid, $context->id, 'enrol_'.$instance->enrol, $instance->id);
-                  $count++;
+                  if (!empty($enrolment->userid)) {
+                      role_assign($roleid, $enrolment->userid, $context->id, 'enrol_'.$instance->enrol, $instance->id);
+                      $count++;
+                  }
               }
            }
        }
