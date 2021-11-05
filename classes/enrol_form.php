@@ -15,7 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package local_commerce
+ * The form to confirm the intention to self enrol with autoenrol.
+ *
+ * @package enrol_autoenrol
  * @author Andrew Hancox <andrewdchancox@googlemail.com>
  * @author Open Source Learning <enquiries@opensourcelearning.co.uk>
  * @link https://opensourcelearning.co.uk
@@ -27,9 +29,26 @@ namespace enrol_autoenrol;
 
 use moodleform;
 
+defined('MOODLE_INTERNAL') || die();
+
 require_once("$CFG->libdir/formslib.php");
 
+/**
+ * The form to confirm the intention to self enrol with autoenrol.
+ *
+ * @package enrol_autoenrol
+ * @author Andrew Hancox <andrewdchancox@googlemail.com>
+ * @author Open Source Learning <enquiries@opensourcelearning.co.uk>
+ * @link https://opensourcelearning.co.uk
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright 2021, Andrew Hancox
+ */
 class enrol_form extends moodleform {
+    /**
+     * The object that identify the autoenrol instance.
+     *
+     * @var object $instance
+     */
     protected $instance;
 
     /**
@@ -42,6 +61,11 @@ class enrol_form extends moodleform {
         return $formid;
     }
 
+    /**
+     * The form definition.
+     *
+     * @return void
+     */
     public function definition() {
         $mform = $this->_form;
         $instance = $this->_customdata;

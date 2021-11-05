@@ -658,7 +658,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      */
     public function restore_role_assignment($instance, $roleid, $userid, $contextid) {
         // Just restore every role.
-        if ($DB->record_exists('user_enrolments', array('enrolid'=>$instance->id, 'userid'=>$userid))) {
+        if ($DB->record_exists('user_enrolments', array('enrolid' => $instance->id, 'userid' => $userid))) {
             role_assign($roleid, $userid, $contextid, 'enrol_'.$instance->enrol, $instance->id);
         }
     }

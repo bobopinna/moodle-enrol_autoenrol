@@ -67,27 +67,27 @@ if (!empty($instances)) {
     $defaultroleid = $DB->get_field('config_plugins', 'value', $query);
     $count = 0;
     foreach ($instances as $instance) {
-       $context = context_course::instance($instance->courseid);
-       if ($instance->roleid == null) {
-           $instance->roleid = $defaultroleid;
-           $DB->update_record('enrol', $instance);
-       }
-       $roleid = $instance->roleid;
-       if ($enrolments = $DB->get_records('user_enrolments', array('enrolid' => $instance->id))) {
-           foreach ($enrolments as $enrolment) {
-              if ($options['slow']) {
-                  if ($DB->record_exists('user', array('id' => $enrolment->userid, 'deleted' => 0))) {
-                      role_assign($roleid, $enrolment->userid, $context->id, 'enrol_'.$instance->enrol, $instance->id);
-                      $count++;
-                  }
-              } else {
-                  if (!empty($enrolment->userid)) {
-                      role_assign($roleid, $enrolment->userid, $context->id, 'enrol_'.$instance->enrol, $instance->id);
-                      $count++;
-                  }
-              }
-           }
-       }
+        $context = context_course::instance($instance->courseid);
+        if ($instance->roleid == null) {
+            $instance->roleid = $defaultroleid;
+            $DB->update_record('enrol', $instance);
+        }
+        $roleid = $instance->roleid;
+        if ($enrolments = $DB->get_records('user_enrolments', array('enrolid' => $instance->id))) {
+            foreach ($enrolments as $enrolment) {
+                if ($options['slow']) {
+                    if ($DB->record_exists('user', array('id' => $enrolment->userid, 'deleted' => 0))) {
+                        role_assign($roleid, $enrolment->userid, $context->id, 'enrol_'.$instance->enrol, $instance->id);
+                        $count++;
+                    }
+                } else {
+                    if (!empty($enrolment->userid)) {
+                        role_assign($roleid, $enrolment->userid, $context->id, 'enrol_'.$instance->enrol, $instance->id);
+                        $count++;
+                    }
+                }
+            }
+        }
     }
     cli_writeln('Assigned ' . $count . ' roles');
 } else {
