@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [2.3.5] - 2021-11-26
+### Fixed
+- enrol duration configuration - Thanks to Henrique Cavet
+
 ## [2.3.4] - 2021-10-13
 ### Added
 - default setting for selfunenrol in new instances
