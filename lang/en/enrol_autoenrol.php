@@ -147,7 +147,7 @@ $string['expirymessageenrollerbody'] = 'Autoenrolment in the course \'{$a->cours
 {$a->users}
 
 To extend their enrolment, go to {$a->extendurl}';
-$string['expirymessageenrolledsubject'] = 'Selft enrolment expiry notification';
+$string['expirymessageenrolledsubject'] = 'Autoenrolment expiry notification';
 $string['expirymessageenrolledbody'] = 'Dear {$a->user},
 
 This is a notification that your enrolment in the course \'{$a->course}\' is due to expire on {$a->timeend}.
