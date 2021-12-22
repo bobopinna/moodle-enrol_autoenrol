@@ -38,6 +38,7 @@ The following placeholders may be included in the message:
 
 * Course name {$a->coursename}
 * Link to user\'s profile page {$a->profileurl}
+* Link to course {$a->link}
 * User email {$a->email}
 * User fullname {$a->fullname}';
 $string['enrolme'] = 'Enrol me';
