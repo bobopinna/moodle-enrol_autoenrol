@@ -24,8 +24,6 @@
 
 namespace enrol_autoenrol;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Class with filter frontend (editing form) functionality.
  *

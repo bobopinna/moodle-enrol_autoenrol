@@ -27,8 +27,6 @@
 
 use enrol_autoenrol\enrol_form;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Class enrol_autoenrol_plugin
  *

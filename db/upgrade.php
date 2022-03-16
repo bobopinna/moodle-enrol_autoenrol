@@ -24,10 +24,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
- * Auto Enrol pluing upgrade task
+ * Auto Enrol plugin upgrade task
  *
  * @param int $oldversion the version we are upgrading from
  * @return bool always true
