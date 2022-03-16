@@ -23,8 +23,6 @@
 
 namespace enrol_autoenrol\task;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Class sync_enrolments
  * @package enrol_autoenrol

@@ -24,8 +24,6 @@
 
 namespace enrol_autoenrol\task;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Sync expirations task.
  *
