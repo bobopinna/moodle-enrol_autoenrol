@@ -77,6 +77,12 @@ class enrol_autoenrol_edit_form extends moodleform {
             $logourl = $OUTPUT->pix_url('logo', 'enrol_autoenrol');
         }
 
+        // Merge these two settings to one value for the single selection element.
+        if ($instance->notifyall and $instance->expirynotify) {
+            $instance->expirynotify = 2;
+        }
+        unset($instance->notifyall);
+
         $img = html_writer::empty_tag(
                 'img',
                 array(
