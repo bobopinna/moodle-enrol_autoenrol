@@ -2,6 +2,8 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Fixed
+- expirynotify reedit value - Thanks to SYoung3000
 
 ## [2.3.5] - 2021-11-26
 ### Fixed
