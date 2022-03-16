@@ -45,7 +45,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      * name => Instance name
      * status => Instance status (enabled/disabled)
      * roleid => User role id
-     * enrolperiod => Enrolment duration
+     * enrolperiod => Enrolment duration/until date
      * expirenotify => Who need to be notified on expire
      * expirethreshold => How many minutes before expire need to send notify
      * enrolstartdate => When start to enrol
@@ -276,8 +276,10 @@ class enrol_autoenrol_plugin extends enrol_plugin {
         }
         if ($this->enrol_allowed($user, $instance)) {
             $timestart = time();
-            if ($instance->enrolperiod) {
+            if ($instance->enrolperiod > 0) {
                 $timeend = $timestart + $instance->enrolperiod;
+            } else if ($instance->enrolperiod < 0) {
+                $timeend = -$instance->enrolperiod;
             } else {
                 $timeend = 0;
             }

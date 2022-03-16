@@ -5,6 +5,9 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 - expirynotify reedit value - Thanks to SYoung3000
 
+### Added
+- enrolment duration until a specified date
+
 ## [2.3.5] - 2021-11-26
 ### Fixed
 - enrol duration configuration - Thanks to Henrique Cavet

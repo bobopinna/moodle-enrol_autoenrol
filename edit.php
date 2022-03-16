@@ -98,6 +98,15 @@ if ($mform->is_cancelled()) {
         $data->notifyall = 0;
     }
 
+    switch ($data->durationselector) {
+        case 2:
+            $data->enrolperiod = -$data->durationlimit;
+        break;
+        case 0:
+            $data->enrolperiod = 0;
+        break;
+    }
+
     if ($instance->id) {
         $instance->timemodified = time();
         if (has_capability('enrol/autoenrol:method', $context)) {

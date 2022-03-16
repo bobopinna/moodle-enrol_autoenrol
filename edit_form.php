@@ -83,6 +83,16 @@ class enrol_autoenrol_edit_form extends moodleform {
         }
         unset($instance->notifyall);
 
+        $instance->durationlimit = 0;
+        $instance->durationselector = 0;
+        if ($instance->enrolperiod > 0) {
+            $instance->durationselector = 1;
+        } else if ($instance->enrolperiod < 0) {
+            $instance->durationselector = 2;
+            $instance->enrolperiod = 0;
+            $instance->durationlimit = -$instance->enrolperiod;
+        }
+
         $img = html_writer::empty_tag(
                 'img',
                 array(
@@ -154,11 +164,24 @@ class enrol_autoenrol_edit_form extends moodleform {
         $this->_form->addHelpButton('customint6', 'selfunenrol', 'enrol_autoenrol');
         $this->_form->disabledIf('customint6', 'customint1', 'eq', '1');
 
-        // Enrol duration.
-        $options = array('optional' => true, 'defaultunit' => 86400);
-        $this->_form->addElement('duration', 'enrolperiod', get_string('enrolperiod', 'enrol_autoenrol'), $options);
-        $this->_form->addHelpButton('enrolperiod', 'enrolperiod', 'enrol_autoenrol');
+        // Enrol duration selector.
+        $choices = array();
+        $choices[0] = get_string('durationdisabled', 'enrol_autoenrol');
+        $choices[1] = get_string('durationfortime', 'enrol_autoenrol');
+        $choices[2] = get_string('durationuntildate', 'enrol_autoenrol');
+        $this->_form->addElement('select', 'durationselector', get_string('enrolperiod', 'enrol_autoenrol'), $choices);
+        $this->_form->addHelpButton('durationselector', 'enrolperiod', 'enrol_autoenrol');
+
+        // Duration in time.
+        $options = array('defaultunit' => 86400);
+        $this->_form->addElement('duration', 'enrolperiod', '', $options);
         $this->_form->setDefault('enrolperiod', $plugin->get_config('enrolperiod'));
+        $this->_form->disabledIf('enrolperiod', 'durationselector', 'ne', '1');
+
+        // Dutation until date.
+        $this->_form->addElement('date_time_selector', 'durationlimit');
+        $this->_form->setDefault('durationlimit', 0);
+        $this->_form->disabledIf('durationlimit', 'durationselector', 'ne', '2');
 
         // Expire notify.
         $options = $this->get_expirynotify_options();
