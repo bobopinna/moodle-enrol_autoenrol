@@ -76,10 +76,12 @@ class enrol_autoenrol_edit_form extends moodleform {
         }
 
         // Merge these two settings to one value for the single selection element.
-        if ($instance->notifyall and $instance->expirynotify) {
-            $instance->expirynotify = 2;
+        if (isset($instance->notifyall) && isset($instance->expirynotify)) {
+            if ($instance->notifyall && $instance->expirynotify) {
+                $instance->expirynotify = 2;
+            }
+            unset($instance->notifyall);
         }
-        unset($instance->notifyall);
 
         $img = html_writer::empty_tag(
                 'img',
