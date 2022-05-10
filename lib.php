@@ -48,7 +48,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      * expirethreshold => How many minutes before expire need to send notify
      * enrolstartdate => When start to enrol
      * enrolenddate => When stop to enrol
-     * customint1 => Enrol on course access or on login
+     * customint1 => Enrol on course access, on login or with user confirmation
      * customint2 => -- NOT USED -- Old group field filter
      * customint3 => Longtime no see unenrol
      * customint4 => New enrolment enabled
