@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [2.3.7] - 2022-05-11
+### Fixed
+- Unwanted autoenrolment using Moodle App course search
+
 ## [2.3.6] - 2022-03-31
 ### Fixed
 - expirynotify reedit value - Thanks to SYoung3000
