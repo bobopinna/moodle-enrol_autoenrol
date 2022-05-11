@@ -106,6 +106,15 @@ class enrol_autoenrol_plugin extends enrol_plugin {
     }
 
     /**
+     * We are a good plugin and don't invent our own UI/validation code path.
+     *
+     * @return boolean
+     */
+    public function use_standard_editing_ui() {
+        return true;
+    }
+
+    /**
      * Must show enrolme link.
      *
      * @param stdClass $instance
@@ -135,6 +144,25 @@ class enrol_autoenrol_plugin extends enrol_plugin {
         return parent::get_unenrolself_link($instance);
     }
 
+    /**
+     * Return information for enrolment instance containing list of parameters required
+     * for enrolment, name of enrolment plugin etc.
+     *
+     * @param stdClass $instance enrolment instance
+     * @return stdClass instance info.
+     */
+    public function get_enrol_info(stdClass $instance) {
+        global $USER;
+
+        $instanceinfo = new stdClass();
+        $instanceinfo->id = $instance->id;
+        $instanceinfo->courseid = $instance->courseid;
+        $instanceinfo->type = $this->get_name();
+        $instanceinfo->name = $this->get_instance_name($instance);
+        $instanceinfo->status = $this->enrol_allowed($instance, $USER);
+
+        return $instanceinfo;
+    }
 
     /**
      * Attempt to automatically enrol current user in course without any interaction,
@@ -167,12 +195,12 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      * Custom function, checks to see if user fulfills
      * our requirements before enrolling them.
      *
-     * @param object $user
      * @param stdClass $instance
+     * @param object $user
      *
      * @return bool
      */
-    public function enrol_allowed($user, stdClass $instance) {
+    public function enrol_allowed(stdClass $instance, $user) {
         global $DB;
 
         if (isguestuser()) {
@@ -272,7 +300,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
         if ($instance->enrol !== 'autoenrol') {
             throw new coding_exception('Invalid enrol instance type!');
         }
-        if ($this->enrol_allowed($user, $instance)) {
+        if ($this->enrol_allowed($instance, $user)) {
             $timestart = time();
             if ($instance->enrolperiod) {
                 $timeend = $timestart + $instance->enrolperiod;
@@ -740,7 +768,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
     public function enrol_page_hook(stdClass $instance) {
         global $USER, $OUTPUT;
 
-        if (!$this->enrol_allowed($USER, $instance)) {
+        if (!$this->enrol_allowed($instance, $USER)) {
             return false;
         }
 
