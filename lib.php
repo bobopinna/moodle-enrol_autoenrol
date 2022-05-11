@@ -165,33 +165,6 @@ class enrol_autoenrol_plugin extends enrol_plugin {
     }
 
     /**
-     * Attempt to automatically enrol current user in course without any interaction,
-     * calling code has to make sure the plugin and instance are active.
-     *
-     * This should return either a timestamp in the future or false.
-     *
-     * @param stdClass $instance course enrol instance
-     *
-     * @return bool|int false means not enrolled, integer means timeend
-     * @throws coding_exception
-     */
-    public function try_autoenrol(stdClass $instance) {
-        global $USER, $CFG;
-
-        if (!defined('ENROL_DO_NOT_SEND_EMAIL')) {
-            define('ENROL_DO_NOT_SEND_EMAIL', 0);
-        }
-
-        if (($CFG->branch < 32) || ($instance->customint7 == ENROL_DO_NOT_SEND_EMAIL)) {
-            if ($this->user_autoenrol($instance, $USER)) {
-                return 0;
-            }
-        }
-        return false;
-    }
-
-
-    /**
      * Custom function, checks to see if user fulfills
      * our requirements before enrolling them.
      *
