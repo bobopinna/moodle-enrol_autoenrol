@@ -122,11 +122,15 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      * @return bool
      */
     public function show_enrolme_link(stdClass $instance) {
+        global $USER;
+
         if ($this->get_config('loginenrol') && $instance->customint1 == 1) {
             // Don't offer enrolself if we are going to enrol them on login.
             return false;
+        } else if ($this->enrol_allowed($instance, $USER)) {
+            return true;
         }
-        return true;
+        return false;
     }
 
     /**
