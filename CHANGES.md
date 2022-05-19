@@ -2,6 +2,8 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Changed
+- Hidden the "Enrol me in this course" link when user does not satisfy user filter rules 
 
 ## [2.3.7] - 2022-05-11
 ### Fixed
