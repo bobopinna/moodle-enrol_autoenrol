@@ -1015,4 +1015,406 @@ class enrol_autoenrol_plugin extends enrol_plugin {
 
         return $contact;
     }
+
+    /**
+     * Add elements to the edit instance form.
+     *
+     * @param stdClass $instance
+     * @param MoodleQuickForm $mform
+     * @param context $context
+     * @return bool
+     */
+    public function edit_instance_form($instance, MoodleQuickForm $mform, $context) {
+        global $CFG, $DB, $OUTPUT, $COURSE;
+
+        // Merge these two settings to one value for the single selection element.
+        if (isset($instance->notifyall) && isset($instance->expirynotify)) {
+            if ($instance->notifyall && $instance->expirynotify) {
+                $instance->expirynotify = 2;
+            }
+            unset($instance->notifyall);
+        }
+
+        $logourl = '';
+        if (method_exists($OUTPUT, 'image_url')) {
+            $logourl = $OUTPUT->image_url('logo', 'enrol_autoenrol');
+        } else {
+            $logourl = $OUTPUT->pix_url('logo', 'enrol_autoenrol');
+        }
+
+        $img = html_writer::empty_tag(
+                'img',
+                array(
+                        'src'   => $logourl,
+                        'alt'   => 'AutoEnrol Logo',
+                        'title' => 'AutoEnrol Logo'
+                )
+        );
+        $img = html_writer::div($img, null, array('style' => 'text-align:center;margin: 1em 0;'));
+
+        $mform->addElement('html', $img);
+        $mform->addElement(
+                'static', 'description', html_writer::tag('strong', get_string('warning', 'enrol_autoenrol')),
+                get_string('warning_message', 'enrol_autoenrol'));
+
+        $mform->addElement('header', 'generalsection', get_string('general'));
+        $mform->setExpanded('generalsection');
+
+        // Custom instance name.
+        $nameattribs = array('size' => '20', 'maxlength' => '255');
+        $mform->addElement('text', 'name', get_string('instancename', 'enrol_autoenrol'), $nameattribs);
+        $mform->setType('name', PARAM_TEXT);
+        $mform->setDefault('name', '');
+        $mform->addHelpButton('name', 'instancename', 'enrol_autoenrol');
+        $mform->addRule('name', get_string('maximumchars', '', 255), 'maxlength', 255, 'server');
+
+        // Auto Enrol enabled status.
+        $options = $this->get_status_options();
+        $mform->addElement('select', 'status', get_string('status', 'enrol_autoenrol'), $options);
+        $mform->addHelpButton('status', 'status', 'enrol_autoenrol');
+
+        // New enrolment enabled.
+        $mform->addElement('selectyesno', 'customint4', get_string('newenrols', 'enrol_autoenrol'));
+        $mform->addHelpButton('customint4', 'newenrols', 'enrol_autoenrol');
+        $mform->setDefault('customint4', $this->get_config('newenrols'));
+        $mform->disabledIf('customint4', 'status', 'eq', ENROL_INSTANCE_DISABLED);
+
+        // Role id.
+        if ($instance->id) {
+            $options = $this->extend_assignable_roles($context, $instance->roleid);
+        } else {
+            $options = $this->extend_assignable_roles($context, $this->get_config('defaultrole'));
+        }
+        $mform->addElement('select', 'roleid', get_string('role', 'enrol_autoenrol'), $options);
+        $mform->setDefault('roleid', $this->get_config('defaultrole'));
+        $mform->setType('roleid', PARAM_INT);
+
+        // Enrol When.
+        if ($this->get_config('loginenrol')) {
+            $options = $this->get_enrolmethod_options();
+            $mform->addElement('select', 'customint1', get_string('method', 'enrol_autoenrol'), $options);
+            if (!has_capability('enrol/autoenrol:method', $context)) {
+                $mform->disabledIf('customint1', 'customchar3', 'eq', '-');
+            }
+            $mform->setType('customint1', PARAM_INT);
+            $mform->addHelpButton('customint1', 'method', 'enrol_autoenrol');
+        }
+
+        // Enrol always.
+        $mform->addElement('selectyesno', 'customint8', get_string('alwaysenrol', 'enrol_autoenrol'));
+        $mform->setType('customint8', PARAM_INT);
+        $mform->setDefault('customint8', 0);
+        $mform->addHelpButton('customint8', 'alwaysenrol', 'enrol_autoenrol');
+
+        // Self unenrol.
+        $mform->addElement('selectyesno', 'customint6', get_string('selfunenrol', 'enrol_autoenrol'));
+        $mform->setType('customint6', PARAM_INT);
+        $mform->setDefault('customint6', $this->get_config('selfunenrol'));
+        $mform->addHelpButton('customint6', 'selfunenrol', 'enrol_autoenrol');
+        $mform->disabledIf('customint6', 'customint1', 'eq', '1');
+
+        // Enrol duration.
+        $options = array('optional' => true, 'defaultunit' => 86400);
+        $mform->addElement('duration', 'enrolperiod', get_string('enrolperiod', 'enrol_autoenrol'), $options);
+        $mform->addHelpButton('enrolperiod', 'enrolperiod', 'enrol_autoenrol');
+        $mform->setDefault('enrolperiod', $this->get_config('enrolperiod'));
+
+        // Expire notify.
+        $options = $this->get_expirynotify_options();
+        $mform->addElement('select', 'expirynotify', get_string('expirynotify', 'core_enrol'), $options);
+        $mform->addHelpButton('expirynotify', 'expirynotify', 'core_enrol');
+        $mform->setDefault('expirynotify', $this->get_config('expirynotify'));
+
+        // Expire threshold.
+        $options = array('optional' => false, 'defaultunit' => 86400);
+        $mform->addElement('duration', 'expirythreshold', get_string('expirythreshold', 'core_enrol'), $options);
+        $mform->addHelpButton('expirythreshold', 'expirythreshold', 'core_enrol');
+        $mform->disabledIf('expirythreshold', 'expirynotify', 'eq', 0);
+        $mform->setDefault('expirythreshold', $this->get_config('expirythreshold'));
+
+        // Start date.
+        $options = array('optional' => true);
+        $mform->addElement('date_time_selector', 'enrolstartdate', get_string('enrolstartdate', 'enrol_autoenrol'), $options);
+        $mform->setDefault('enrolstartdate', 0);
+        $mform->addHelpButton('enrolstartdate', 'enrolstartdate', 'enrol_autoenrol');
+
+        // End date.
+        $mform->addElement('date_time_selector', 'enrolenddate', get_string('enrolenddate', 'enrol_autoenrol'), $options);
+        $mform->setDefault('enrolenddate', 0);
+        $mform->addHelpButton('enrolenddate', 'enrolenddate', 'enrol_autoenrol');
+
+        // Longtime no see.
+        $options = $this->get_longtimenosee_options();
+        $mform->addElement('select', 'customint3', get_string('longtimenosee', 'enrol_autoenrol'), $options);
+        $mform->addHelpButton('customint3', 'longtimenosee', 'enrol_autoenrol');
+        $mform->setDefault('customint3', $this->get_config('longtimenosee'));
+
+        // Welcome message sending.
+        if (function_exists('enrol_send_welcome_email_options')) {
+            $options = enrol_send_welcome_email_options();
+            unset($options[ENROL_SEND_EMAIL_FROM_KEY_HOLDER]);
+            $mform->addElement('select', 'customint7',
+                    get_string('sendcoursewelcomemessage', 'enrol_autoenrol'), $options);
+        } else {
+            $mform->addElement('checkbox', 'customint7', get_string('sendcoursewelcomemessage', 'enrol_autoenrol'));
+        }
+        $mform->setDefault('customint7', $this->get_config('sendcoursewelcomemessage'));
+
+        // Welcome message text.
+        $mform->addElement('textarea', 'customtext1',
+                get_string('customwelcomemessage', 'enrol_autoenrol'), array('cols' => '60', 'rows' => '8'));
+        $mform->addHelpButton('customtext1', 'customwelcomemessage', 'enrol_autoenrol');
+
+        // Filter section.
+        $mform->addElement('header', 'filtersection', get_string('filtering', 'enrol_autoenrol'));
+        $mform->setExpanded('filtersection', true);
+
+        // The filter definition.
+        $mform->addElement('textarea', 'availabilityconditionsjson',
+                get_string('userfilter', 'enrol_autoenrol'));
+        $mform->addHelpButton('availabilityconditionsjson', 'userfilter', 'enrol_autoenrol');
+        \enrol_autoenrol\filter_frontend::include_all_javascript($COURSE);
+
+        // Group users by.
+        $options = $this->get_groupon_options();
+        $mform->addElement('select', 'customchar3', get_string('groupon', 'enrol_autoenrol'), $options);
+        $mform->setType('customchar3', PARAM_TEXT);
+        $mform->addHelpButton('customchar3', 'groupon', 'enrol_autoenrol');
+
+        // Group name.
+        $groupnameattribs = array('size' => '20', 'maxlength' => '100');
+        $mform->addElement('text', 'customchar1', get_string('groupname', 'enrol_autoenrol'), $groupnameattribs);
+        $mform->setDefault('customchar1', '');
+        $mform->setType('customchar1', PARAM_TEXT);
+        $mform->addHelpButton('customchar1', 'groupname', 'enrol_autoenrol');
+        $mform->disabledIf('customchar1', 'customchar3', 'ne', 'userfilter');
+        $mform->addRule('customchar1', get_string('maximumchars', '', 100), 'maxlength', 100, 'server');
+
+        // Max number of enrolled user by this instance.
+        $mform->addElement('text', 'customint5', get_string('countlimit', 'enrol_autoenrol'));
+        $mform->setType('customint5', PARAM_INT);
+        $mform->setDefault('customint5', $this->get_config('maxenrolled'));
+        $mform->addHelpButton('customint5', 'countlimit', 'enrol_autoenrol');
+    }
+
+    /**
+     * Perform custom validation of the data used to edit the instance.
+     *
+     * @param array $data array of ("fieldname"=>value) of submitted data
+     * @param array $files array of uploaded files "element_name"=>tmp_file_path
+     * @param object $instance The instance loaded from the DB
+     * @param context $context The context of the instance we are editing
+     * @return array of "element_name"=>"error_description" if there are errors,
+     *         or an empty array if everything is OK.
+     * @return void
+     */
+    public function edit_instance_validation($data, $files, $instance, $context) {
+        $errors = array();
+
+        // Use this code to validate the 'User Filtering' section.
+        \core_availability\frontend::report_validation_errors($data, $errors);
+
+        if ($data['status'] == ENROL_INSTANCE_ENABLED) {
+            if (!empty($data['enrolenddate']) and $data['enrolenddate'] < $data['enrolstartdate']) {
+                $errors['enrolenddate'] = get_string('enrolenddaterror', 'enrol_autoenrol');
+            }
+        }
+
+        if ($data['expirynotify'] > 0 and $data['expirythreshold'] < 86400) {
+            $errors['expirythreshold'] = get_string('errorthresholdlow', 'core_enrol');
+        }
+
+        // Now these ones are checked by quickforms, but we may be called by the upload enrolments tool, or a webservice.
+        if (core_text::strlen($data['name']) > 255) {
+            $errors['name'] = get_string('err_maxlength', 'form', 255);
+        }
+        if (core_text::strlen($data['customchar1']) > 100) {
+            $errors['customchar1'] = get_string('err_maxlength', 'form', 100);
+        }
+
+        $validstatus = array_keys($this->get_status_options());
+        $context = context_course::instance($instance->courseid);
+        $validroles = array_keys($this->extend_assignable_roles($context, $data['roleid']));
+        $validexpirynotify = array_keys($this->get_expirynotify_options());
+        $validenrolmethod = array_keys($this->get_enrolmethod_options());
+        $validlongtimenosee = array_keys($this->get_longtimenosee_options());
+        $validgroupon = array_keys($this->get_groupon_options());
+        $validyesno = array(0, 1);
+        $tovalidate = array(
+            'name' => PARAM_TEXT,
+            'status' => $validstatus,
+            'roleid' => $validroles,
+            'enrolperiod' => PARAM_INT,
+            'expirynotify' => $validexpirynotify,
+            'enrolstartdate' => PARAM_INT,
+            'enrolenddate' => PARAM_INT,
+            'customint1' => $validenrolmethod,
+            'customint3' => $validlongtimenosee,
+            'customint4' => $validyesno,
+            'customint5' => PARAM_INT,
+            'customint6' => $validyesno,
+            'customint7' => PARAM_INT,
+            'customint8' => $validyesno,
+            'customchar1' => PARAM_TEXT,
+            'customchar3' => $validgroupon
+        );
+        if ($data['expirynotify'] != 0) {
+            $tovalidate['expirythreshold'] = PARAM_INT;
+        }
+        $typeerrors = $this->validate_param_types($data, $tovalidate);
+        $errors = array_merge($errors, $typeerrors);
+
+        return $errors;
+    }
+
+    /**
+     * Return an array of valid options for the status.
+     *
+     * @return array
+     */
+    protected function get_status_options() {
+        $options = array(ENROL_INSTANCE_ENABLED  => get_string('yes'),
+                         ENROL_INSTANCE_DISABLED => get_string('no'));
+        return $options;
+    }
+
+    /**
+     * Gets a list of roles that this user can assign for the course as the default for self-enrolment.
+     *
+     * @param context $context the context.
+     * @param integer $defaultrole the id of the role that is set as the default for self-enrolment
+     * @return array index is the role id, value is the role name
+     */
+    public function extend_assignable_roles($context, $defaultrole) {
+        global $DB;
+
+        $roles = get_assignable_roles($context, ROLENAME_BOTH);
+        if (!isset($roles[$defaultrole])) {
+            if ($role = $DB->get_record('role', array('id' => $defaultrole))) {
+                $roles[$defaultrole] = role_get_name($role, $context, ROLENAME_BOTH);
+            }
+        }
+        return $roles;
+    }
+
+    /**
+     * Return an array of valid options for the expirynotify property.
+     *
+     * @return array
+     */
+    protected function get_expirynotify_options() {
+        $options = array(0 => get_string('no'),
+                         1 => get_string('expirynotifyenroller', 'enrol_autoenrol'),
+                         2 => get_string('expirynotifyall', 'enrol_autoenrol'));
+        return $options;
+    }
+
+    /**
+     * Return an array of valid options for the enrol method property.
+     *
+     * @return array
+     */
+    protected function get_enrolmethod_options() {
+        $options = array( 0 => get_string('m_course', 'enrol_autoenrol'),
+                          1 => get_string('m_site', 'enrol_autoenrol'),
+                          2 => get_string('m_confirmation', 'enrol_autoenrol'));
+        return $options;
+    }
+
+    /**
+     * Return an array of valid options for the longtimenosee property.
+     *
+     * @return array
+     */
+    protected function get_longtimenosee_options() {
+        $options = array(0 => get_string('never'),
+                         1800 * 3600 * 24 => get_string('numdays', '', 1800),
+                         1000 * 3600 * 24 => get_string('numdays', '', 1000),
+                         365 * 3600 * 24 => get_string('numdays', '', 365),
+                         180 * 3600 * 24 => get_string('numdays', '', 180),
+                         150 * 3600 * 24 => get_string('numdays', '', 150),
+                         120 * 3600 * 24 => get_string('numdays', '', 120),
+                         90 * 3600 * 24 => get_string('numdays', '', 90),
+                         60 * 3600 * 24 => get_string('numdays', '', 60),
+                         30 * 3600 * 24 => get_string('numdays', '', 30),
+                         21 * 3600 * 24 => get_string('numdays', '', 21),
+                         14 * 3600 * 24 => get_string('numdays', '', 14),
+                         7 * 3600 * 24 => get_string('numdays', '', 7));
+        return $options;
+    }
+
+    /**
+     * Return an array of valid options for the longtimenosee property.
+     *
+     * @return array
+     */
+    protected function get_groupon_options() {
+        global $DB;
+
+        $options = array('-' => get_string('nogroupon', 'enrol_autoenrol'),
+                         'userfilter' => get_string('userfilter', 'enrol_autoenrol'),
+                         'auth' => get_string('authentication'),
+                         'lang' => get_string('language'),
+                         'department' => get_string('department'),
+                         'institution' => get_string('institution'),
+                         'address' => get_string('address'),
+                         'city' => get_string('city'),
+                         'email' => get_string('email'));
+
+        $customfields = $DB->get_records('user_info_field');
+        if (!empty($customfields)) {
+            foreach ($customfields as $customfield) {
+                $options[$customfield->shortname] = $customfield->name;
+            }
+        }
+        return $options;
+    }
+
+
+    /**
+     * Add new instance of enrol plugin.
+     * @param object $course
+     * @param array $fields instance fields
+     * @return int id of new instance, null if can not be created
+     */
+    public function add_instance($course, array $fields = null) {
+        // In the form we are representing 2 db columns with one field.
+        if (!empty($fields) && !empty($fields['expirynotify'])) {
+            if ($fields['expirynotify'] == 2) {
+                $fields['expirynotify'] = 1;
+                $fields['notifyall'] = 1;
+            } else {
+                $fields['notifyall'] = 0;
+            }
+        }
+
+        return parent::add_instance($course, $fields);
+    }
+
+    /**
+     * Update instance of enrol plugin.
+     * @param stdClass $instance
+     * @param stdClass $data modified instance fields
+     * @return boolean
+     */
+    public function update_instance($instance, $data) {
+        // In the form we are representing 2 db columns with one field.
+        if ($data->expirynotify == 2) {
+            $data->expirynotify = 1;
+            $data->notifyall = 1;
+        } else {
+            $data->notifyall = 0;
+        }
+        // Keep previous/default value of disabled expirythreshold option.
+        if (!$data->expirynotify) {
+            $data->expirythreshold = $instance->expirythreshold;
+        }
+        // Add previous value of newenrols if disabled.
+        if (!isset($data->customint4)) {
+            $data->customint4 = $instance->customint4;
+        }
+
+        return parent::update_instance($instance, $data);
+    }
+
 }

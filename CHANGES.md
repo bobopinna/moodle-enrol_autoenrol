@@ -2,8 +2,11 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+
+## [2.3.8] - 2022-06-06
 ### Changed
-- Hidden the "Enrol me in this course" link when user does not satisfy user filter rules 
+- Hidden the "Enrol me in this course" link when user does not satisfy user filter rules
+- Moved instance edit form from two files (edit.php and edit_form.php) to lib.php as in self enrolment method
 
 ## [2.3.7] - 2022-05-11
 ### Fixed

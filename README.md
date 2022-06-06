@@ -1,19 +1,28 @@
-# AutoEnrol Enrolment Method [![Build Status](https://travis-ci.org/bobopinna/moodle-enrol_autoenrol.svg?branch=master)](https://travis-ci.org/bobopinna/moodle-enrol_autoenrol)
+# AutoEnrol Enrolment Method
+
+AutoEnrol adds functionality to automatically enrol users onto a course, either as they 
+log in to your Moodle site or as they access a course. This plugin was at first intended 
+for use on courses which you want all users to be able to access but can also be configured
+for more advanced purposes as reserved access courses. Using the new user filtering you can
+think at Autoenrol as a Swiss Army knife for Moodle enrolments.
 
 When added to a course this enrolment plugin can enrol users onto a course automatically,
-either as they log into your Moodle site or as they click on the course. It is intended 
-for use on site-wide courses such as "Moodle Help" or "Learner Voice". 
+either as they log into your Moodle site or as they click on the course. It was originally
+intended for use on site-wide courses such as "Moodle Help" or "Learner Voice". 
 
 In addition the plugin has advanced functionality to support automatically grouping and
 filtering users based upon their attributes. Depending on how your user accounts are set
 up this may help you to give access to certain user groups.
 
-The plugin adds new permissions to help you manage the use of the plugin. The
-first permission called "config" allows the user to add a new instance of the plugin
-and change only the most basic options. The second permission is called "method" and gives
-users the ability to change when the user will be enrolled on a course, and what type of 
-enrolment it will be (ie something other than student). There are further permissions 
-relating to the plugin which should be reviewed through Moodle's "Define Roles" page.
+Configuration of the plugin is managed by two capabilities which allow administrators to 
+easily control who has access to the plugin.
+
+The AutoEnrol filter use moodle standard availability interface so it adds great flexibility 
+in user filtering.
+The moodle profile availability core plugin unfortunately does not include language and 
+authentication method.  If you need them, you can install additional availability plugins 
+like [Restriction by language](https://moodle.org/plugins/availability_language) and 
+[Restriction by authentication](https://github.com/bobopinna/moodle-availability_auth).
 
 ## [Changelog](CHANGES.md)
 
@@ -26,9 +35,10 @@ relating to the plugin which should be reviewed through Moodle's "Define Roles" 
 
 ## Maintainer
 
-The module was authored by Mark Ward and is being maintained by Roberto Pinna and Angelo Calò.
+The module is being maintained by Roberto Pinna with Angelo Calò (testing).
 
-The original module developed by Mark Ward can be found on [his GitHub](https://github.com/markward/enrol_autoenrol). 
+The original module was developed by Mark Ward and it can be found on 
+[his GitHub](https://github.com/markward/enrol_autoenrol). 
 
 ## Thanks to
 
@@ -38,8 +48,8 @@ Thanks also to users who have taken the time to share feedback and improve the m
 
 ## Technical Support
 
-Issue tracker can be found on [GitHub](https://github.com/bobopinna/moodle-enrol_autoenrol/issues). Please
-try to give as much detail about your problem as possible and I'll do what I can to help.
+Issue tracker can be found on [GitHub](https://github.com/bobopinna/moodle-enrol_autoenrol/issues).
+Please try to give as much detail about your problem as possible and I'll do what I can to help.
 
 ## License
 
