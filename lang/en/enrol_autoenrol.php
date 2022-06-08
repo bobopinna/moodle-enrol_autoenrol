@@ -52,6 +52,11 @@ $string['warning'] = 'Caution!';
 $string['warning_message'] = 'Adding this plugin to your course will allow any registered Moodle users access to your course. Only install this plugin if you want to allow open access to your course for users who have logged in.';
 $string['welcomemessage'] = 'Welcome message';
 $string['welcometocourse'] = 'Welcome to {$a}';
+$string['welcometocoursetext'] = 'Welcome to {$a->coursename}!
+
+If you have not done so already, you should edit your profile page so that we can learn more about you:
+
+  {$a->profileurl}';
 
 $string['role'] = 'Default assigned role';
 $string['role_help'] = 'Power users can use this setting to change the permission level at which users are enrolled.';
