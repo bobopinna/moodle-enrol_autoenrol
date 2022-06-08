@@ -125,7 +125,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
         global $USER;
 
         if ($this->get_config('loginenrol') && $instance->customint1 == 1) {
-            // Don't offer enrolself if we are going to enrol them on login.
+            // Don't offer enrol link if we are going to enrol them on login.
             return false;
         } else if ($this->enrol_allowed($instance, $USER)) {
             return true;
@@ -138,7 +138,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      *
      * @param int $instance
      *
-     * @return moodle_url or NULL if self unenrolment not supported
+     * @return moodle_url or NULL if self unenrolment is not supported
      */
     public function get_unenrolself_link($instance) {
         if (($this->get_config('loginenrol') && ($instance->customint1 == 1)) || ($instance->customint6 == 0)) {
@@ -319,28 +319,6 @@ class enrol_autoenrol_plugin extends enrol_plugin {
     }
 
     /**
-     * Sets up navigation entries.
-     *
-     * @param object   $instancesnode
-     * @param stdClass $instance
-     *
-     * @throws coding_exception
-     */
-    public function add_course_navigation($instancesnode, stdClass $instance) {
-        if ($instance->enrol !== 'autoenrol') {
-            throw new coding_exception('Invalid enrol instance type!');
-        }
-
-        $context = context_course::instance($instance->courseid);
-        if (has_capability('enrol/autoenrol:config', $context)) {
-            $managelink = new moodle_url(
-                    '/enrol/autoenrol/edit.php', array('courseid' => $instance->courseid, 'id' => $instance->id));
-            $instancesnode->add($this->get_instance_name($instance), $managelink, navigation_node::TYPE_SETTING);
-        }
-    }
-
-
-    /**
      * Returns localised name of enrol instance
      *
      * @param object $instance (null is accepted too)
@@ -361,33 +339,6 @@ class enrol_autoenrol_plugin extends enrol_plugin {
         } else {
             return format_string($instance->name);
         }
-    }
-
-    /**
-     * Returns edit icons for the page with list of instances
-     *
-     * @param stdClass $instance
-     *
-     * @return array
-     * @throws coding_exception
-     */
-    public function get_action_icons(stdClass $instance) {
-        global $OUTPUT;
-
-        if ($instance->enrol !== 'autoenrol') {
-            throw new coding_exception('invalid enrol instance!');
-        }
-        $context = context_course::instance($instance->courseid);
-        $icons = array();
-
-        if (has_capability('enrol/autoenrol:config', $context)) {
-            $editlink = new moodle_url(
-                    '/enrol/autoenrol/edit.php', array('courseid' => $instance->courseid, 'id' => $instance->id));
-            $icons[] = $OUTPUT->action_icon(
-                    $editlink, new pix_icon('t/edit', get_string('edit'), 'core', array('class' => 'iconsmall')));
-        }
-
-        return $icons;
     }
 
     /**
@@ -580,21 +531,19 @@ class enrol_autoenrol_plugin extends enrol_plugin {
     }
 
     /**
-     * Returns link to page which may be used to add new instance of enrolment plugin in course.
+     * Return true if we can add a new instance to this course.
      *
      * @param int $courseid
-     *
-     * @return moodle_url page url
+     * @return boolean
      */
-    public function get_newinstance_link($courseid) {
-        $context = context_course::instance($courseid);
+    public function can_add_instance($courseid) {
+        $context = context_course::instance($courseid, MUST_EXIST);
 
         if (!has_capability('moodle/course:enrolconfig', $context) or !has_capability('enrol/autoenrol:config', $context)) {
-            return null;
+            return false;
         }
 
-        // Multiple instances supported.
-        return new moodle_url('/enrol/autoenrol/edit.php', array('courseid' => $courseid));
+        return true;
     }
 
     /**
@@ -956,7 +905,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
                 $messagetext = html_to_text($messagehtml);
             }
         } else {
-            $messagetext = get_string('welcometocoursetext', 'enrol_self', $a);
+            $messagetext = get_string('welcometocoursetext', 'enrol_autoenrol', $a);
             $messagehtml = text_to_html($messagetext, null, false, true);
         }
 
@@ -1279,10 +1228,10 @@ class enrol_autoenrol_plugin extends enrol_plugin {
     }
 
     /**
-     * Gets a list of roles that this user can assign for the course as the default for self-enrolment.
+     * Gets a list of roles that this user can assign for the course as the default for autoenrol.
      *
      * @param context $context the context.
-     * @param integer $defaultrole the id of the role that is set as the default for self-enrolment
+     * @param integer $defaultrole the id of the role that is set as the default for autoenrol
      * @return array index is the role id, value is the role name
      */
     public function extend_assignable_roles($context, $defaultrole) {
