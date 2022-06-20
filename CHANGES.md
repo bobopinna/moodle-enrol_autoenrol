@@ -2,6 +2,8 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Fixed
+- Check for already enrolled users
 
 ## [2.3.8] - 2022-06-06
 ### Changed

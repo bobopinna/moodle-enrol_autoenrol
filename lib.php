@@ -193,7 +193,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
         if (!$instance->customint8) {
             // Do not reenrol if already enrolled with another method.
             $context = context_course::instance($instance->courseid);
-            if (is_enrolled($context, $user, 'moodle/course:view')) {
+            if (is_enrolled($context, $user)) {
                 // No need to enrol someone who is already enrolled.
                 return false;
             }
