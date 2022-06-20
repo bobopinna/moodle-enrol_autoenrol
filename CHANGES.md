@@ -2,6 +2,8 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+
+## [2.3.9] - 2022-06-20
 ### Fixed
 - Check for already enrolled users
 - Availability conditions edit values with new edit form in lib.php
