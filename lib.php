@@ -984,6 +984,12 @@ class enrol_autoenrol_plugin extends enrol_plugin {
             unset($instance->notifyall);
         }
 
+        // Retrieve availability conditions from customtext2.
+        if (isset($instance->customtext2) && !empty($instance->customtext2)) {
+            $instance->availabilityconditionsjson = $instance->customtext2;
+            unset($instance->customtext2);
+        }
+
         $logourl = '';
         if (method_exists($OUTPUT, 'image_url')) {
             $logourl = $OUTPUT->image_url('logo', 'enrol_autoenrol');
@@ -1327,13 +1333,21 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      * @return int id of new instance, null if can not be created
      */
     public function add_instance($course, array $fields = null) {
-        // In the form we are representing 2 db columns with one field.
-        if (!empty($fields) && !empty($fields['expirynotify'])) {
-            if ($fields['expirynotify'] == 2) {
-                $fields['expirynotify'] = 1;
-                $fields['notifyall'] = 1;
-            } else {
-                $fields['notifyall'] = 0;
+        if (!empty($fields)) {
+            // In the form we are representing 2 db columns with one field.
+            if (!empty($fields['expirynotify'])) {
+                if ($fields['expirynotify'] == 2) {
+                    $fields['expirynotify'] = 1;
+                    $fields['notifyall'] = 1;
+                } else {
+                    $fields['notifyall'] = 0;
+                }
+            }
+
+            // Store availability conditions in customtext2.
+            if (isset($fields['availabilityconditionsjson']) && !empty($fields['availabilityconditionsjson'])) {
+                $fields['customtext2'] = $fields['availabilityconditionsjson'];
+                unset($fields['availabilityconditionsjson']);
             }
         }
 
@@ -1353,6 +1367,11 @@ class enrol_autoenrol_plugin extends enrol_plugin {
             $data->notifyall = 1;
         } else {
             $data->notifyall = 0;
+        }
+        // Store availability conditions in customtext2.
+        if (!empty($data->availabilityconditionsjson)) {
+            $data->customtext2 = $data->availabilityconditionsjson;
+            unset($data->availabilityconditionsjson);
         }
         // Keep previous/default value of disabled expirythreshold option.
         if (!$data->expirynotify) {
