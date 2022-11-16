@@ -447,7 +447,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
         raise_memory_limit(MEMORY_HUGE);
 
         // Get records of all active users.
-        $users = $DB->get_records('user', array('deleted' => '0', 'suspended' => 0), null, '*');
+        $users = $DB->get_records('user', array('deleted' => '0'), null, '*');
 
         $trace->output(get_string('checksync', 'enrol_autoenrol', count($users)));
         foreach ($users as $user) {
