@@ -2,6 +2,8 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Changed
+- Update suspended user enrolment status
 
 ## [2.3.9] - 2022-06-20
 ### Fixed
