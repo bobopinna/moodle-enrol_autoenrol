@@ -33,6 +33,13 @@ like [Restriction by language](https://moodle.org/plugins/availability_language)
 3. Visit the "Site Administration > Plugins > Enrolments" page.
 4. Click the eye symbol next to "Auto Enrol" to enable the plugin. 
 
+## Use
+
+1. Visit Participants page in your course.
+2. Go to Enrolment Methods page.
+3. Select AutoEnrol from the Add... dropdown menu.
+4. Configure the new AutoEnrol instance as you need and save.
+
 ## Maintainer
 
 The module is being maintained by Roberto Pinna with Angelo Calò (testing).
