@@ -180,7 +180,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
     public function enrol_allowed(stdClass $instance, $user) {
         global $DB;
 
-        if (isguestuser()) {
+        if (isguestuser($user)) {
             // Can not enrol guest!!
             return false;
         }
