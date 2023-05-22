@@ -755,7 +755,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
         $fields['customint3']      = $this->get_config('longtimenosee');
         $fields['customint4']      = $this->get_config('newenrols');
         $fields['customint5']      = $this->get_config('maxenrolled');
-        $fields['customint6']      = 0;
+        $fields['customint6']      = $this->get_config('selfunenrol');
         $fields['customint7']      = $this->get_config('sendcoursewelcomemessage');
         $fields['customint8']      = 0;
 
