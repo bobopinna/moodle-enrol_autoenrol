@@ -1045,15 +1045,13 @@ class enrol_autoenrol_plugin extends enrol_plugin {
         $mform->setType('roleid', PARAM_INT);
 
         // Enrol When.
-        if ($this->get_config('loginenrol')) {
-            $options = $this->get_enrolmethod_options();
-            $mform->addElement('select', 'customint1', get_string('method', 'enrol_autoenrol'), $options);
-            if (!has_capability('enrol/autoenrol:method', $context)) {
-                $mform->disabledIf('customint1', 'customchar3', 'eq', '-');
-            }
-            $mform->setType('customint1', PARAM_INT);
-            $mform->addHelpButton('customint1', 'method', 'enrol_autoenrol');
+        $options = $this->get_enrolmethod_options();
+        $mform->addElement('select', 'customint1', get_string('method', 'enrol_autoenrol'), $options);
+        if (!has_capability('enrol/autoenrol:method', $context)) {
+            $mform->disabledIf('customint1', 'customchar3', 'eq', '-');
         }
+        $mform->setType('customint1', PARAM_INT);
+        $mform->addHelpButton('customint1', 'method', 'enrol_autoenrol');
 
         // Enrol always.
         $mform->addElement('selectyesno', 'customint8', get_string('alwaysenrol', 'enrol_autoenrol'));
@@ -1270,9 +1268,14 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      * @return array
      */
     protected function get_enrolmethod_options() {
-        $options = array( 0 => get_string('m_course', 'enrol_autoenrol'),
-                          1 => get_string('m_site', 'enrol_autoenrol'),
-                          2 => get_string('m_confirmation', 'enrol_autoenrol'));
+        $options = array(0 => get_string('m_course', 'enrol_autoenrol'));
+
+        if (!empty($this->get_config('loginenrol'))) {
+             $options[1] = get_string('m_site', 'enrol_autoenrol');
+        }
+
+        $options[2] = get_string('m_confirmation', 'enrol_autoenrol');
+        
         return $options;
     }
 
