@@ -75,6 +75,10 @@ class enrol_form extends moodleform {
         $heading = $plugin->get_instance_name($instance);
         $mform->addElement('header', 'autoenrolheader', $heading);
 
+        if (!empty($instance->customint2)) {
+            list($message, $a) = \enrol_autoenrol\welcomemessage::get_welcomemessage($instance);
+            $mform->addElement('html', $message);
+        }
         $this->add_action_buttons(false, get_string('enrolme', 'enrol_autoenrol'));
 
         $mform->addElement('hidden', 'id');
