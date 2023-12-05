@@ -29,14 +29,14 @@ require_once($CFG->libdir . '/clilib.php');
 
 // Now get cli options.
 list($options, $unrecognized) = cli_get_params(
-        array(
+        [
                 'help' => false,
                 'slow' => false,
-        ),
-        array(
+        ],
+        [
                 'h' => 'help',
                 's' => 'slow',
-        )
+        ]
 );
 
 if ($unrecognized) {
@@ -60,10 +60,10 @@ Example:
 // Turn on debugging so we can see the detailed progress.
 set_debugging(DEBUG_DEVELOPER, true);
 
-$instances = $DB->get_records('enrol', array('enrol' => 'autoenrol'));
+$instances = $DB->get_records('enrol', ['enrol' => 'autoenrol']);
 if (!empty($instances)) {
     cli_writeln('Found ' . count($instances) . ' instances of autoenrol');
-    $query = array('plugin' => 'enrol_autoenrol', 'name' => 'defaultrole');
+    $query = ['plugin' => 'enrol_autoenrol', 'name' => 'defaultrole'];
     $defaultroleid = $DB->get_field('config_plugins', 'value', $query);
     $count = 0;
     foreach ($instances as $instance) {
@@ -73,10 +73,10 @@ if (!empty($instances)) {
             $DB->update_record('enrol', $instance);
         }
         $roleid = $instance->roleid;
-        if ($enrolments = $DB->get_records('user_enrolments', array('enrolid' => $instance->id))) {
+        if ($enrolments = $DB->get_records('user_enrolments', ['enrolid' => $instance->id])) {
             foreach ($enrolments as $enrolment) {
                 if ($options['slow']) {
-                    if ($DB->record_exists('user', array('id' => $enrolment->userid, 'deleted' => 0))) {
+                    if ($DB->record_exists('user', ['id' => $enrolment->userid, 'deleted' => 0])) {
                         role_assign($roleid, $enrolment->userid, $context->id, 'enrol_'.$instance->enrol, $instance->id);
                         $count++;
                     }

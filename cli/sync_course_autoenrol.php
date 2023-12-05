@@ -29,13 +29,13 @@ require_once($CFG->libdir . '/clilib.php');
 
 // Now get cli options.
 list($options, $unrecognized) = cli_get_params(
-        array(
+        [
                 'help' => false,
-                'courseid' => false
-        ),
-        array(
-                'h' => 'help'
-        )
+                'courseid' => false,
+        ],
+        [
+                'h' => 'help',
+        ]
 );
 
 if ($unrecognized) {
@@ -57,7 +57,7 @@ Example:
 }
 
 if (!empty($options['courseid'])) {
-    if (! $DB->get_records('course', array('id' => $options['courseid']))) {
+    if (! $DB->get_records('course', ['id' => $options['courseid']])) {
         cli_error('Specified course does not exists!');
     }
 }

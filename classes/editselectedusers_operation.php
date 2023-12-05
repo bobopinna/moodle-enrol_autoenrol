@@ -63,8 +63,8 @@ class enrol_autoenrol_editselectedusers_operation extends enrol_bulk_enrolment_o
         }
 
         // Get all of the user enrolment id's.
-        $ueids = array();
-        $instances = array();
+        $ueids = [];
+        $instances = [];
         foreach ($users as $user) {
             foreach ($user->enrolments as $enrolment) {
                 $ueids[] = $enrolment->id;
@@ -88,7 +88,7 @@ class enrol_autoenrol_editselectedusers_operation extends enrol_bulk_enrolment_o
 
         list($ueidsql, $params) = $DB->get_in_or_equal($ueids, SQL_PARAMS_NAMED);
 
-        $updatesql = array();
+        $updatesql = [];
         if ($status == ENROL_USER_ACTIVE || $status == ENROL_USER_SUSPENDED) {
             $updatesql[] = 'status = :status';
             $params['status'] = (int)$status;
@@ -126,13 +126,13 @@ class enrol_autoenrol_editselectedusers_operation extends enrol_bulk_enrolment_o
                     $enrolment->enrol     = 'autoenrol';
                     // Trigger event.
                     $event = \core\event\user_enrolment_updated::create(
-                        array(
+                        [
                             'objectid' => $enrolment->id,
                             'courseid' => $enrolment->courseid,
                             'context' => context_course::instance($enrolment->courseid),
                             'relateduserid' => $user->id,
-                            'other' => array('enrol' => 'autoenrol')
-                        )
+                            'other' => ['enrol' => 'autoenrol'],
+                        ]
                     );
                     $event->trigger();
                 }

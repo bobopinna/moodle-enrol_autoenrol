@@ -23,8 +23,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$tasks = array(
-    array(
+$tasks = [
+    [
         'classname' => '\enrol_autoenrol\task\sync_enrolments',
         'blocking' => 0,
         'minute' => 'R',
@@ -32,9 +32,9 @@ $tasks = array(
         'day' => '*',
         'month' => '*',
         'dayofweek' => '*',
-        'disabled' => 1
-    ),
-    array(
+        'disabled' => 1,
+    ],
+    [
         'classname' => '\enrol_autoenrol\task\sync_expirations',
         'blocking' => 0,
         'minute' => '*/10',
@@ -42,9 +42,9 @@ $tasks = array(
         'day' => '*',
         'month' => '*',
         'dayofweek' => '*',
-        'disabled' => 0
-    ),
-    array(
+        'disabled' => 0,
+    ],
+    [
         'classname' => '\enrol_autoenrol\task\send_expiry_notifications',
         'blocking' => 0,
         'minute' => '*/10',
@@ -52,7 +52,7 @@ $tasks = array(
         'day' => '*',
         'month' => '*',
         'dayofweek' => '*',
-        'disabled' => 0
-    )
-);
+        'disabled' => 0,
+    ],
+];
 

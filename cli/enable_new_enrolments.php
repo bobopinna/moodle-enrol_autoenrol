@@ -29,14 +29,14 @@ require_once($CFG->libdir . '/clilib.php');
 
 // Now get cli options.
 list($options, $unrecognized) = cli_get_params(
-        array(
+        [
                 'help' => false,
-                'check' => false
-        ),
-        array(
+                'check' => false,
+        ],
+        [
                 'h' => 'help',
-                'c' => 'check'
-        )
+                'c' => 'check',
+        ]
 );
 
 if ($unrecognized) {
@@ -60,7 +60,7 @@ Example:
 // Turn on debugging so we can see the detailed progress.
 set_debugging(DEBUG_DEVELOPER, true);
 
-$instances = $DB->get_records('enrol', array('enrol' => 'autoenrol', 'customint4' => 0));
+$instances = $DB->get_records('enrol', ['enrol' => 'autoenrol', 'customint4' => 0]);
 if (!empty($instances)) {
     cli_writeln('Found ' . count($instances) . ' instances of autoenrol with new enrolments disable');
     foreach ($instances as $instance) {

@@ -26,51 +26,51 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$capabilities = array(
+$capabilities = [
 
-    'enrol/autoenrol:config'      => array(
+    'enrol/autoenrol:config'      => [
         'captype'      => 'write',
         'contextlevel' => CONTEXT_COURSE,
-        'archetypes'   => array(
+        'archetypes'   => [
             'manager'        => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
-        )
-    ),
+        ],
+    ],
 
-    'enrol/autoenrol:manage'      => array(
+    'enrol/autoenrol:manage'      => [
         'captype'      => 'write',
         'contextlevel' => CONTEXT_COURSE,
-        'archetypes'   => array(
+        'archetypes'   => [
             'manager'        => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
-        ),
-        'clonepermissionsfrom' => 'enrol/autoenrol:config'
-    ),
+        ],
+        'clonepermissionsfrom' => 'enrol/autoenrol:config',
+    ],
 
-    'enrol/autoenrol:unenrol'     => array(
+    'enrol/autoenrol:unenrol'     => [
         'captype'      => 'write',
         'contextlevel' => CONTEXT_COURSE,
-        'archetypes'   => array(
+        'archetypes'   => [
             'manager'        => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
-        )
-    ),
+        ],
+    ],
 
-    'enrol/autoenrol:unenrolself' => array(
+    'enrol/autoenrol:unenrolself' => [
         'captype'      => 'write',
         'contextlevel' => CONTEXT_COURSE,
-        'archetypes'   => array(
+        'archetypes'   => [
             'student' => CAP_ALLOW,
-        )
-    ),
+        ],
+    ],
 
-    'enrol/autoenrol:method'      => array(
+    'enrol/autoenrol:method'      => [
         'captype'      => 'write',
         'contextlevel' => CONTEXT_COURSE,
-        'archetypes'   => array(
-            'manager'        => CAP_ALLOW
-        )
-    ),
+        'archetypes'   => [
+            'manager'        => CAP_ALLOW,
+        ],
+    ],
 
-);
+];
 
