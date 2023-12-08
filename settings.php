@@ -151,6 +151,15 @@ if ($ADMIN->fulltree) {
         );
     }
 
+    $settings->add(
+        new admin_setting_configcheckbox(
+            'enrol_autoenrol/showwelcomemessageonconfirmationpage',
+            get_string('showwelcomemessageonconfirmationpage', 'enrol_autoenrol'),
+            get_string('showwelcomemessageonconfirmationpage_help', 'enrol_autoenrol'),
+            0
+        )
+    );
+
     if (!during_initial_install()) {
         $pluginmanager = \core_plugin_manager::instance();
         $availabilities = array_keys($pluginmanager->get_enabled_plugins('availability'));

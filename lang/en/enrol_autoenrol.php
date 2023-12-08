@@ -57,6 +57,8 @@ $string['welcometocoursetext'] = 'Welcome to {$a->coursename}!
 If you have not done so already, you should edit your profile page so that we can learn more about you:
 
   {$a->profileurl}';
+$string['showwelcomemessageonconfirmationpage'] = 'Show the welcomemessage on confirmation page.';
+$string['showwelcomemessageonconfirmationpage_help'] = 'Default value for new autoenrol instances to also show the welcome message on the enrol confirmation page.';
 
 $string['role'] = 'Default assigned role';
 $string['role_help'] = 'Power users can use this setting to change the permission level at which users are enrolled.';
