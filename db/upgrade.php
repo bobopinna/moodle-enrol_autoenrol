@@ -40,7 +40,8 @@ function xmldb_enrol_autoenrol_upgrade($oldversion) {
             get_string('g_dept', 'enrol_autoenrol'),
             get_string('g_inst', 'enrol_autoenrol'),
             get_string('g_lang', 'enrol_autoenrol'),
-            get_string('g_email', 'enrol_autoenrol')];
+            get_string('g_email', 'enrol_autoenrol'),
+        ];
 
         $instances = $DB->get_records('enrol', ['enrol' => 'autoenrol']);
 

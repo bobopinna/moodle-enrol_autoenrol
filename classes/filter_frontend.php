@@ -47,8 +47,7 @@ class filter_frontend extends \core_availability\frontend {
         // make multiple yui_module calls, so we group all the plugin modules
         // into a single call (the main init function will call init for each
         // plugin).
-        $modules = ['moodle-core_availability-form', 'base', 'node',
-                'panel', 'moodle-core-notification-dialogue', 'json'];
+        $modules = ['moodle-core_availability-form', 'base', 'node', 'panel', 'moodle-core-notification-dialogue', 'json'];
 
         // Work out JS to include for all components.
         $pluginmanager = \core_plugin_manager::instance();
@@ -74,7 +73,8 @@ class filter_frontend extends \core_availability\frontend {
                 // Get parameters for this plugin.
                 $componentparams->{$plugin} = [$component,
                         $frontend->allow_add($course, $cm, $section),
-                        $frontend->get_javascript_init_params($course, $cm, $section)];
+                        $frontend->get_javascript_init_params($course, $cm, $section),
+                ];
 
                 // Include strings for this plugin.
                 $identifiers = $frontend->get_javascript_strings();
@@ -100,7 +100,7 @@ class filter_frontend extends \core_availability\frontend {
                 'show_verb', 'shown_individual', 'hidden_all', 'shown_all',
                 'condition_group', 'condition_group_info', 'and', 'or',
                 'label_multi', 'label_sign', 'setheading', 'itemheading',
-                'missingplugin'],
-                'availability');
+                'missingplugin',
+        ], 'availability');
     }
 }

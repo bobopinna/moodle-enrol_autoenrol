@@ -886,8 +886,8 @@ class enrol_autoenrol_plugin extends enrol_plugin {
         $context = context_course::instance($course->id);
 
         $a = new stdClass();
-        $a->coursename = format_string($course->fullname, true, array('context' => $context));
-        $a->profileurl = new moodle_url('/user/view.php', array('id' => $user->id, 'course' => $course->id));
+        $a->coursename = format_string($course->fullname, true, ['context' => $contex]);
+        $a->profileurl = new moodle_url('/user/view.php', ['id' => $user->id, 'course' => $course->id]);
         $a->link = course_get_url($course)->out();
 
         if (trim($instance->customtext1) !== '') {
@@ -1227,8 +1227,10 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      * @return array
      */
     protected function get_status_options() {
-        $options = [ENROL_INSTANCE_ENABLED  => get_string('yes'),
-                         ENROL_INSTANCE_DISABLED => get_string('no')];
+        $options = [
+                    ENROL_INSTANCE_ENABLED  => get_string('yes'),
+                    ENROL_INSTANCE_DISABLED => get_string('no'),
+                   ];
         return $options;
     }
 
@@ -1257,9 +1259,11 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      * @return array
      */
     protected function get_expirynotify_options() {
-        $options = [0 => get_string('no'),
-                         1 => get_string('expirynotifyenroller', 'enrol_autoenrol'),
-                         2 => get_string('expirynotifyall', 'enrol_autoenrol')];
+        $options = [
+                    0 => get_string('no'),
+                    1 => get_string('expirynotifyenroller', 'enrol_autoenrol'),
+                    2 => get_string('expirynotifyall', 'enrol_autoenrol'),
+                   ];
         return $options;
     }
 
@@ -1287,18 +1291,19 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      */
     protected function get_longtimenosee_options() {
         $options = [0 => get_string('never'),
-                         1800 * 3600 * 24 => get_string('numdays', '', 1800),
-                         1000 * 3600 * 24 => get_string('numdays', '', 1000),
-                         365 * 3600 * 24 => get_string('numdays', '', 365),
-                         180 * 3600 * 24 => get_string('numdays', '', 180),
-                         150 * 3600 * 24 => get_string('numdays', '', 150),
-                         120 * 3600 * 24 => get_string('numdays', '', 120),
-                         90 * 3600 * 24 => get_string('numdays', '', 90),
-                         60 * 3600 * 24 => get_string('numdays', '', 60),
-                         30 * 3600 * 24 => get_string('numdays', '', 30),
-                         21 * 3600 * 24 => get_string('numdays', '', 21),
-                         14 * 3600 * 24 => get_string('numdays', '', 14),
-                         7 * 3600 * 24 => get_string('numdays', '', 7)];
+                    1800 * 3600 * 24 => get_string('numdays', '', 1800),
+                    1000 * 3600 * 24 => get_string('numdays', '', 1000),
+                    365 * 3600 * 24 => get_string('numdays', '', 365),
+                    180 * 3600 * 24 => get_string('numdays', '', 180),
+                    150 * 3600 * 24 => get_string('numdays', '', 150),
+                    120 * 3600 * 24 => get_string('numdays', '', 120),
+                    90 * 3600 * 24 => get_string('numdays', '', 90),
+                    60 * 3600 * 24 => get_string('numdays', '', 60),
+                    30 * 3600 * 24 => get_string('numdays', '', 30),
+                    21 * 3600 * 24 => get_string('numdays', '', 21),
+                    14 * 3600 * 24 => get_string('numdays', '', 14),
+                    7 * 3600 * 24 => get_string('numdays', '', 7),
+                   ];
         return $options;
     }
 
@@ -1311,14 +1316,15 @@ class enrol_autoenrol_plugin extends enrol_plugin {
         global $DB;
 
         $options = ['-' => get_string('nogroupon', 'enrol_autoenrol'),
-                         'userfilter' => get_string('userfilter', 'enrol_autoenrol'),
-                         'auth' => get_string('authentication'),
-                         'lang' => get_string('language'),
-                         'department' => get_string('department'),
-                         'institution' => get_string('institution'),
-                         'address' => get_string('address'),
-                         'city' => get_string('city'),
-                         'email' => get_string('email')];
+                    'userfilter' => get_string('userfilter', 'enrol_autoenrol'),
+                    'auth' => get_string('authentication'),
+                    'lang' => get_string('language'),
+                    'department' => get_string('department'),
+                    'institution' => get_string('institution'),
+                    'address' => get_string('address'),
+                    'city' => get_string('city'),
+                    'email' => get_string('email'),
+                   ];
 
         $customfields = $DB->get_records('user_info_field');
         if (!empty($customfields)) {
