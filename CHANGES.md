@@ -2,6 +2,14 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+
+## [2.4.0] - 2024-02-16
+### Fixed
+- Fix #45 Check for guest users by [Peter Kaijers|https://github.com/peterkeijsers]
+- Fix #47 Selfunenrol instance value by [Edoardo Bontà|https://github.com/ebonta]
+- Fix #48 Enrol When dropdown menu values - Thanks to matthewhilton
+- Fix some coding styles by [Peter Mayer|https://github.com/PM84]
+
 ### Changed
 - Update suspended user enrolment status
 
