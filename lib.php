@@ -71,7 +71,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      * @return array
      */
     public function get_info_icons(array $instances) {
-        return array(new pix_icon('icon', get_string('pluginname', 'enrol_autoenrol'), 'enrol_autoenrol'));
+        return [new pix_icon('icon', get_string('pluginname', 'enrol_autoenrol'), 'enrol_autoenrol')];
     }
 
     /**
@@ -186,7 +186,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
         }
 
         // Do not reenrol if already enrolled with this method.
-        if ($DB->record_exists('user_enrolments', array('userid' => $user->id, 'enrolid' => $instance->id))) {
+        if ($DB->record_exists('user_enrolments', ['userid' => $user->id, 'enrolid' => $instance->id])) {
             return false;
         }
 
@@ -208,17 +208,17 @@ class enrol_autoenrol_plugin extends enrol_plugin {
             return false;
         }
 
-        if ($instance->enrolstartdate != 0 and $instance->enrolstartdate > time()) {
+        if ($instance->enrolstartdate != 0 && $instance->enrolstartdate > time()) {
             return false;
         }
 
-        if ($instance->enrolenddate != 0 and $instance->enrolenddate < time()) {
+        if ($instance->enrolenddate != 0 && $instance->enrolenddate < time()) {
             return false;
         }
 
         if ($instance->customint5 > 0) {
             // We need to check that we haven't reached the limit count.
-            $totalenrolments = $DB->count_records('user_enrolments', array('enrolid' => $instance->id));
+            $totalenrolments = $DB->count_records('user_enrolments', ['enrolid' => $instance->id]);
             if ($totalenrolments >= $instance->customint5) {
                 return false;
             }
@@ -302,7 +302,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      * @return array An array of user_enrolment_actions
      */
     public function get_user_enrolment_actions(course_enrolment_manager $manager, $ue) {
-        $actions = array();
+        $actions = [];
         $context = $manager->get_context();
         $instance = $ue->enrolmentinstance;
         $params = $manager->get_moodlepage()->url->params();
@@ -311,7 +311,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
             $url = new moodle_url('/enrol/unenroluser.php', $params);
             $actions[] = new user_enrolment_action(
                     new pix_icon('t/delete', ''), get_string('unenrol', 'enrol'), $url,
-                    array('class' => 'unenrollink', 'rel' => $ue->id));
+                    ['class' => 'unenrollink', 'rel' => $ue->id]);
         }
         return $actions;
     }
@@ -327,7 +327,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
         global $DB;
 
         if (empty($instance->name)) {
-            if (!empty($instance->roleid) and $role = $DB->get_record('role', array('id' => $instance->roleid))) {
+            if (!empty($instance->roleid) && $role = $DB->get_record('role', ['id' => $instance->roleid])) {
                 $role = ' (' . role_get_name($role, context_course::instance($instance->courseid, IGNORE_MISSING)) . ')';
             } else {
                 $role = '';
@@ -353,16 +353,16 @@ class enrol_autoenrol_plugin extends enrol_plugin {
     public function sync_user_enrolments($user, $onlogin=true, $course = null) {
         global $DB, $PAGE;
 
-        $instances = array();
+        $instances = [];
         if (!empty($course)) {
             // Get records of all enabled the AutoEnrol instances in a specified course.
-            $instances = $DB->get_records('enrol', array('enrol' => 'autoenrol', 'status' => 0, 'courseid' => $course), null, '*');
+            $instances = $DB->get_records('enrol', ['enrol' => 'autoenrol', 'status' => 0, 'courseid' => $course], null, '*');
         } else {
             // Get records of all enabled the AutoEnrol instances.
-            $instances = $DB->get_records('enrol', array('enrol' => 'autoenrol', 'status' => 0), null, '*');
+            $instances = $DB->get_records('enrol', ['enrol' => 'autoenrol', 'status' => 0], null, '*');
         }
         // Now get a record of all of the users enrolments.
-        $userenrolments = $DB->get_records('user_enrolments', array('userid' => $user->id), null, '*');
+        $userenrolments = $DB->get_records('user_enrolments', ['userid' => $user->id], null, '*');
         // Run through all of the autoenrolment instances and check that the user has been enrolled.
         foreach ($instances as $instance) {
             $found = false;
@@ -412,12 +412,12 @@ class enrol_autoenrol_plugin extends enrol_plugin {
                                 // We want this "other user" to keep their roles.
                                 continue;
                             }
-                            role_unassign_all(array(
+                            role_unassign_all([
                                     'contextid' => $context->id,
                                     'userid' => $user->id,
                                     'component' => 'enrol_autoenrol',
-                                    'itemid' => $instance->id
-                            ));
+                                    'itemid' => $instance->id,
+                            ]);
                         }
                     }
                 } else {
@@ -445,7 +445,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
         raise_memory_limit(MEMORY_HUGE);
 
         // Get records of all active users.
-        $users = $DB->get_records('user', array('deleted' => '0'), null, '*');
+        $users = $DB->get_records('user', ['deleted' => '0'], null, '*');
 
         $trace->output(get_string('checksync', 'enrol_autoenrol', count($users)));
         foreach ($users as $user) {
@@ -477,7 +477,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
 
         $trace->output('Verifying autoenrolments expiration...');
 
-        $params = array('now' => time(), 'useractive' => ENROL_USER_ACTIVE, 'courselevel' => CONTEXT_COURSE);
+        $params = ['now' => time(), 'useractive' => ENROL_USER_ACTIVE, 'courselevel' => CONTEXT_COURSE];
         $coursesql = "";
         if ($courseid) {
             $coursesql = "AND e.courseid = :courseid";
@@ -537,7 +537,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
     public function can_add_instance($courseid) {
         $context = context_course::instance($courseid, MUST_EXIST);
 
-        if (!has_capability('moodle/course:enrolconfig', $context) or !has_capability('enrol/autoenrol:config', $context)) {
+        if (!has_capability('moodle/course:enrolconfig', $context) || !has_capability('enrol/autoenrol:config', $context)) {
             return false;
         }
 
@@ -552,7 +552,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
     public function get_bulk_operations(course_enrolment_manager $manager) {
         $context = $manager->get_context();
 
-        $bulkoperations = array();
+        $bulkoperations = [];
         if (has_capability('enrol/autoenrol:manage', $context)) {
             $bulkoperations['editselectedusers'] = new enrol_autoenrol_editselectedusers_operation($manager, $this);
         }
@@ -576,14 +576,14 @@ class enrol_autoenrol_plugin extends enrol_plugin {
         if ($step->get_task()->get_target() == backup::TARGET_NEW_COURSE) {
             $merge = false;
         } else {
-            $merge = array(
+            $merge = [
                 'courseid'   => $data->courseid,
                 'enrol'      => $this->get_name(),
                 'status'     => $data->status,
                 'roleid'     => $data->roleid,
-            );
+            ];
         }
-        if ($merge and $instances = $DB->get_records('enrol', $merge, 'id')) {
+        if ($merge && $instances = $DB->get_records('enrol', $merge, 'id')) {
             $instance = reset($instances);
             $instanceid = $instance->id;
         } else {
@@ -617,7 +617,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
         global $DB;
 
         // Just restore every role.
-        if ($DB->record_exists('user_enrolments', array('enrolid' => $instance->id, 'userid' => $userid))) {
+        if ($DB->record_exists('user_enrolments', ['enrolid' => $instance->id, 'userid' => $userid])) {
             role_assign($roleid, $userid, $contextid, 'enrol_'.$instance->enrol, $instance->id);
         }
     }
@@ -674,7 +674,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
 
             $groups = $DB->get_records_sql('SELECT * FROM {groups} WHERE "courseid" = :courseid AND ' .
                     $DB->sql_like('idnumber', ':idnumber'),
-                    array('idnumber' => 'autoenrol|' . $instance->id . '|%', 'courseid' => $instance->courseid));
+                    ['idnumber' => 'autoenrol|' . $instance->id . '|%', 'courseid' => $instance->courseid]);
 
             foreach ($groups as $group) {
                 groups_delete_group($group);
@@ -746,7 +746,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
             $notifyall = 0;
         }
 
-        $fields = array();
+        $fields = [];
         $fields['roleid']          = $this->get_config('defaultrole');
         $fields['enrolperiod']     = $this->get_config('enrolperiod');
         $fields['expirynotify']    = $expirynotify;
@@ -776,7 +776,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
         if (isset($instance->customchar3) && ($instance->customchar3 != '-')) {
             $profileattribute = $instance->customchar3;
         } else if (isset($instance->customint2)) {
-            $oldfields = array(0 => '', 1 => 'auth', 2 => 'department', 3 => 'institution', 4 => 'lang', 5 => 'email');
+            $oldfields = [0 => '', 1 => 'auth', 2 => 'department', 3 => 'institution', 4 => 'lang', 5 => 'email'];
             $profileattribute = $oldfields[$instance->customint2];
         }
 
@@ -787,7 +787,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
             if (!empty($instance->customchar1)) {
                 $name = $instance->customchar1;
             } else {
-                $standardfields = array('auth', 'lang', 'department', 'institution', 'address', 'city', 'email');
+                $standardfields = ['auth', 'lang', 'department', 'institution', 'address', 'city', 'email'];
                 if (in_array($profileattribute, $standardfields)) {
                     $name = $user->$profileattribute;
                 } else {
@@ -851,11 +851,11 @@ class enrol_autoenrol_plugin extends enrol_plugin {
         $hash = md5($groupname);
         $idnumber = 'autoenrol|' . $instance->id . '|' .$hash;
 
-        $group = $DB->get_record('groups', array('idnumber' => $idnumber, 'courseid' => $instance->courseid));
+        $group = $DB->get_record('groups', ['idnumber' => $idnumber, 'courseid' => $instance->courseid]);
 
         if ($group == null) {
             // If not exists idnumber Try to get group from name.
-            $group = $DB->get_record('groups', array('name' => $groupname, 'courseid' => $instance->courseid));
+            $group = $DB->get_record('groups', ['name' => $groupname, 'courseid' => $instance->courseid]);
         }
 
         if ($group == null) {
@@ -882,7 +882,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
     protected function email_welcome_message($instance, $user) {
         global $DB;
 
-        $course = $DB->get_record('course', array('id' => $instance->courseid), '*', MUST_EXIST);
+        $course = $DB->get_record('course', ['id' => $instance->courseid], '*', MUST_EXIST);
         $context = context_course::instance($course->id);
 
         $a = new stdClass();
@@ -892,8 +892,8 @@ class enrol_autoenrol_plugin extends enrol_plugin {
 
         if (trim($instance->customtext1) !== '') {
             $message = $instance->customtext1;
-            $key = array('{$a->coursename}', '{$a->profileurl}', '{$a->link}', '{$a->fullname}', '{$a->email}');
-            $value = array($a->coursename, $a->profileurl, $a->link, fullname($user), $user->email);
+            $key = ['{$a->coursename}', '{$a->profileurl}', '{$a->link}', '{$a->fullname}', '{$a->email}'];
+            $value = [$a->coursename, $a->profileurl, $a->link, fullname($user), $user->email];
             $message = str_replace($key, $value, $message);
             if (strpos($message, '<') === false) {
                 // Plain text only.
@@ -902,7 +902,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
             } else {
                 // This is most probably the tag/newline soup known as FORMAT_MOODLE.
                 $messagehtml = format_text($message, FORMAT_MOODLE,
-                    array('context' => $context, 'para' => false, 'newlines' => true, 'filter' => false));
+                    ['context' => $context, 'para' => false, 'newlines' => true, 'filter' => false]);
                 $messagetext = html_to_text($messagehtml);
             }
         } else {
@@ -911,7 +911,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
         }
 
         $subject = get_string('welcometocourse', 'enrol_autoenrol',
-            format_string($course->fullname, true, array('context' => $context)));
+            format_string($course->fullname, true, ['context' => $context]));
 
         $sendoption = $instance->customint7;
         $contact = $this->get_welcome_email_contact($sendoption, $context);
@@ -940,7 +940,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
         $contact = null;
         // Send as the first user assigned as the course contact.
         if ($sendoption == ENROL_SEND_EMAIL_FROM_COURSE_CONTACT) {
-            $rusers = array();
+            $rusers = [];
             if (!empty($CFG->coursecontact)) {
                 $croles = explode(',', $CFG->coursecontact);
                 list($sort, $sortparams) = users_order_by_sql('u');
@@ -1000,13 +1000,13 @@ class enrol_autoenrol_plugin extends enrol_plugin {
 
         $img = html_writer::empty_tag(
                 'img',
-                array(
+                [
                         'src'   => $logourl,
                         'alt'   => 'AutoEnrol Logo',
-                        'title' => 'AutoEnrol Logo'
-                )
+                        'title' => 'AutoEnrol Logo',
+                ]
         );
-        $img = html_writer::div($img, null, array('style' => 'text-align:center;margin: 1em 0;'));
+        $img = html_writer::div($img, null, ['style' => 'text-align:center;margin: 1em 0;']);
 
         $mform->addElement('html', $img);
         $mform->addElement(
@@ -1017,7 +1017,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
         $mform->setExpanded('generalsection');
 
         // Custom instance name.
-        $nameattribs = array('size' => '20', 'maxlength' => '255');
+        $nameattribs = ['size' => '20', 'maxlength' => '255'];
         $mform->addElement('text', 'name', get_string('instancename', 'enrol_autoenrol'), $nameattribs);
         $mform->setType('name', PARAM_TEXT);
         $mform->setDefault('name', '');
@@ -1068,7 +1068,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
         $mform->disabledIf('customint6', 'customint1', 'eq', '1');
 
         // Enrol duration.
-        $options = array('optional' => true, 'defaultunit' => 86400);
+        $options = ['optional' => true, 'defaultunit' => 86400];
         $mform->addElement('duration', 'enrolperiod', get_string('enrolperiod', 'enrol_autoenrol'), $options);
         $mform->addHelpButton('enrolperiod', 'enrolperiod', 'enrol_autoenrol');
         $mform->setDefault('enrolperiod', $this->get_config('enrolperiod'));
@@ -1080,14 +1080,14 @@ class enrol_autoenrol_plugin extends enrol_plugin {
         $mform->setDefault('expirynotify', $this->get_config('expirynotify'));
 
         // Expire threshold.
-        $options = array('optional' => false, 'defaultunit' => 86400);
+        $options = ['optional' => false, 'defaultunit' => 86400];
         $mform->addElement('duration', 'expirythreshold', get_string('expirythreshold', 'core_enrol'), $options);
         $mform->addHelpButton('expirythreshold', 'expirythreshold', 'core_enrol');
         $mform->disabledIf('expirythreshold', 'expirynotify', 'eq', 0);
         $mform->setDefault('expirythreshold', $this->get_config('expirythreshold'));
 
         // Start date.
-        $options = array('optional' => true);
+        $options = ['optional' => true];
         $mform->addElement('date_time_selector', 'enrolstartdate', get_string('enrolstartdate', 'enrol_autoenrol'), $options);
         $mform->setDefault('enrolstartdate', 0);
         $mform->addHelpButton('enrolstartdate', 'enrolstartdate', 'enrol_autoenrol');
@@ -1116,7 +1116,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
 
         // Welcome message text.
         $mform->addElement('textarea', 'customtext1',
-                get_string('customwelcomemessage', 'enrol_autoenrol'), array('cols' => '60', 'rows' => '8'));
+                get_string('customwelcomemessage', 'enrol_autoenrol'), ['cols' => '60', 'rows' => '8']);
         $mform->addHelpButton('customtext1', 'customwelcomemessage', 'enrol_autoenrol');
 
         // Filter section.
@@ -1136,7 +1136,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
         $mform->addHelpButton('customchar3', 'groupon', 'enrol_autoenrol');
 
         // Group name.
-        $groupnameattribs = array('size' => '20', 'maxlength' => '100');
+        $groupnameattribs = ['size' => '20', 'maxlength' => '100'];
         $mform->addElement('text', 'customchar1', get_string('groupname', 'enrol_autoenrol'), $groupnameattribs);
         $mform->setDefault('customchar1', '');
         $mform->setType('customchar1', PARAM_TEXT);
@@ -1163,18 +1163,18 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      * @return void
      */
     public function edit_instance_validation($data, $files, $instance, $context) {
-        $errors = array();
+        $errors = [];
 
         // Use this code to validate the 'User Filtering' section.
         \core_availability\frontend::report_validation_errors($data, $errors);
 
         if ($data['status'] == ENROL_INSTANCE_ENABLED) {
-            if (!empty($data['enrolenddate']) and $data['enrolenddate'] < $data['enrolstartdate']) {
+            if (!empty($data['enrolenddate']) && $data['enrolenddate'] < $data['enrolstartdate']) {
                 $errors['enrolenddate'] = get_string('enrolenddaterror', 'enrol_autoenrol');
             }
         }
 
-        if ($data['expirynotify'] > 0 and $data['expirythreshold'] < 86400) {
+        if ($data['expirynotify'] > 0 && $data['expirythreshold'] < 86400) {
             $errors['expirythreshold'] = get_string('errorthresholdlow', 'core_enrol');
         }
 
@@ -1193,8 +1193,8 @@ class enrol_autoenrol_plugin extends enrol_plugin {
         $validenrolmethod = array_keys($this->get_enrolmethod_options());
         $validlongtimenosee = array_keys($this->get_longtimenosee_options());
         $validgroupon = array_keys($this->get_groupon_options());
-        $validyesno = array(0, 1);
-        $tovalidate = array(
+        $validyesno = [0, 1];
+        $tovalidate = [
             'name' => PARAM_TEXT,
             'status' => $validstatus,
             'roleid' => $validroles,
@@ -1210,8 +1210,8 @@ class enrol_autoenrol_plugin extends enrol_plugin {
             'customint7' => PARAM_INT,
             'customint8' => $validyesno,
             'customchar1' => PARAM_TEXT,
-            'customchar3' => $validgroupon
-        );
+            'customchar3' => $validgroupon,
+        ];
         if ($data['expirynotify'] != 0) {
             $tovalidate['expirythreshold'] = PARAM_INT;
         }
@@ -1227,8 +1227,8 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      * @return array
      */
     protected function get_status_options() {
-        $options = array(ENROL_INSTANCE_ENABLED  => get_string('yes'),
-                         ENROL_INSTANCE_DISABLED => get_string('no'));
+        $options = [ENROL_INSTANCE_ENABLED  => get_string('yes'),
+                         ENROL_INSTANCE_DISABLED => get_string('no')];
         return $options;
     }
 
@@ -1244,7 +1244,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
 
         $roles = get_assignable_roles($context, ROLENAME_BOTH);
         if (!isset($roles[$defaultrole])) {
-            if ($role = $DB->get_record('role', array('id' => $defaultrole))) {
+            if ($role = $DB->get_record('role', ['id' => $defaultrole])) {
                 $roles[$defaultrole] = role_get_name($role, $context, ROLENAME_BOTH);
             }
         }
@@ -1257,9 +1257,9 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      * @return array
      */
     protected function get_expirynotify_options() {
-        $options = array(0 => get_string('no'),
+        $options = [0 => get_string('no'),
                          1 => get_string('expirynotifyenroller', 'enrol_autoenrol'),
-                         2 => get_string('expirynotifyall', 'enrol_autoenrol'));
+                         2 => get_string('expirynotifyall', 'enrol_autoenrol')];
         return $options;
     }
 
@@ -1269,14 +1269,14 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      * @return array
      */
     protected function get_enrolmethod_options() {
-        $options = array(0 => get_string('m_course', 'enrol_autoenrol'));
+        $options = [0 => get_string('m_course', 'enrol_autoenrol')];
 
         if (!empty($this->get_config('loginenrol'))) {
              $options[1] = get_string('m_site', 'enrol_autoenrol');
         }
 
         $options[2] = get_string('m_confirmation', 'enrol_autoenrol');
-        
+
         return $options;
     }
 
@@ -1286,7 +1286,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      * @return array
      */
     protected function get_longtimenosee_options() {
-        $options = array(0 => get_string('never'),
+        $options = [0 => get_string('never'),
                          1800 * 3600 * 24 => get_string('numdays', '', 1800),
                          1000 * 3600 * 24 => get_string('numdays', '', 1000),
                          365 * 3600 * 24 => get_string('numdays', '', 365),
@@ -1298,7 +1298,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
                          30 * 3600 * 24 => get_string('numdays', '', 30),
                          21 * 3600 * 24 => get_string('numdays', '', 21),
                          14 * 3600 * 24 => get_string('numdays', '', 14),
-                         7 * 3600 * 24 => get_string('numdays', '', 7));
+                         7 * 3600 * 24 => get_string('numdays', '', 7)];
         return $options;
     }
 
@@ -1310,7 +1310,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
     protected function get_groupon_options() {
         global $DB;
 
-        $options = array('-' => get_string('nogroupon', 'enrol_autoenrol'),
+        $options = ['-' => get_string('nogroupon', 'enrol_autoenrol'),
                          'userfilter' => get_string('userfilter', 'enrol_autoenrol'),
                          'auth' => get_string('authentication'),
                          'lang' => get_string('language'),
@@ -1318,7 +1318,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
                          'institution' => get_string('institution'),
                          'address' => get_string('address'),
                          'city' => get_string('city'),
-                         'email' => get_string('email'));
+                         'email' => get_string('email')];
 
         $customfields = $DB->get_records('user_info_field');
         if (!empty($customfields)) {

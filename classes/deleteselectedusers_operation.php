@@ -59,8 +59,8 @@ class enrol_autoenrol_deleteselectedusers_operation extends enrol_bulk_enrolment
      * @return enrol_autoenrol_deleteselectedusers_form
      */
     public function get_form($defaultaction = null, $defaultcustomdata = null) {
-        if (!array($defaultcustomdata)) {
-            $defaultcustomdata = array();
+        if (![$defaultcustomdata]) {
+            $defaultcustomdata = [];
         }
         $defaultcustomdata['title'] = $this->get_title();
         $defaultcustomdata['message'] = get_string('confirmbulkdeleteenrolment', 'enrol_autoenrol');

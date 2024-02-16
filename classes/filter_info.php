@@ -48,7 +48,7 @@ class filter_info extends \core_availability\info {
     public function __construct($instance) {
         global $DB;
 
-        $course = $DB->get_record('course', array('id' => $instance->courseid));
+        $course = $DB->get_record('course', ['id' => $instance->courseid]);
         $visible = $instance->status == 0 ? true : false;
 
         parent::__construct($course, $visible, $instance->customtext2);

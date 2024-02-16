@@ -39,15 +39,15 @@ if ($ADMIN->fulltree) {
             0)
     );
 
-    $options = array(1  => get_string('yes'), 0 => get_string('no'));
+    $options = [1  => get_string('yes'), 0 => get_string('no')];
     $settings->add(new admin_setting_configselect('enrol_autoenrol/newenrols',
         get_string('newenrols', 'enrol_autoenrol'), get_string('newenrols_desc', 'enrol_autoenrol'), 1, $options));
 
-    $options = array(1  => get_string('yes'), 0 => get_string('no'));
+    $options = [1  => get_string('yes'), 0 => get_string('no')];
     $settings->add(new admin_setting_configselect('enrol_autoenrol/loginenrol',
         get_string('loginenrol', 'enrol_autoenrol'), get_string('loginenrol_desc', 'enrol_autoenrol'), 1, $options));
 
-    $options = array(1  => get_string('yes'), 0 => get_string('no'));
+    $options = [1  => get_string('yes'), 0 => get_string('no')];
     $settings->add(new admin_setting_configselect('enrol_autoenrol/selfunenrol',
         get_string('selfunenrol', 'enrol_autoenrol'), get_string('selfunenrol_desc', 'enrol_autoenrol'), 1, $options));
 
@@ -75,12 +75,12 @@ if ($ADMIN->fulltree) {
         )
     );
 
-    $options = array(
+    $options = [
         ENROL_EXT_REMOVED_UNENROL        => get_string('extremovedunenrol', 'enrol'),
         ENROL_EXT_REMOVED_KEEP           => get_string('extremovedkeep', 'enrol'),
         ENROL_EXT_REMOVED_SUSPEND        => get_string('extremovedsuspend', 'enrol'),
-        ENROL_EXT_REMOVED_SUSPENDNOROLES => get_string('extremovedsuspendnoroles', 'enrol')
-    );
+        ENROL_EXT_REMOVED_SUSPENDNOROLES => get_string('extremovedsuspendnoroles', 'enrol'),
+    ];
     $settings->add(
         new admin_setting_configselect(
             'enrol_autoenrol/autounenrolaction',
@@ -101,7 +101,7 @@ if ($ADMIN->fulltree) {
         )
     );
 
-    $options = array();
+    $options = [];
     for ($i = 0; $i < 24; $i++) {
         $options[$i] = $i;
     }
@@ -111,17 +111,17 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configduration('enrol_autoenrol/enrolperiod',
         get_string('enrolperiod', 'enrol_autoenrol'), get_string('enrolperiod_desc', 'enrol_autoenrol'), 0));
 
-    $options = array(0 => get_string('no'),
+    $options = [0 => get_string('no'),
                      1 => get_string('expirynotifyenroller', 'enrol_autoenrol'),
-                     2 => get_string('expirynotifyall', 'enrol_autoenrol'));
+                     2 => get_string('expirynotifyall', 'enrol_autoenrol')];
     $settings->add(new admin_setting_configselect('enrol_autoenrol/expirynotify',
         get_string('expirynotify', 'core_enrol'), get_string('expirynotify_help', 'core_enrol'), 0, $options));
 
     $settings->add(new admin_setting_configduration('enrol_autoenrol/expirythreshold',
         get_string('expirythreshold', 'core_enrol'), get_string('expirythreshold_help', 'core_enrol'), 86400, 86400));
 
-    $options = array(0 => get_string('never'));
-    foreach (array(1800, 1000, 365, 180, 150, 120, 90, 60, 30, 21, 14, 7) as $daynum) {
+    $options = [0 => get_string('never')];
+    foreach ([1800, 1000, 365, 180, 150, 120, 90, 60, 30, 21, 14, 7] as $daynum) {
         $options[$daynum * 3600 * 24] = get_string('numdays', '', $daynum);
     }
     $settings->add(new admin_setting_configselect('enrol_autoenrol/longtimenosee',
@@ -154,7 +154,7 @@ if ($ADMIN->fulltree) {
     if (!during_initial_install()) {
         $pluginmanager = \core_plugin_manager::instance();
         $availabilities = array_keys($pluginmanager->get_enabled_plugins('availability'));
-        $options = array();
+        $options = [];
         foreach ($availabilities as $availability) {
                  $options[$availability] = get_string('pluginname', "availability_{$availability}");
         }
@@ -163,7 +163,7 @@ if ($ADMIN->fulltree) {
             new admin_setting_configmultiselect('enrol_autoenrol/availabilityplugins',
                 get_string('availabilityplugins', 'enrol_autoenrol'),
                 get_string('availabilityplugins_help', 'enrol_autoenrol'),
-                array('profile', 'grouping'),
+                ['profile', 'grouping'],
                 $options
             )
         );

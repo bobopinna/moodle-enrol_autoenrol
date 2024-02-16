@@ -35,14 +35,14 @@ function xmldb_enrol_autoenrol_upgrade($oldversion) {
 
     if ($oldversion < 2014113000) {
 
-        $filtertype = array(get_string('g_none', 'enrol_autoenrol'),
+        $filtertype = [get_string('g_none', 'enrol_autoenrol'),
             get_string('g_auth', 'enrol_autoenrol'),
             get_string('g_dept', 'enrol_autoenrol'),
             get_string('g_inst', 'enrol_autoenrol'),
             get_string('g_lang', 'enrol_autoenrol'),
-            get_string('g_email', 'enrol_autoenrol'));
+            get_string('g_email', 'enrol_autoenrol')];
 
-        $instances = $DB->get_records('enrol', array('enrol' => 'autoenrol'));
+        $instances = $DB->get_records('enrol', ['enrol' => 'autoenrol']);
 
         foreach ($instances as $instance) {
             $groupids = explode(',', $instance->customtext1);
@@ -83,7 +83,7 @@ function xmldb_enrol_autoenrol_upgrade($oldversion) {
 
     if ($oldversion < 2016122000) {
 
-        $fields = array();
+        $fields = [];
         $fields[] = '-';
         $fields[] = 'auth';
         $fields[] = 'department';
@@ -91,7 +91,7 @@ function xmldb_enrol_autoenrol_upgrade($oldversion) {
         $fields[] = 'lang';
         $fields[] = 'email';
 
-        $instances = $DB->get_records('enrol', array('enrol' => 'autoenrol'));
+        $instances = $DB->get_records('enrol', ['enrol' => 'autoenrol']);
 
         foreach ($instances as $instance) {
             if (isset($instance->customint2)) {
@@ -122,7 +122,7 @@ function xmldb_enrol_autoenrol_upgrade($oldversion) {
     }
 
     if ($oldversion < 2021050500) {
-        $instances = $DB->get_records('enrol', array('enrol' => 'autoenrol'));
+        $instances = $DB->get_records('enrol', ['enrol' => 'autoenrol']);
 
         foreach ($instances as $instance) {
             // A match string was defined.
@@ -135,7 +135,7 @@ function xmldb_enrol_autoenrol_upgrade($oldversion) {
 
                     // Check field type.
                     $fieldtype = 'cf';
-                    if (in_array($oldfield, array('auth', 'lang', 'department', 'institution', 'address', 'city', 'email'))) {
+                    if (in_array($oldfield, ['auth', 'lang', 'department', 'institution', 'address', 'city', 'email'])) {
                         $fieldtype = 'sf';
                     }
                     // Check the old soft match.
@@ -155,7 +155,7 @@ function xmldb_enrol_autoenrol_upgrade($oldversion) {
     }
 
     if ($oldversion < 2021050600) {
-        $instances = $DB->get_records('enrol', array('enrol' => 'autoenrol'));
+        $instances = $DB->get_records('enrol', ['enrol' => 'autoenrol']);
 
         foreach ($instances as $instance) {
             if (isset($instance->customchar2) && !empty($instance->customchar2)) {
@@ -178,14 +178,14 @@ function xmldb_enrol_autoenrol_upgrade($oldversion) {
     }
 
     if ($oldversion < 2021051700) {
-        $instances = $DB->get_records('enrol', array('enrol' => 'autoenrol'));
+        $instances = $DB->get_records('enrol', ['enrol' => 'autoenrol']);
 
         foreach ($instances as $instance) {
             $groups = $DB->get_records_select('groups', 'idnumber LIKE \'autoenrol|' . $instance->id . '|%\'');
             foreach ($groups as $group) {
                 $hash = md5($group->name);
                 $newidnumber = 'autoenrol|' . $instance->id . '|' .$hash;
-                $DB->set_field('groups', 'idnumber', $newidnumber, array('id' => $group->id));
+                $DB->set_field('groups', 'idnumber', $newidnumber, ['id' => $group->id]);
             }
         }
         upgrade_plugin_savepoint(true, 2021051700, 'enrol', 'autoenrol');
@@ -196,9 +196,9 @@ function xmldb_enrol_autoenrol_upgrade($oldversion) {
     }
 
     if ($oldversion < 2021061700) {
-        $brokenupdate = $DB->get_record('upgrade_log', array('plugin' => 'enrol_autoenrol', 'version' => '2021051400'));
+        $brokenupdate = $DB->get_record('upgrade_log', ['plugin' => 'enrol_autoenrol', 'version' => '2021051400']);
 
-        $instances = $DB->get_records('enrol', array('enrol' => 'autoenrol'));
+        $instances = $DB->get_records('enrol', ['enrol' => 'autoenrol']);
         if (!empty($brokenupdate) && ($brokenupdate->targetversion != '2021061700')) {
             $brokenupdatetime = $brokenupdate->timemodified;
 
@@ -222,15 +222,15 @@ function xmldb_enrol_autoenrol_upgrade($oldversion) {
     }
 
     if ($oldversion < 2021101300) {
-        $instances = $DB->get_records('enrol', array('enrol' => 'autoenrol', 'roleid' => null));
+        $instances = $DB->get_records('enrol', ['enrol' => 'autoenrol', 'roleid' => null]);
         if (!empty($instances)) {
-            $query = array('plugin' => 'enrol_autoenrol', 'name' => 'defaultrole');
+            $query = ['plugin' => 'enrol_autoenrol', 'name' => 'defaultrole'];
             $roleid = $DB->get_field('config_plugins', 'value', $query);
             foreach ($instances as $instance) {
                 $context = context_course::instance($instance->courseid);
                 $instance->roleid = $roleid;
                 $DB->update_record('enrol', $instance);
-                if ($enrolments = $DB->get_records('user_enrolments', array('enrolid' => $instance->id))) {
+                if ($enrolments = $DB->get_records('user_enrolments', ['enrolid' => $instance->id])) {
                     foreach ($enrolments as $enrolment) {
                         role_assign($roleid, $enrolment->userid, $context->id, 'enrol_'.$instance->enrol, $instance->id);
                     }
@@ -248,7 +248,7 @@ function xmldb_enrol_autoenrol_upgrade($oldversion) {
         $instances = $DB->get_records_select('enrol', 'enrol = \'autoenrol\' AND enrolperiod > 0');
         if (!empty($instances)) {
             foreach ($instances as $instance) {
-                if ($enrolments = $DB->get_records('user_enrolments', array('enrolid' => $instance->id))) {
+                if ($enrolments = $DB->get_records('user_enrolments', ['enrolid' => $instance->id])) {
                     foreach ($enrolments as $enrolment) {
                         $enrolment->timeend = $enrolment->timestart + $instance->enrolperiod;
                         $DB->update_record('user_enrolments', $enrolment);
