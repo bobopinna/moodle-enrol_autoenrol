@@ -240,8 +240,6 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      * @return bool
      */
     private function check_rule($instance, $user) {
-        global $CFG;
-
         // Very quick check to see if the user is being filtered.
         if (!empty($instance->customtext2)) {
             if (!is_object($user)) {
@@ -574,6 +572,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      */
     public function restore_instance(restore_enrolments_structure_step $step, stdClass $data, $course, $oldid) {
         global $DB;
+
         if ($step->get_task()->get_target() == backup::TARGET_NEW_COURSE) {
             $merge = false;
         } else {
@@ -615,6 +614,8 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      * @param int $contextid
      */
     public function restore_role_assignment($instance, $roleid, $userid, $contextid) {
+        global $DB;
+
         // Just restore every role.
         if ($DB->record_exists('user_enrolments', array('enrolid' => $instance->id, 'userid' => $userid))) {
             role_assign($roleid, $userid, $contextid, 'enrol_'.$instance->enrol, $instance->id);
@@ -879,14 +880,14 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      * @return void
      */
     protected function email_welcome_message($instance, $user) {
-        global $CFG, $DB;
+        global $DB;
 
         $course = $DB->get_record('course', array('id' => $instance->courseid), '*', MUST_EXIST);
         $context = context_course::instance($course->id);
 
         $a = new stdClass();
         $a->coursename = format_string($course->fullname, true, array('context' => $context));
-        $a->profileurl = new moodle_url($CFG->wwwroot . '/user/view.php', array('id' => $user->id, 'course' => $course->id));
+        $a->profileurl = new moodle_url('/user/view.php', array('id' => $user->id, 'course' => $course->id));
         $a->link = course_get_url($course)->out();
 
         if (trim($instance->customtext1) !== '') {
@@ -974,7 +975,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      * @return bool
      */
     public function edit_instance_form($instance, MoodleQuickForm $mform, $context) {
-        global $CFG, $DB, $OUTPUT, $COURSE;
+        global $OUTPUT, $COURSE;
 
         // Merge these two settings to one value for the single selection element.
         if (isset($instance->notifyall) && isset($instance->expirynotify)) {
