@@ -240,8 +240,6 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      * @return bool
      */
     private function check_rule($instance, $user) {
-        global $CFG;
-
         // Very quick check to see if the user is being filtered.
         if (!empty($instance->customtext2)) {
             if (!is_object($user)) {
@@ -574,6 +572,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      */
     public function restore_instance(restore_enrolments_structure_step $step, stdClass $data, $course, $oldid) {
         global $DB;
+
         if ($step->get_task()->get_target() == backup::TARGET_NEW_COURSE) {
             $merge = false;
         } else {
@@ -881,7 +880,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      * @return void
      */
     protected function email_welcome_message($instance, $user) {
-        global $CFG, $DB;
+        global $DB;
 
         $course = $DB->get_record('course', ['id' => $instance->courseid], '*', MUST_EXIST);
         $context = context_course::instance($course->id);
@@ -976,7 +975,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      * @return bool
      */
     public function edit_instance_form($instance, MoodleQuickForm $mform, $context) {
-        global $CFG, $DB, $OUTPUT, $COURSE;
+        global $OUTPUT, $COURSE;
 
         // Merge these two settings to one value for the single selection element.
         if (isset($instance->notifyall) && isset($instance->expirynotify)) {
