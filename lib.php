@@ -529,6 +529,39 @@ class enrol_autoenrol_plugin extends enrol_plugin {
     }
 
     /**
+     * Returns the user who is responsible for autoenrolments in given instance.
+     *
+     * Usually it is the first editing teacher - the person with "highest authority"
+     * as defined by sort_by_roleassignment_authority() having 'enrol/autoenrol:manage'
+     * capability.
+     *
+     * @param int $instanceid enrolment instance id
+     * @return stdClass user record
+     */
+    protected function get_enroller($instanceid) {
+        global $DB;
+
+        if ($this->lasternollerinstanceid == $instanceid && $this->lasternoller) {
+            return $this->lasternoller;
+        }
+
+        $instance = $DB->get_record('enrol', ['id' => $instanceid, 'enrol' => $this->get_name()], '*', MUST_EXIST);
+        $context = context_course::instance($instance->courseid);
+
+        if ($users = get_enrolled_users($context, 'enrol/autoenrol:manage')) {
+            $users = sort_by_roleassignment_authority($users, $context);
+            $this->lasternoller = reset($users);
+            unset($users);
+        } else {
+            $this->lasternoller = parent::get_enroller($instanceid);
+        }
+
+        $this->lasternollerinstanceid = $instanceid;
+
+        return $this->lasternoller;
+    }
+
+    /**
      * Return true if we can add a new instance to this course.
      *
      * @param int $courseid

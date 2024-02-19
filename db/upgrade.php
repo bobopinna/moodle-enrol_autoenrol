@@ -276,8 +276,8 @@ function xmldb_enrol_autoenrol_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2022062000, 'enrol', 'autoenrol');
     }
 
-    if ($oldversion < 2024021600) {
-        upgrade_plugin_savepoint(true, 2024021600, 'enrol', 'autoenrol');
+    if ($oldversion < 2024021900) {
+        upgrade_plugin_savepoint(true, 2024021900, 'enrol', 'autoenrol');
     }
 
     return true;
