@@ -307,6 +307,16 @@ class enrol_autoenrol_plugin extends enrol_plugin {
         $instance = $ue->enrolmentinstance;
         $params = $manager->get_moodlepage()->url->params();
         $params['ue'] = $ue->id;
+        if ($this->allow_manage($instance) && has_capability("enrol/{$instance->enrol}:manage", $context)) {
+            $url = new moodle_url('/enrol/editenrolment.php', $params);
+            $actions[] = new user_enrolment_action(
+                    new pix_icon('t/edit', ''), get_string('editenrolment', 'enrol'), $url,
+                    array(
+                      'class' => 'editenrollink',
+                      'rel' => $ue->id,
+                      'data-action' => ENROL_ACTION_EDIT
+                    ));
+        }
         if ($this->allow_unenrol_user($instance, $ue) && has_capability('enrol/autoenrol:unenrol', $context)) {
             $url = new moodle_url('/enrol/unenroluser.php', $params);
             $actions[] = new user_enrolment_action(
