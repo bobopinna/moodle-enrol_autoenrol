@@ -919,7 +919,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
         $context = context_course::instance($course->id);
 
         $a = new stdClass();
-        $a->coursename = format_string($course->fullname, true, ['context' => $contex]);
+        $a->coursename = format_string($course->fullname, true, ['context' => $context]);
         $a->profileurl = new moodle_url('/user/view.php', ['id' => $user->id, 'course' => $course->id]);
         $a->link = course_get_url($course)->out();
 
