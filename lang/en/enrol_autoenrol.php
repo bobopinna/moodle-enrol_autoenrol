@@ -40,6 +40,7 @@ $string['autounenrolaction_help'] = 'Select the action to carry out when the use
 $string['availabilityplugins'] = 'Enabled availability plugins';
 $string['availabilityplugins_help'] = 'Select availability plugins that could be used in Autoenrol user filter. Use Ctrl+click or Cmd+click for multiple selection.';
 $string['cannotenrol'] = 'You can\'t enrol to this course using auto enrol.';
+$string['checksync'] = 'Check for syncronization to {$a} users';
 $string['config'] = 'Configuration';
 $string['countlimit'] = 'Limit';
 $string['countlimit_help'] = 'This instance will count the number of enrolments it makes on a course and can stop enrolling users once it reaches a certain level. The default setting of 0 means unlimited.';
