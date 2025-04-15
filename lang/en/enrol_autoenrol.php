@@ -25,7 +25,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['alwaysenrol'] = 'Always Enrol';
+$string['alwaysenrol'] = 'Auto enrol already enrolled user';
 $string['alwaysenrol_help'] = 'When set to Yes the plugins will always enrol users, even if they already have access to the course through another method.';
 $string['auto'] = 'Auto';
 $string['auto_desc'] = 'This group has been automatically created by the Auto Enrol plugin. It will be deleted if you remove the Auto Enrol plugin from the course.';
@@ -111,7 +111,7 @@ $string['maxenrolled_help'] = 'Specifies the maximum number of users that can au
 $string['messageprovider:expiry_notification'] = 'Autoenrol enrolment expiry notifications';
 $string['method'] = 'Enrol When';
 $string['method_help'] = 'Power users can use this setting to change the plugin\'s behaviour so that users are enrolled to the course upon logging in rather than waiting for them to access the course. This is helpful for courses which should be visible on a users "my courses" list by default.';
-$string['newenrols'] = 'Allow new enrolments';
+$string['newenrols'] = 'Allow new auto enrolments';
 $string['newenrols_desc'] = 'Allow users to Autoenrol into new courses by default.';
 $string['newenrols_help'] = 'This setting determines whether a user can enrol into this course.';
 $string['nogroupon'] = 'Do not create groups';
@@ -131,7 +131,7 @@ $string['sendcoursewelcomemessage_help'] = 'When a user is auto enrolled in the 
 $string['sendexpirynotificationstask'] = 'Autoenrol enrolment send expiry notifications task';
 $string['softmatch'] = 'Soft Match';
 $string['softmatch_help'] = 'When enabled AutoEnrol will enrol a user when they partially match the "Allow Only" value instead of requiring an exact match. Soft matches are also case-insensitive. The value of "Filter By" will be used for the group name.';
-$string['status'] = 'Allow existing enrolments';
+$string['status'] = 'Keep current auto enrolments active';
 $string['status_desc'] = 'Enable Autoenrol method in new courses.';
 $string['status_help'] = 'If enabled together with \'Allow new enrolments\' disabled, only users who Autoenrolled previously can access the course. If disabled, this Autoenrolment method is effectively disabled, since all existing Autoenrolments are suspended and new users cannot Autoenrol.';
 $string['syncenrolmentstask'] = 'Synchronise Autoenrol task';

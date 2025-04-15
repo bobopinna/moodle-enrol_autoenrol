@@ -2,6 +2,8 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Changed
+- Updated strings to match self enrolment
 
 ## [2.4.1] - 2025-03-14
 ### Fixed
