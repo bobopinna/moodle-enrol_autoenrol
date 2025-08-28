@@ -830,7 +830,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
             if (!empty($instance->customchar1)) {
                 $name = $instance->customchar1;
             } else {
-                $standardfields = ['auth', 'lang', 'department', 'institution', 'address', 'city', 'email'];
+                $standardfields = ['auth', 'lang', 'department', 'institution', 'address', 'city', 'email', 'username'];
                 if (in_array($profileattribute, $standardfields)) {
                     $name = $user->$profileattribute;
                 } else {
@@ -1351,7 +1351,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
     }
 
     /**
-     * Return an array of valid options for the longtimenosee property.
+     * Return an array of valid options for the groupon property.
      *
      * @return array
      */
@@ -1367,6 +1367,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
                     'address' => get_string('address'),
                     'city' => get_string('city'),
                     'email' => get_string('email'),
+                    'username' => get_string('username'),
                    ];
 
         $customfields = $DB->get_records('user_info_field');
