@@ -1382,10 +1382,10 @@ class enrol_autoenrol_plugin extends enrol_plugin {
     /**
      * Add new instance of enrol plugin.
      * @param object $course
-     * @param array $fields instance fields
+     * @param ?array $fields instance fields
      * @return int id of new instance, null if can not be created
      */
-    public function add_instance($course, array $fields = null) {
+    public function add_instance($course, ?array $fields = null) {
         if (!empty($fields)) {
             // In the form we are representing 2 db columns with one field.
             if (!empty($fields['expirynotify'])) {
