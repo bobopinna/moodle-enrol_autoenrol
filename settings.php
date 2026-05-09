@@ -51,6 +51,10 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configselect('enrol_autoenrol/selfunenrol',
         get_string('selfunenrol', 'enrol_autoenrol'), get_string('selfunenrol_desc', 'enrol_autoenrol'), 1, $options));
 
+    $options = [1  => get_string('yes'), 0 => get_string('no')];
+    $settings->add(new admin_setting_configselect('enrol_autoenrol/allowunsuspend',
+        get_string('allowunsuspend', 'enrol_autoenrol'), get_string('allowunsuspend_desc', 'enrol_autoenrol'), 0, $options));
+
     if (!during_initial_install()) {
         $options = get_default_enrol_roles(context_system::instance());
         $student = get_archetype_roles('student');

@@ -25,6 +25,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+$string['allowunsuspend'] = 'Allow unsuspension';
+$string['allowunsuspend_desc'] = 'When set to Yes the plugin will unsuspend a previously suspended user enrolment if that user matches the filtering rules.';
 $string['alwaysenrol'] = 'Auto enrol already enrolled user';
 $string['alwaysenrol_help'] = 'When set to Yes the plugins will always enrol users, even if they already have access to the course through another method.';
 $string['auto'] = 'Auto';
