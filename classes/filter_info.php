@@ -48,6 +48,8 @@ class filter_info extends \core_availability\info {
     public function __construct($instance) {
         global $DB;
 
+        $this->instance = $instance;
+
         $course = $DB->get_record('course', ['id' => $instance->courseid]);
         $visible = $instance->status == 0 ? true : false;
 
@@ -60,7 +62,7 @@ class filter_info extends \core_availability\info {
      * @return string This thing name
      */
     protected function get_thing_name() {
-        return get_instance_name($this->instance);
+        return enrol_get_plugin('autoenrol')->get_instance_name($this->instance);
     }
 
     /**

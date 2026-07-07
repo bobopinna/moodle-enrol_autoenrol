@@ -458,7 +458,18 @@ class enrol_autoenrol_plugin extends enrol_plugin {
                         }
                     }
                 } else {
-                    // If rule is verified update user group enrolments.
+                    // If rule is verified check for suspended enrolments.
+                    if ($this->get_config('allowunsuspend')) {
+                        // Check if enrolment is suspended.
+                        foreach ($userenrolments as $userenrolment) {
+                            if ($userenrolment->enrolid == $instance->id) {
+                                if ($userenrolment->status == ENROL_USER_SUSPENDED) {
+                                    $this->update_user_enrol($instance, $user->id, ENROL_USER_ACTIVE);
+                                }
+                            }
+                        }
+                    }
+                    // Update user group enrolments.
                     $this->process_group($instance, $user);
                 }
             }
