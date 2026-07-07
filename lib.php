@@ -742,7 +742,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
         if ($this->get_config('removegroups')) {
             require_once($CFG->dirroot . '/group/lib.php');
 
-            $groups = $DB->get_records_sql('SELECT * FROM {groups} WHERE "courseid" = :courseid AND ' .
+            $groups = $DB->get_records_sql('SELECT * FROM {groups} WHERE courseid = :courseid AND ' .
                     $DB->sql_like('idnumber', ':idnumber'),
                     ['idnumber' => 'autoenrol|' . $instance->id . '|%', 'courseid' => $instance->courseid]);
 
