@@ -26,6 +26,7 @@ defined('MOODLE_INTERNAL') || die();
 
 $messageproviders = [
 
+    'course_welcome' => [],
     'expiry_notification' => [],
 
 ];

@@ -110,6 +110,7 @@ $string['m_course'] = 'Entering the Course';
 $string['m_site'] = 'Logging into Site';
 $string['maxenrolled'] = 'Max enrolled users';
 $string['maxenrolled_help'] = 'Specifies the maximum number of users that can autoenrol. 0 means no limit.';
+$string['messageprovider:course_welcome'] = 'Course welcome notifications';
 $string['messageprovider:expiry_notification'] = 'Autoenrol enrolment expiry notifications';
 $string['method'] = 'Enrol When';
 $string['method_help'] = 'Power users can use this setting to change the plugin\'s behaviour so that users are enrolled to the course upon logging in rather than waiting for them to access the course. This is helpful for courses which should be visible on a users "my courses" list by default.';
@@ -151,6 +152,5 @@ $string['welcometocoursetext'] = 'Welcome to {$a->coursename}!
 If you have not done so already, you should edit your profile page so that we can learn more about you:
 
   {$a->profileurl}';
-
 
 
