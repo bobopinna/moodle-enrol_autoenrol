@@ -1311,6 +1311,10 @@ class enrol_autoenrol_plugin extends enrol_plugin {
         $validroles = array_keys($this->extend_assignable_roles($context, $instance->roleid));
         $validexpirynotify = array_keys($this->get_expirynotify_options());
         $validenrolmethod = array_keys($this->get_enrolmethod_options());
+        // Only users with the method capability may switch an instance to enrolment on site login.
+        if (!has_capability('enrol/autoenrol:method', $context) && ($instance->customint1 ?? null) != 1) {
+            $validenrolmethod = array_diff($validenrolmethod, [1]);
+        }
         $validlongtimenosee = array_keys($this->get_longtimenosee_options());
         $validgroupon = array_keys($this->get_groupon_options());
         $validyesno = [0, 1];

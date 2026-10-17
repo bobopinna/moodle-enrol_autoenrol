@@ -270,4 +270,78 @@ final class lib_test extends \advanced_testcase {
 
         return [$course, $instance, $teacher, $user];
     }
+
+    /**
+     * Build the submitted instance form data.
+     *
+     * @param int $method the "Enrol When" value
+     * @return array
+     */
+    private function get_form_data(int $method): array {
+        global $DB;
+        return [
+            'name' => '',
+            'status' => ENROL_INSTANCE_ENABLED,
+            'roleid' => $DB->get_field('role', 'id', ['shortname' => 'student']),
+            'enrolperiod' => 0,
+            'expirynotify' => 0,
+            'expirythreshold' => 86400,
+            'enrolstartdate' => 0,
+            'enrolenddate' => 0,
+            'customint1' => $method,
+            'customint3' => 0,
+            'customint4' => 0,
+            'customint5' => 0,
+            'customint6' => 0,
+            'customint7' => 0,
+            'customint8' => 0,
+            'customchar1' => '',
+            'customchar3' => '-',
+            'availabilityconditionsjson' => '',
+        ];
+    }
+
+    /**
+     * Users without enrol/autoenrol:method must not switch an instance to login enrolment.
+     *
+     * @covers ::enrol_autoenrol->edit_instance_validation
+     */
+    public function test_edit_instance_validation_rejects_login_method_without_capability(): void {
+        $this->resetAfterTest();
+        set_config('loginenrol', 1, 'enrol_autoenrol');
+        $course = $this->getDataGenerator()->create_course();
+        $teacher = $this->getDataGenerator()->create_and_enrol($course, 'editingteacher');
+        $context = context_course::instance($course->id);
+        $data = $this->get_form_data(1);
+        $instance = (object) ['id' => null, 'courseid' => $course->id, 'roleid' => $data['roleid'], 'customint1' => 0];
+        $this->setUser($teacher);
+
+        $errors = enrol_get_plugin('autoenrol')->edit_instance_validation($data, [], $instance, $context);
+
+        $this->assertArrayHasKey('customint1', $errors);
+    }
+
+    /**
+     * Managers may set login enrolment and teachers may keep an existing value.
+     *
+     * @covers ::enrol_autoenrol->edit_instance_validation
+     */
+    public function test_edit_instance_validation_accepts_login_method_with_capability(): void {
+        $this->resetAfterTest();
+        set_config('loginenrol', 1, 'enrol_autoenrol');
+        $course = $this->getDataGenerator()->create_course();
+        $manager = $this->getDataGenerator()->create_and_enrol($course, 'manager');
+        $teacher = $this->getDataGenerator()->create_and_enrol($course, 'editingteacher');
+        $context = context_course::instance($course->id);
+        $plugin = enrol_get_plugin('autoenrol');
+        $data = $this->get_form_data(1);
+
+        $this->setUser($manager);
+        $instance = (object) ['id' => null, 'courseid' => $course->id, 'roleid' => $data['roleid'], 'customint1' => 0];
+        $this->assertSame([], $plugin->edit_instance_validation($data, [], $instance, $context));
+
+        $this->setUser($teacher);
+        $instance = (object) ['id' => 1, 'courseid' => $course->id, 'roleid' => $data['roleid'], 'customint1' => 1];
+        $this->assertSame([], $plugin->edit_instance_validation($data, [], $instance, $context));
+    }
 }
