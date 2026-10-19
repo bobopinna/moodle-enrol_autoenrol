@@ -38,6 +38,18 @@ like [Restriction by language](https://moodle.org/plugins/availability_language)
 Check Moodle documentation:
 https://docs.moodle.org/en/Enrolment_methods#Managing_enrolment_methods.
 
+### Enrolment on meeting conditions
+
+When "Enrol When" is set to "Meeting the conditions (scheduled task)", the scheduled task
+"Enrol users matching the Autoenrol conditions" enrols every user account that matches the
+user filter, without waiting for users to log in or to access the course. If "Allow
+enrolments on login" is enabled, these users are also enrolled on login. Users that no more
+match the filter are handled with the "Auto unenrol action" setting.
+
+Each run checks only the user accounts created, modified or logged in since the previous run,
+all user accounts are checked once a day. Setting this option requires the
+enrol/autoenrol:method capability.
+
 ## Maintainer
 
 The module is being maintained by Roberto Pinna with Angelo Calò (testing).

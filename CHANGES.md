@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added
+- "Meeting the conditions" enrol method: a scheduled task enrols every user account that matches
+  the instance conditions, without waiting for users to log in or access the course
+
 ### Changed
 - Updated strings to match self enrolment
 

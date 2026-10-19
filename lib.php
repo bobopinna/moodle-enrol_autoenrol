@@ -47,7 +47,8 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      * expirethreshold => How many minutes before expire need to send notify
      * enrolstartdate => When start to enrol
      * enrolenddate => When stop to enrol
-     * customint1 => Enrol on course access (0), on login (1) or with user confirmation (2)
+     * customint1 => Enrol on course access (0), on login (1), with user confirmation (2)
+     *               or by scheduled task when the user meets the conditions (3)
      * customint2 => -- NOT USED -- Old group field filter
      * customint3 => Longtime no see unenrol (in seconds)
      * customint4 => New enrolment enabled (0-No, 1-Yes)
@@ -61,6 +62,15 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      * customtext1 => Welcome message
      * customtext2 => Conditional rule
      */
+
+    /** @var int Number of users loaded at once by sync_instance() */
+    const SYNC_BATCH_SIZE = 1000;
+
+    /** @var int Id of the instance being synchronised by sync_instance() */
+    private $syncinstanceid = 0;
+
+    /** @var \enrol_autoenrol\filter_info|null User filter of the instance being synchronised by sync_instance() */
+    private $syncfilterinfo = null;
 
     /**
      * Get enrol method icon
@@ -123,7 +133,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
     public function show_enrolme_link(stdClass $instance) {
         global $USER;
 
-        if ($this->get_config('loginenrol') && $instance->customint1 == 1) {
+        if ($this->get_config('loginenrol') && in_array($instance->customint1, [1, 3])) {
             // Don't offer enrol link if we are going to enrol them on login.
             return false;
         } else if ($this->enrol_allowed($instance, $USER)) {
@@ -140,8 +150,12 @@ class enrol_autoenrol_plugin extends enrol_plugin {
      * @return moodle_url or NULL if self unenrolment is not supported
      */
     public function get_unenrolself_link($instance) {
-        if (($this->get_config('loginenrol') && ($instance->customint1 == 1)) || ($instance->customint6 == 0)) {
-            // Don't offer unenrolself if we are going to re-enrol them on login or if not permitted.
+        if (
+            ($this->get_config('loginenrol') && ($instance->customint1 == 1)) ||
+            ($instance->customint1 == 3) ||
+            ($instance->customint6 == 0)
+        ) {
+            // Don't offer unenrolself if we are going to re-enrol them on login or by scheduled task or if not permitted.
             return null;
         }
         return parent::get_unenrolself_link($instance);
@@ -272,7 +286,12 @@ class enrol_autoenrol_plugin extends enrol_plugin {
                 return false;
             }
 
-            $info = new \enrol_autoenrol\filter_info($instance);
+            if (($this->syncinstanceid == $instance->id) && !empty($this->syncfilterinfo)) {
+                // Reuse the filter built once by sync_instance().
+                $info = $this->syncfilterinfo;
+            } else {
+                $info = new \enrol_autoenrol\filter_info($instance);
+            }
             $information = '';
 
             return $info->is_available($information, false, $user->id);
@@ -403,14 +422,16 @@ class enrol_autoenrol_plugin extends enrol_plugin {
         $userenrolments = $DB->get_records('user_enrolments', ['userid' => $user->id], null, '*');
         // Run through all of the autoenrolment instances and check that the user has been enrolled.
         foreach ($instances as $instance) {
-            $found = false;
+            $found = null;
             foreach ($userenrolments as $userenrolment) {
                 if ($userenrolment->enrolid == $instance->id) {
-                    $found = true;
+                    $found = $userenrolment;
                 }
             }
 
-            if (!$found && (($this->get_config('loginenrol') && ($instance->customint1 == 1)) || !$onlogin)) {
+            // Instances enrolling on meeting conditions also enrol on login, so new users do not wait for the scheduled task.
+            $enrolonlogin = $this->get_config('loginenrol') && in_array($instance->customint1, [1, 3]);
+            if (!$found && ($enrolonlogin || !$onlogin)) {
                 // If user is not enrolled and this instance enrol on login or called with sync task, try to enrol.
                 if ($this->user_autoenrol($instance, $user)) {
                     if ($onlogin) {
@@ -421,54 +442,258 @@ class enrol_autoenrol_plugin extends enrol_plugin {
                 }
             } else if ($found) {
                 // If user is enrolled check if the rule still verified.
-                if (!$this->check_rule($instance, $user)) {
-                    if (!$context = context_course::instance($instance->courseid, IGNORE_MISSING)) {
-                        // Very weird.
-                        continue;
-                    }
+                $this->sync_user_enrolment($instance, $user, $found);
+            }
+        }
+    }
 
-                    // Deal with enrolments of users that no more match the rule.
-                    $unenrolaction = $this->get_config('autounenrolaction');
-                    if ($unenrolaction === false) {
-                        $unenrolaction = ENROL_EXT_REMOVED_UNENROL;
-                    }
-                    if ($unenrolaction == ENROL_EXT_REMOVED_UNENROL) {
-                        $this->unenrol_user($instance, $user->id);
-                    } else if ($unenrolaction == ENROL_EXT_REMOVED_SUSPEND || $unenrolaction == ENROL_EXT_REMOVED_SUSPENDNOROLES) {
-                        // Suspend users.
-                        foreach ($userenrolments as $userenrolment) {
-                            if ($userenrolment->enrolid == $instance->id) {
-                                if ($userenrolment->status != ENROL_USER_SUSPENDED) {
-                                    $this->update_user_enrol($instance, $user->id, ENROL_USER_SUSPENDED);
-                                }
-                            }
-                        }
-                        if ($unenrolaction == ENROL_EXT_REMOVED_SUSPENDNOROLES) {
-                            role_unassign_all([
-                                    'contextid' => $context->id,
-                                    'userid' => $user->id,
-                                    'component' => 'enrol_autoenrol',
-                                    'itemid' => $instance->id,
-                            ]);
-                        }
-                    }
-                } else {
-                    // If rule is verified check for suspended enrolments.
-                    if ($this->get_config('allowunsuspend')) {
-                        // Check if enrolment is suspended.
-                        foreach ($userenrolments as $userenrolment) {
-                            if ($userenrolment->enrolid == $instance->id) {
-                                if ($userenrolment->status == ENROL_USER_SUSPENDED) {
-                                    $this->update_user_enrol($instance, $user->id, ENROL_USER_ACTIVE);
-                                }
-                            }
-                        }
-                    }
-                    // Update user group enrolments.
-                    $this->process_group($instance, $user);
+    /**
+     * Check if an enrolled user still matches the instance rule and update the enrolment.
+     *
+     * Users that no more match the rule are unenrolled, kept or suspended as defined by autounenrolaction setting,
+     * users that match the rule are unsuspended (if allowed) and their group membership is updated.
+     *
+     * @param stdClass $instance       enrol instance
+     * @param stdClass $user           user record
+     * @param stdClass $userenrolment  user enrolment record of the user in this instance
+     *
+     * @return void
+     */
+    protected function sync_user_enrolment(stdClass $instance, stdClass $user, stdClass $userenrolment) {
+        if (!$this->check_rule($instance, $user)) {
+            if (!$context = context_course::instance($instance->courseid, IGNORE_MISSING)) {
+                // Very weird.
+                return;
+            }
+
+            // Deal with enrolments of users that no more match the rule.
+            $unenrolaction = $this->get_config('autounenrolaction');
+            if ($unenrolaction === false) {
+                $unenrolaction = ENROL_EXT_REMOVED_UNENROL;
+            }
+            if ($unenrolaction == ENROL_EXT_REMOVED_UNENROL) {
+                $this->unenrol_user($instance, $user->id);
+            } else if ($unenrolaction == ENROL_EXT_REMOVED_SUSPEND || $unenrolaction == ENROL_EXT_REMOVED_SUSPENDNOROLES) {
+                // Suspend users.
+                if ($userenrolment->status != ENROL_USER_SUSPENDED) {
+                    $this->update_user_enrol($instance, $user->id, ENROL_USER_SUSPENDED);
+                }
+                if ($unenrolaction == ENROL_EXT_REMOVED_SUSPENDNOROLES) {
+                    role_unassign_all([
+                            'contextid' => $context->id,
+                            'userid' => $user->id,
+                            'component' => 'enrol_autoenrol',
+                            'itemid' => $instance->id,
+                    ]);
+                }
+            }
+        } else {
+            // If rule is verified check for suspended enrolments.
+            if ($this->get_config('allowunsuspend') && ($userenrolment->status == ENROL_USER_SUSPENDED)) {
+                $this->update_user_enrol($instance, $user->id, ENROL_USER_ACTIVE);
+            }
+            // Update user group enrolments.
+            $this->process_group($instance, $user);
+        }
+    }
+
+    /**
+     * Synchronise all enrolments of one instance without waiting for any user action.
+     *
+     * Already enrolled users are checked against the rule, then every active user account
+     * that meets the instance conditions gets enrolled.
+     * Used by the enrol_matching_users scheduled task for instances that enrol on meeting conditions.
+     *
+     * To keep the load low, when $since is given only users created, modified or logged in since then
+     * are processed, unless the instance itself changed or opened to new enrolments since then.
+     *
+     * @param progress_trace $trace
+     * @param stdClass       $instance enrol instance
+     * @param int            $since process only users changed since this timestamp, 0 means all users
+     *
+     * @return int number of new enrolments
+     */
+    public function sync_instance(progress_trace $trace, stdClass $instance, $since = 0) {
+        // We may need a lot of time here.
+        core_php_time_limit::raise();
+
+        $now = time();
+        if (($instance->timemodified >= $since) || (($instance->enrolstartdate > $since) && ($instance->enrolstartdate <= $now))) {
+            // Instance settings changed or new enrolments just opened, all users need to be checked.
+            $since = 0;
+        }
+
+        $mode = empty($since) ? 'all users' : 'users changed since ' . userdate($since);
+        $trace->output("Synchronising autoenrol instance $instance->id in course $instance->courseid ($mode)...");
+
+        // Build the user filter once for all users, see check_rule().
+        $this->syncinstanceid = $instance->id;
+        $this->syncfilterinfo = !empty($instance->customtext2) ? new \enrol_autoenrol\filter_info($instance) : null;
+        try {
+            $this->sync_instance_enrolled_users($instance, $since);
+            $enrolled = $this->sync_instance_new_users($trace, $instance, $since, $now);
+        } finally {
+            $this->syncinstanceid = 0;
+            $this->syncfilterinfo = null;
+        }
+
+        $trace->output("...$enrolled new enrolments.", 1);
+
+        return $enrolled;
+    }
+
+    /**
+     * Check that users enrolled with the instance still match the rule, see sync_instance().
+     *
+     * @param stdClass $instance enrol instance
+     * @param int      $since process only users changed since this timestamp, 0 means all users
+     *
+     * @return void
+     */
+    private function sync_instance_enrolled_users(stdClass $instance, $since) {
+        [$changedsql, $params] = $this->get_changed_users_sql($since);
+        $params['enrolid'] = $instance->id;
+
+        $sql = "SELECT u.*, ue.id AS ueid, ue.status AS uestatus
+                  FROM {user_enrolments} ue
+                  JOIN {user} u ON u.id = ue.userid
+                 WHERE ue.enrolid = :enrolid AND u.deleted = 0 AND u.id > :lastid
+                       $changedsql
+              ORDER BY u.id";
+        foreach ($this->get_users_in_batches($sql, $params) as $user) {
+            $userenrolment = (object)['id' => $user->ueid, 'enrolid' => $instance->id, 'userid' => $user->id,
+                                      'status' => $user->uestatus];
+            unset($user->ueid, $user->uestatus);
+            if (!is_siteadmin($user)) {
+                $this->sync_user_enrolment($instance, $user, $userenrolment);
+            }
+        }
+    }
+
+    /**
+     * Enrol users that meet the instance conditions and are not enrolled yet, see sync_instance().
+     *
+     * @param progress_trace $trace
+     * @param stdClass       $instance enrol instance
+     * @param int            $since process only users changed since this timestamp, 0 means all users
+     * @param int            $now current time
+     *
+     * @return int number of new enrolments
+     */
+    private function sync_instance_new_users(progress_trace $trace, stdClass $instance, $since, $now) {
+        global $CFG, $DB;
+
+        // Do not look for new users if instance is not accepting new enrolments.
+        if (
+            empty($instance->customint4) || ($instance->status != ENROL_INSTANCE_ENABLED) ||
+            (!empty($instance->enrolstartdate) && ($instance->enrolstartdate > $now)) ||
+            (!empty($instance->enrolenddate) && ($instance->enrolenddate < $now))
+        ) {
+            $trace->output('...new enrolments not allowed in this instance.', 1);
+            return 0;
+        }
+
+        $limit = (int)$instance->customint5;
+        $count = $DB->count_records('user_enrolments', ['enrolid' => $instance->id]);
+        if ($limit > 0 && $count >= $limit) {
+            $trace->output('...enrolment limit reached.', 1);
+            return 0;
+        }
+
+        // Exclude in the query as many users as possible that enrol_allowed() would refuse, so they are not checked one by one.
+        [$wheresql, $params] = $this->get_changed_users_sql($since);
+        $params += ['guestid' => $CFG->siteguest, 'enrolid' => $instance->id];
+        if (empty($instance->customint8)) {
+            // Users already enrolled with other methods are not enrolled.
+            [$enrolledsql, $enrolledparams] = get_enrolled_sql(context_course::instance($instance->courseid));
+            $wheresql .= " AND u.id NOT IN ($enrolledsql)";
+            $params += $enrolledparams;
+        }
+        if (!empty($instance->customint3)) {
+            // Do not enrol users that sync_expirations() would unenrol as inactive, they would be enrolled again on each run.
+            $wheresql .= " AND :now1 - u.lastaccess <= :longtimenosee1
+                           AND NOT EXISTS (SELECT 1
+                                             FROM {user_lastaccess} ul
+                                            WHERE ul.userid = u.id AND ul.courseid = :courseid
+                                                  AND :now2 - ul.timeaccess > :longtimenosee2)";
+            $params += ['now1' => $now, 'now2' => $now, 'courseid' => $instance->courseid,
+                        'longtimenosee1' => $instance->customint3, 'longtimenosee2' => $instance->customint3];
+        }
+
+        $sql = "SELECT u.*
+                  FROM {user} u
+                 WHERE u.deleted = 0 AND u.suspended = 0 AND u.confirmed = 1 AND u.id <> :guestid AND u.id > :lastid
+                       AND NOT EXISTS (SELECT 1
+                                         FROM {user_enrolments} ue
+                                        WHERE ue.userid = u.id AND ue.enrolid = :enrolid)
+                       $wheresql
+              ORDER BY u.id";
+        $enrolled = 0;
+        foreach ($this->get_users_in_batches($sql, $params) as $user) {
+            if (is_siteadmin($user)) {
+                continue;
+            }
+            try {
+                $isenrolled = $this->user_autoenrol($instance, $user);
+            } catch (moodle_exception $e) {
+                // User may have been enrolled at the same time on login, do not stop the whole synchronisation.
+                $trace->output("error enrolling user $user->id in course $instance->courseid: " . $e->getMessage(), 1);
+                continue;
+            }
+            if ($isenrolled) {
+                $enrolled++;
+                $count++;
+                $trace->output("enrolled user $user->id in course $instance->courseid", 1);
+                if ($limit > 0 && $count >= $limit) {
+                    $trace->output('...enrolment limit reached.', 1);
+                    break;
                 }
             }
         }
+
+        return $enrolled;
+    }
+
+    /**
+     * Return the SQL condition to select only users created, modified or logged in since given time.
+     *
+     * @param int $since timestamp, 0 means all users
+     *
+     * @return array SQL condition starting with AND (or empty) and its params
+     */
+    private function get_changed_users_sql($since) {
+        if (empty($since)) {
+            return ['', []];
+        }
+
+        return [
+            "AND (u.timecreated >= :since1 OR u.timemodified >= :since2 OR u.currentlogin >= :since3)",
+            ['since1' => $since, 'since2' => $since, 'since3' => $since],
+        ];
+    }
+
+    /**
+     * Iterate over the users returned by a query in batches of SYNC_BATCH_SIZE.
+     *
+     * No recordset stays open while enrolments are written and only one batch is kept in memory.
+     * The query must return user ids as first field, filter on u.id > :lastid and be ordered by u.id.
+     *
+     * @param string $sql
+     * @param array  $params
+     *
+     * @return \Generator of user records
+     */
+    private function get_users_in_batches($sql, array $params) {
+        global $DB;
+
+        $lastid = 0;
+        do {
+            $users = $DB->get_records_sql($sql, $params + ['lastid' => $lastid], 0, static::SYNC_BATCH_SIZE);
+            foreach ($users as $user) {
+                $lastid = $user->id;
+                yield $user;
+            }
+        } while (count($users) == static::SYNC_BATCH_SIZE);
     }
 
     /**
@@ -1165,6 +1390,10 @@ class enrol_autoenrol_plugin extends enrol_plugin {
 
         // Enrol When.
         $options = $this->get_enrolmethod_options();
+        if (!has_capability('enrol/autoenrol:method', $context) && (($instance->customint1 ?? null) != 3)) {
+            // Enrolment on meeting conditions requires the method capability.
+            unset($options[3]);
+        }
         $mform->addElement('select', 'customint1', get_string('method', 'enrol_autoenrol'), $options);
         if (!has_capability('enrol/autoenrol:method', $context)) {
             $mform->disabledIf('customint1', 'customchar3', 'eq', '-');
@@ -1184,6 +1413,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
         $mform->setDefault('customint6', $this->get_config('selfunenrol'));
         $mform->addHelpButton('customint6', 'selfunenrol', 'enrol_autoenrol');
         $mform->disabledIf('customint6', 'customint1', 'eq', '1');
+        $mform->disabledIf('customint6', 'customint1', 'eq', '3');
 
         // Enrol duration.
         $options = ['optional' => true, 'defaultunit' => 86400];
@@ -1314,6 +1544,10 @@ class enrol_autoenrol_plugin extends enrol_plugin {
         $validlongtimenosee = array_keys($this->get_longtimenosee_options());
         $validgroupon = array_keys($this->get_groupon_options());
         $validyesno = [0, 1];
+        // Only users with the method capability may switch an instance to enrolment on meeting conditions.
+        if (!has_capability('enrol/autoenrol:method', $context) && (($instance->customint1 ?? null) != 3)) {
+            $validenrolmethod = array_diff($validenrolmethod, [3]);
+        }
         $tovalidate = [
             'name' => PARAM_TEXT,
             'status' => $validstatus,
@@ -1400,6 +1634,7 @@ class enrol_autoenrol_plugin extends enrol_plugin {
         }
 
         $options[2] = get_string('m_confirmation', 'enrol_autoenrol');
+        $options[3] = get_string('m_conditions', 'enrol_autoenrol');
 
         return $options;
     }

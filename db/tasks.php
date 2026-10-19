@@ -45,6 +45,16 @@ $tasks = [
         'disabled' => 0,
     ],
     [
+        'classname' => '\enrol_autoenrol\task\enrol_matching_users',
+        'blocking' => 0,
+        'minute' => '*/15',
+        'hour' => '*',
+        'day' => '*',
+        'month' => '*',
+        'dayofweek' => '*',
+        'disabled' => 0,
+    ],
+    [
         'classname' => '\enrol_autoenrol\task\send_expiry_notifications',
         'blocking' => 0,
         'minute' => '*/10',
